@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="DEBUG">
+    <Appenders>
+        <!-- Console Appender -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5p %c{1}:%L - %m%n" />
+        </Console>
+
+        <!-- File Appender -->
+        <File name="File" fileName= "./logs/${sys:AppName}_${sys:Version}__${sys:current.date.time}_log.txt" append="true">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5p %c{1}:%L - %m%n" />
+        </File>
+    </Appenders>
+
+    <Loggers>
+        <!-- Application Logs -->
+        <Logger name="com.tasnetwork.calibration.energymeter" level="debug" additivity="false">
+            <AppenderRef ref="Console" />
+            <AppenderRef ref="File" />
+        </Logger>
+
+        <!-- Root Logger -->
+        <Root level="debug">
+            <AppenderRef ref="Console" />
+            <AppenderRef ref="File" />
+        </Root>
+    </Loggers>
+</Configuration>

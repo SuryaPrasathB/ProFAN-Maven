@@ -1,0 +1,55 @@
+/* Base button style */
+.button {
+    -fx-background-radius: 5;
+    -fx-padding: 10 20;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 5, 0.5, 0, 2);
+    -fx-cursor: hand;
+    -fx-background-color: transparent; /* Default transparent background */
+}
+
+/* Button hover effect */
+.button:hover {
+    -fx-background-color: derive(-fx-background-color, -10%); /* Darkens the original color */
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 8, 0.5, 0, 2);
+}
+
+/* Button pressed effect */
+.button:pressed {
+    -fx-background-color: derive(-fx-background-color, -20%); /* Darkens more */
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 5, 0.5, 0, 2);
+}
+
+/* Button color modifiers for different colors */
+
+/* Green button */
+.button.green {
+    -fx-background-color: rgb(106, 168, 79);
+}
+
+/* Blue button */
+.button.blue {
+    -fx-background-color: rgb(66, 133, 244);
+}
+
+/* Red button */
+.button.red {
+    -fx-background-color: rgb(244, 67, 54);
+}
+
+/* Yellow button */
+.button.yellow {
+    -fx-background-color: rgb(255, 193, 7);
+}
+
+/* Orange button */
+.button.orange {
+    -fx-background-color: rgb(255, 87, 34);
+}
+
+.blinking-cell {
+    -fx-background-color: yellow;
+    -fx-text-fill: black;
+    -fx-font-weight: bold;
+    -fx-border-color: orange;
+}
+

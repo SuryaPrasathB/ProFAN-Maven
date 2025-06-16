@@ -1,0 +1,1020 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane fx:id="AnchorPaneRunningStatus" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1080.0" prefWidth="1920.0" stylesheets="@../../config/style/application_W.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tasnetwork.calibration.energymeter.project.FanProjectExecuteController">
+   <TabPane prefHeight="1078.0" prefWidth="1918.0" tabClosingPolicy="UNAVAILABLE">
+     <tabs>
+       <Tab text="Execute">
+         <content>
+           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                  <children>
+                  
+                   <BorderPane prefHeight="1046.0" prefWidth="1919.0">
+                        <bottom>
+                          <HBox prefHeight="1050.0" prefWidth="1919.0" spacing="20" BorderPane.alignment="CENTER">
+                              <padding>
+                              <Insets bottom="10" left="10" right="10" top="10" />
+                           </padding>
+                           <TitledPane animated="false" collapsible="false" prefHeight="954.0" prefWidth="1795.0" text="Fan Testing">
+                             <content>
+                               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="874.0" prefWidth="1794.0">
+                                    <children>
+                                       <HBox prefHeight="934.0" prefWidth="1896.0">
+                                          <children>
+                                             <HBox prefHeight="1022.0" prefWidth="18.0" />
+                                                
+                                                      <VBox prefHeight="934.0" prefWidth="1846.0" spacing="20">
+                                                <HBox prefHeight="320.0" prefWidth="1738.0">
+                                                      <children>
+                                                         <Pane prefHeight="256.0" prefWidth="21.0" />
+                                                         <VBox prefHeight="320.0" prefWidth="354.0">
+                                                            <children>
+                                                            <GridPane prefHeight="102.0" prefWidth="323.0">
+                                                              <columnConstraints>
+                                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="195.733349609375" minWidth="10.0" prefWidth="103.60003509521485" />
+                                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="196.39996490478515" minWidth="10.0" prefWidth="196.39996490478515" />
+                                                              </columnConstraints>
+                                                              <rowConstraints>
+                                                                <RowConstraints maxHeight="79.99999237060547" minHeight="30.39999923706055" prefHeight="47.20001983642578" />
+                                                                  <RowConstraints maxHeight="144.7999694824219" minHeight="10.0" prefHeight="36.79999999999999" vgrow="SOMETIMES" />
+                                                                     <RowConstraints maxHeight="224.0000198364258" minHeight="0.0" prefHeight="0.0" vgrow="SOMETIMES" />
+                                                              </rowConstraints>
+                                                               <children>
+                                                                     <ComboBox fx:id="cmbBxModelName" prefWidth="200" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                                                        <GridPane.margin>
+                                                                           <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                                        </GridPane.margin>
+                                                                     </ComboBox>
+                                                                     <Label text="Select Model:" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
+                                                                  <TextField fx:id="txtNewFanSerialNo" GridPane.columnIndex="1">
+                                                                        <GridPane.margin>
+                                                                           <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                                        </GridPane.margin>
+                                                                     </TextField>
+                                                                     <Label text="Fan serial no:" GridPane.halignment="CENTER" />
+                                                                     <ProgressBar fx:id="progressBarTestPoint" prefWidth="200.0" progress="0.0" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                                     <Label text="Test Point Progress:" visible="false" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
+                                                               </children>
+                                                            </GridPane>
+                                                            </children>
+                                                         </VBox>
+                                                         <Pane prefHeight="256.0" prefWidth="21.0" />
+                                                         <TitledPane animated="false" collapsible="false" prefHeight="320.0" prefWidth="320.0" style="-fx-border-color: black; -fx-border-width: 1;" text="Controls">
+                                                            <content>
+                                                               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                                                  <children>
+                                                                     <GridPane layoutX="-2.0" layoutY="20.0" prefHeight="250.0" prefWidth="310.0">
+                                                                        <columnConstraints>
+                                                                           <ColumnConstraints hgrow="SOMETIMES" maxWidth="150.0" minWidth="10.0" prefWidth="150.0" />
+                                                                           <ColumnConstraints hgrow="SOMETIMES" maxWidth="110.0" minWidth="10.0" prefWidth="110.0" />
+                                                                           <ColumnConstraints hgrow="SOMETIMES" maxWidth="60.0" minWidth="10.0" prefWidth="40.0" />
+                                                                        </columnConstraints>
+                                                                        <rowConstraints>
+                                                                           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                        </rowConstraints>
+                                                                        <children>
+                                                                           <Button fx:id="btnDimmerForwardExecute" mnemonicParsing="false" onAction="#btnDimmerForwardOnClick" prefHeight="26.0" prefWidth="322.0" text="Forward">
+                                                                              <GridPane.margin>
+                                                                                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                                              </GridPane.margin>
+                                                                           </Button>
+                                                                           <TextField fx:id="txtForwardInMsecExecute" alignment="CENTER" promptText="*100" GridPane.columnIndex="1">
+                                                                              <GridPane.margin>
+                                                                                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                                              </GridPane.margin>
+                                                                           </TextField>
+                                                                           <Label alignment="CENTER" prefHeight="18.0" prefWidth="66.0" text="ms" GridPane.columnIndex="2" GridPane.halignment="CENTER" />
+                                                                           <Button fx:id="btnDimmerReverseExecute" mnemonicParsing="false" onAction="#btnDimmerReverseOnClick" prefHeight="26.0" prefWidth="284.0" text="Reverse" GridPane.rowIndex="1">
+                                                                              <GridPane.margin>
+                                                                                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                                              </GridPane.margin>
+                                                                           </Button>
+                                                                           <TextField fx:id="txtReverseInMsecExecute" alignment="CENTER" promptText="*100" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                                                              <GridPane.margin>
+                                                                                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                                              </GridPane.margin>
+                                                                           </TextField>
+                                                                           <Label alignment="CENTER" prefHeight="18.0" prefWidth="66.0" text="ms" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
+                                                                           <Button fx:id="btnDimmerSetMinExecute" mnemonicParsing="false" onAction="#btnDimmerSetMinOnClick" prefHeight="26.0" prefWidth="334.0" text="Set Min" GridPane.rowIndex="2">
+                                                                              <GridPane.margin>
+                                                                                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                                              </GridPane.margin>
+                                                                           </Button>
+                                                                           <Button fx:id="btnDimmerIsMinExecute" mnemonicParsing="false" onAction="#btnDimmerIsMinOnClick" prefHeight="26.0" prefWidth="108.0" style="-fx-background-color: green;" text="Is Min ?" textFill="WHITE" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                                                              <GridPane.margin>
+                                                                                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                                              </GridPane.margin>
+                                                                           </Button>
+                                                                           <Button fx:id="btnTestVoltageExecute" mnemonicParsing="false" onAction="#btnTestVoltageOnClick" prefHeight="26.0" prefWidth="299.0" text="Test Voltage" GridPane.rowIndex="4">
+                                                                              <GridPane.margin>
+                                                                                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                                              </GridPane.margin>
+                                                                           </Button>
+                                                                           <Button fx:id="btnSetVoltageExecute" mnemonicParsing="false" onAction="#btnSetVoltageOnClick" prefHeight="26.0" prefWidth="298.0" text="Set Voltage" GridPane.rowIndex="5">
+                                                                              <GridPane.margin>
+                                                                                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                                              </GridPane.margin>
+                                                                           </Button>
+                                                                           <Button fx:id="btnMaintainVoltageExecute" mnemonicParsing="false" onAction="#btnMaintainVoltageOnClick" prefHeight="26.0" prefWidth="417.0" text="Maintain" GridPane.rowIndex="6">
+                                                                              <GridPane.margin>
+                                                                                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                                              </GridPane.margin>
+                                                                           </Button>
+                                                                           <TextField fx:id="txtTestVoltageExecute" alignment="CENTER" text="240" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                                                                              <GridPane.margin>
+                                                                                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                                              </GridPane.margin>
+                                                                           </TextField>
+                                                                           <TextField fx:id="txtSetVoltageExecute" alignment="CENTER" text="240" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                                                                              <GridPane.margin>
+                                                                                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                                              </GridPane.margin>
+                                                                           </TextField>
+                                                                           <Label alignment="CENTER" prefHeight="18.0" prefWidth="66.0" text="V" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+                                                                           <Label alignment="CENTER" prefHeight="18.0" prefWidth="66.0" text="V" GridPane.columnIndex="2" GridPane.rowIndex="5" />
+                                                                        </children>
+                                                                     </GridPane>
+                                                                  </children>
+                                                               </AnchorPane>
+                                                            </content>
+                                                         </TitledPane>
+                                                         <Pane prefHeight="256.0" prefWidth="21.0" />
+                                                         <TitledPane animated="false" collapsible="false" prefHeight="320.0" prefWidth="320.0" style="-fx-border-color: black; -fx-border-width: 1;" text="Fan">
+                                                            <content>
+                                                               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                                                  <children>
+                                                                     <GridPane layoutY="45.0" prefHeight="94.0" prefWidth="310.0">
+                                                                        <columnConstraints>
+                                                                           <ColumnConstraints hgrow="SOMETIMES" maxWidth="150.0" minWidth="10.0" prefWidth="150.0" />
+                                                                           <ColumnConstraints hgrow="SOMETIMES" maxWidth="140.0" minWidth="10.0" prefWidth="140.0" />
+                                                                           <ColumnConstraints hgrow="SOMETIMES" maxWidth="40.0" minWidth="10.0" prefWidth="40.0" />
+                                                                        </columnConstraints>
+                                                                        <rowConstraints>
+                                                                           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                        </rowConstraints>
+                                                                        <children>
+                                                                           <Button fx:id="btnFanRpmExecute" mnemonicParsing="false" onAction="#btnFanRpmOnClick" prefHeight="26.0" prefWidth="108.0" text="RPM">
+                                                                              <GridPane.margin>
+                                                                                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                                              </GridPane.margin>
+                                                                           </Button>
+                                                                           <TextField fx:id="txtFanRpmExecute" alignment="CENTER" editable="false" focusTraversable="false" GridPane.columnIndex="1">
+                                                                              <GridPane.margin>
+                                                                                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                                              </GridPane.margin>
+                                                                           </TextField>
+                                                                           <Label alignment="CENTER" prefHeight="18.0" prefWidth="66.0" text="rpm" GridPane.columnIndex="2" GridPane.halignment="CENTER" />
+                                                                           <Button fx:id="btnFanWindspeedExecute" mnemonicParsing="false" onAction="#btnFanWindspeedOnClick" prefHeight="26.0" prefWidth="108.0" text="WIND SPEED" GridPane.rowIndex="1">
+                                                                              <GridPane.margin>
+                                                                                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                                              </GridPane.margin>
+                                                                           </Button>
+                                                                           <TextField fx:id="txtFanWindSpeedExecute" alignment="CENTER" editable="false" focusTraversable="false" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                                                              <GridPane.margin>
+                                                                                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                                              </GridPane.margin>
+                                                                           </TextField>
+                                                                           <Label alignment="CENTER" prefHeight="18.0" prefWidth="66.0" text="m/s" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                                                        </children>
+                                                                     </GridPane>
+                                                                     <ToggleButton fx:id="toggle_AutoFanExecute" layoutX="186.0" layoutY="11.0" mnemonicParsing="false" text="AUTO" />
+                                                                     <Label layoutX="54.0" layoutY="15.0" text="Real time Update ?" />
+                                                                     <ProgressIndicator fx:id="pi_AutoFan1" layoutX="287.0" layoutY="16.0" prefHeight="16.0" prefWidth="16.0" visible="false" />
+                                                                  </children>
+                                                               </AnchorPane>
+                                                            </content>
+                                                         </TitledPane>
+                                                         <Pane prefHeight="256.0" prefWidth="21.0" />
+                                                         <AnchorPane fx:id="dynamicContentPane" prefHeight="272.0" prefWidth="700.0" />
+                                                         <Pane prefHeight="256.0" prefWidth="21.0" />
+                                                      </children>
+                                                   </HBox>
+                                                <TableView fx:id="tvTestSetup" prefHeight="387.0" prefWidth="1705.0">
+                                                   <columns>
+                                                         <TableColumn fx:id="colTestSetupSerialNo" prefWidth="60.0" resizable="false" text="S.No" />
+                                                         <TableColumn fx:id="colTestSetupStatus" prefWidth="100.0" resizable="false" text="Status" />
+                                                         <TableColumn fx:id="colTestSetupTestPointName" prefWidth="200.0" resizable="false" text="Test Name" />
+                                                         <TableColumn fx:id="colTestSetupTargetVoltage" prefWidth="150.0" resizable="false" text="Target Voltage" />
+                                                         <TableColumn fx:id="colTestSetupTimeInSec" prefWidth="150.0" resizable="false" text="Setup Time in Sec" />
+                                                         <TableColumn fx:id="colTestSetupRpmActual" prefWidth="150.0" resizable="false" text="Actual Rpm" />
+                                                      <TableColumn fx:id="colTestSetupCurrentActual" minWidth="0.0" prefWidth="160.0" resizable="false" text="Actual Current" />
+                                                         <TableColumn fx:id="colTestSetupWattsActual" minWidth="0.0" prefWidth="160.0" resizable="false" text="Actual Watts" />
+                                                         <TableColumn fx:id="colTestSetupActivePowerActual" prefWidth="160.0" resizable="false" text="Actual VA" />
+                                                         <TableColumn fx:id="colTestSetupPfActual" prefWidth="160.0" resizable="false" text="Actual Pf" />
+                                                         <TableColumn fx:id="colTestSetupWindSpeedActual" prefWidth="160.0" resizable="false" text="Actual Wind Speed" />
+                                                         <TableColumn fx:id="colTestSetupProgress" prefWidth="120.0" resizable="false" text="Progress" />
+                                                   </columns>
+                                                </TableView>
+                                                <GridPane prefHeight="37.0" prefWidth="1738.0">
+                                                  <columnConstraints>
+                                                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                  </columnConstraints>
+                                                  <rowConstraints>
+                                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                  </rowConstraints>
+                                                      <children>
+                                                         <Button fx:id="btnTestPointStart" mnemonicParsing="false" onAction="#btnTestPointStartOnClick" prefHeight="213.0" prefWidth="291.0" style="-fx-background-color: lightgrey;" stylesheets="@../../static/styles.css" text="START" textFill="#3e3e3e" GridPane.columnIndex="1">
+                                                            <GridPane.margin>
+                                                               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                            </GridPane.margin>
+                                                            <padding>
+                                                               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                            </padding>
+                                                            <cursor>
+                                                               <Cursor fx:constant="OPEN_HAND" />
+                                                            </cursor>
+                                                            <font>
+                                                               <Font name="System Bold" size="12.0" />
+                                                            </font>
+                                                         </Button>
+                                                         <Button fx:id="btnTestPointResume" mnemonicParsing="false" onAction="#btnTestPointResumeOnClick" prefHeight="176.0" prefWidth="291.0" style="-fx-background-color: lightgrey;" stylesheets="@../../static/styles.css" text="RESUME" GridPane.columnIndex="2">
+                                                            <GridPane.margin>
+                                                               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                            </GridPane.margin>
+                                                            <padding>
+                                                               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                            </padding>
+                                                            <font>
+                                                               <Font name="System Bold" size="12.0" />
+                                                            </font>
+                                                         </Button>
+                                                         <Button fx:id="btnTestPointStepRun" mnemonicParsing="false" onAction="#btnTestPointStepRunOnClick" prefHeight="203.0" prefWidth="291.0" style="-fx-background-color: lightgrey;" stylesheets="@../../static/styles.css" text="STEP RUN" GridPane.columnIndex="3">
+                                                            <GridPane.margin>
+                                                               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                            </GridPane.margin>
+                                                            <padding>
+                                                               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                            </padding>
+                                                            <font>
+                                                               <Font name="System Bold" size="12.0" />
+                                                            </font>
+                                                         </Button>
+                                                         <Button fx:id="btnTestPointCloseProject" mnemonicParsing="false" onAction="#btnTestPointCloseProjectOnClick" prefHeight="132.0" prefWidth="291.0" style="-fx-background-color: lightgrey;" stylesheets="@../../static/styles.css" text="CLOSE PROJECT" GridPane.columnIndex="5">
+                                                            <GridPane.margin>
+                                                               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                            </GridPane.margin>
+                                                            <padding>
+                                                               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                            </padding>
+                                                            <font>
+                                                               <Font name="System Bold" size="12.0" />
+                                                            </font>
+                                                         </Button>
+                                                         <Button fx:id="btnTestPointStop" mnemonicParsing="false" onAction="#btnTestPointStopOnClick" prefHeight="170.0" prefWidth="291.0" style="-fx-background-color: lightgrey;" stylesheets="@../../static/styles.css" text="STOP" GridPane.columnIndex="4">
+                                                            <GridPane.margin>
+                                                               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                            </GridPane.margin>
+                                                            <padding>
+                                                               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                            </padding>
+                                                            <font>
+                                                               <Font name="System Bold" size="12.0" />
+                                                            </font>
+                                                         </Button>
+                                                         <Button fx:id="saveButton" mnemonicParsing="false" onAction="#btnSaveOnClick" prefHeight="132.0" prefWidth="291.0" style="-fx-background-color: lightgrey;" stylesheets="@../../static/styles.css" text="SAVE" visible="false">
+                                                            <padding>
+                                                               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                            </padding>
+                                                            <font>
+                                                               <Font name="System Bold" size="12.0" />
+                                                            </font>
+                                                            <GridPane.margin>
+                                                               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                            </GridPane.margin>
+                                                         </Button>
+                                                      </children>
+                                                </GridPane>
+                                                   <HBox prefHeight="100.0" prefWidth="1734.0">
+                                                      <children>
+                                                         <Pane prefHeight="100.0" prefWidth="20.0" />
+                                                         <ListView fx:id="listViewLogs" prefHeight="82.0" prefWidth="690.0" style="-fx-background-color: white; -fx-border-color: black; -fx-border-width: 2;" />
+                                                         <Pane prefHeight="82.0" prefWidth="263.0" />
+                                                         <TextArea fx:id="textAreaLogs" editable="false" maxHeight="-Infinity" prefHeight="78.0" prefWidth="600.0" promptText="LOGS" style="-fx-border-color: black; -fx-background-color: white;" wrapText="true" />
+                                                         <Pane prefHeight="100.0" prefWidth="20.0" />
+                                                      </children>
+                                                   </HBox>
+                                                </VBox>
+                                                <HBox prefHeight="894.0" prefWidth="273.0" />
+                                          </children>
+                                       </HBox>
+                                    </children>
+                                 </AnchorPane>
+                             </content>
+                           </TitledPane>
+                          </HBox>
+                        </bottom>
+                  </BorderPane>
+                  </children>
+               </AnchorPane>
+         </content>
+       </Tab>
+       <Tab disable="true" text="Debug">
+         <content>
+           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                  <children>
+                     <VBox layoutX="106.0" layoutY="53.0" prefHeight="1014.0" prefWidth="1854.0">
+                        <children>
+                           <Pane prefHeight="12.0" prefWidth="1550.0" />
+                           <HBox prefHeight="320.0" prefWidth="1550.0">
+                              <children>
+                                 <Pane prefHeight="320.0" prefWidth="25.0" />
+                                 <TitledPane animated="false" collapsible="false" prefHeight="320.0" prefWidth="320.0" style="-fx-border-color: black; -fx-border-width: 1;" text="Controls">
+                                   <content>
+                                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                          <children>
+                                             <GridPane layoutX="-2.0" layoutY="20.0" prefHeight="250.0" prefWidth="310.0">
+                                               <columnConstraints>
+                                                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="150.0" minWidth="10.0" prefWidth="150.0" />
+                                                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="110.0" minWidth="10.0" prefWidth="110.0" />
+                                                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="60.0" minWidth="10.0" prefWidth="40.0" />
+                                               </columnConstraints>
+                                               <rowConstraints>
+                                                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                               </rowConstraints>
+                                                <children>
+                                                   <Button fx:id="btnDimmerForward" mnemonicParsing="false" onAction="#btnDimmerForwardOnClick" prefHeight="26.0" prefWidth="322.0" text="Forward">
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </Button>
+                                                   <TextField fx:id="txtForwardInMsec" alignment="CENTER" promptText="*100" GridPane.columnIndex="1">
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </TextField>
+                                                   <Label alignment="CENTER" prefHeight="18.0" prefWidth="66.0" text="ms" GridPane.columnIndex="2" GridPane.halignment="CENTER" />
+                                                   <Button fx:id="btnDimmerReverse" mnemonicParsing="false" onAction="#btnDimmerReverseOnClick" prefHeight="26.0" prefWidth="284.0" text="Reverse" GridPane.rowIndex="1">
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </Button>
+                                                   <TextField fx:id="txtReverseInMsec" alignment="CENTER" promptText="*100" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </TextField>
+                                                   <Label alignment="CENTER" prefHeight="18.0" prefWidth="66.0" text="ms" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
+                                                   <Button fx:id="btnDimmerSetMin" mnemonicParsing="false" onAction="#btnDimmerSetMinOnClick" prefHeight="26.0" prefWidth="334.0" text="Set Min" GridPane.rowIndex="2">
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </Button>
+                                                   <Button fx:id="btnDimmerIsMin" mnemonicParsing="false" onAction="#btnDimmerIsMinOnClick" prefHeight="26.0" prefWidth="108.0" style="-fx-background-color: green;" text="Is Min ?" textFill="WHITE" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </Button>
+                                                   <Button fx:id="btnTestVoltage" mnemonicParsing="false" onAction="#btnTestVoltageOnClick" prefHeight="26.0" prefWidth="299.0" text="Test Voltage" GridPane.rowIndex="4">
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </Button>
+                                                   <Button fx:id="btnSetVoltage" mnemonicParsing="false" onAction="#btnSetVoltageOnClick" prefHeight="26.0" prefWidth="298.0" text="Set Voltage" GridPane.rowIndex="5">
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </Button>
+                                                   <Button fx:id="btnMaintainVoltage" mnemonicParsing="false" onAction="#btnMaintainVoltageOnClick" prefHeight="26.0" prefWidth="417.0" text="Maintain" GridPane.rowIndex="6">
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </Button>
+                                                   <TextField fx:id="txtTestVoltage" alignment="CENTER" text="240" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </TextField>
+                                                   <TextField fx:id="txtSetVoltage" alignment="CENTER" text="240" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </TextField>
+                                                   <Label alignment="CENTER" prefHeight="18.0" prefWidth="66.0" text="V" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+                                                   <Label alignment="CENTER" prefHeight="18.0" prefWidth="66.0" text="V" GridPane.columnIndex="2" GridPane.rowIndex="5" />
+                                                </children>
+                                             </GridPane>
+                                          </children>
+                                       </AnchorPane>
+                                   </content>
+                                 </TitledPane>
+                                 <Pane prefHeight="320.0" prefWidth="25.0" />
+                                 <TitledPane animated="false" collapsible="false" prefHeight="320.0" prefWidth="320.0" style="-fx-background-color: black; -fx-border-color: red; -fx-border-width: 1;" text="R Phase Readings" textFill="RED">
+                                    <content>
+                                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                          <children>
+                                             <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#ff1f1f" height="294.0" layoutX="-1.0" layoutY="-2.0" opacity="0.5" stroke="BLACK" strokeType="INSIDE" width="319.0" />
+                                             <GridPane layoutY="46.0" prefHeight="242.0" prefWidth="310.0">
+                                                <columnConstraints>
+                                                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="150.0" minWidth="10.0" prefWidth="150.0" />
+                                                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="140.0" minWidth="10.0" prefWidth="140.0" />
+                                                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="40.0" minWidth="10.0" prefWidth="40.0" />
+                                                </columnConstraints>
+                                                <rowConstraints>
+                                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                </rowConstraints>
+                                                <children>
+                                                   <Button fx:id="btnRPhaseVoltage" mnemonicParsing="false" onAction="#btnRPhaseVoltageOnClick" prefHeight="90.0" prefWidth="108.0" text="VOLTAGE">
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </Button>
+                                                   <Button fx:id="btnRPhaseCurrent" mnemonicParsing="false" onAction="#btnRPhaseCurrentOnClick" prefHeight="81.0" prefWidth="108.0" text="CURRENT" GridPane.rowIndex="1">
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </Button>
+                                                   <Button fx:id="btnRPhaseWatts" mnemonicParsing="false" onAction="#btnRPhaseWattsOnClick" prefHeight="59.0" prefWidth="108.0" text="WATTS" GridPane.rowIndex="2">
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </Button>
+                                                   <Button fx:id="btnRPhaseVA" mnemonicParsing="false" onAction="#btnRPhaseVAOnClick" prefHeight="61.0" prefWidth="108.0" text="VA" GridPane.rowIndex="3">
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </Button>
+                                                   <Button fx:id="btnRPhasePF" mnemonicParsing="false" onAction="#btnRPhasePFOnClick" prefHeight="68.0" prefWidth="108.0" text="PF" GridPane.rowIndex="4">
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </Button>
+                                                   <TextField fx:id="txtRPhaseVoltage" editable="false" focusTraversable="false" GridPane.columnIndex="1">
+                                                      <opaqueInsets>
+                                                         <Insets />
+                                                      </opaqueInsets>
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </TextField>
+                                                   <TextField fx:id="txtRPhaseCurrent" editable="false" focusTraversable="false" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                                      <opaqueInsets>
+                                                         <Insets />
+                                                      </opaqueInsets>
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </TextField>
+                                                   <TextField fx:id="txtRPhaseWatts" editable="false" focusTraversable="false" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                                      <opaqueInsets>
+                                                         <Insets />
+                                                      </opaqueInsets>
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </TextField>
+                                                   <TextField fx:id="txtRPhaseVA" editable="false" focusTraversable="false" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                                                      <opaqueInsets>
+                                                         <Insets />
+                                                      </opaqueInsets>
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </TextField>
+                                                   <TextField fx:id="txtRPhasePF" editable="false" focusTraversable="false" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                                                      <opaqueInsets>
+                                                         <Insets />
+                                                      </opaqueInsets>
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </TextField>
+                                                   <Label alignment="CENTER" prefHeight="18.0" prefWidth="66.0" text="V" GridPane.columnIndex="2" />
+                                                   <Label alignment="CENTER" prefHeight="18.0" prefWidth="66.0" text="A" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                                   <Label alignment="CENTER" prefHeight="18.0" prefWidth="66.0" text="W" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                                                   <Label alignment="CENTER" prefHeight="18.0" prefWidth="66.0" text="VA" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                                                   <Label alignment="CENTER" prefHeight="18.0" prefWidth="66.0" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+                                                </children>
+                                             </GridPane>
+                                             <Label layoutX="54.0" layoutY="18.0" text="Real time Update ?" />
+                                             <ToggleButton fx:id="toggle_AutoRPhase" layoutX="196.0" layoutY="14.0" mnemonicParsing="false" text="AUTO" />
+                                             <ProgressIndicator fx:id="pi_AutoRPhase" layoutX="287.0" layoutY="19.0" prefHeight="16.0" prefWidth="16.0" visible="false" />
+                                          </children>
+                                       </AnchorPane>
+                                    </content>
+                                    <font>
+                                       <Font name="System Bold" size="12.0" />
+                                    </font>
+                                 </TitledPane>
+                                 <Pane prefHeight="320.0" prefWidth="25.0" />
+                                 <TitledPane animated="false" collapsible="false" prefHeight="320.0" prefWidth="320.0" style="-fx-border-color: yellow; -fx-border-width: 1;" text="Y Phase Readings" textFill="#fdc500">
+                                    <content>
+                                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                          <children>
+                                             <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#ecff21" height="294.0" opacity="0.5" stroke="BLACK" strokeType="INSIDE" width="319.0" />
+                                             <GridPane layoutY="46.0" prefHeight="242.0" prefWidth="310.0">
+                                                <columnConstraints>
+                                                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="150.0" minWidth="10.0" prefWidth="150.0" />
+                                                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="140.0" minWidth="10.0" prefWidth="140.0" />
+                                                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="40.0" minWidth="10.0" prefWidth="40.0" />
+                                                </columnConstraints>
+                                                <rowConstraints>
+                                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                </rowConstraints>
+                                                <children>
+                                                   <Button fx:id="btnYPhaseVoltage" mnemonicParsing="false" onAction="#btnYPhaseVoltageOnClick" prefHeight="90.0" prefWidth="108.0" text="VOLTAGE">
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </Button>
+                                                   <Button fx:id="btnYPhaseCurrent" mnemonicParsing="false" onAction="#btnYPhaseCurrentOnClick" prefHeight="81.0" prefWidth="108.0" text="CURRENT" GridPane.rowIndex="1">
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </Button>
+                                                   <Button fx:id="btnYPhaseWatts" mnemonicParsing="false" onAction="#btnYPhaseWattsOnClick" prefHeight="59.0" prefWidth="108.0" text="WATTS" GridPane.rowIndex="2">
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </Button>
+                                                   <Button fx:id="btnYPhaseVA" mnemonicParsing="false" onAction="#btnYPhaseVAOnClick" prefHeight="61.0" prefWidth="108.0" text="VA" GridPane.rowIndex="3">
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </Button>
+                                                   <Button fx:id="btnYPhasePF" mnemonicParsing="false" onAction="#btnYPhasePFOnClick" prefHeight="68.0" prefWidth="108.0" text="PF" GridPane.rowIndex="4">
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </Button>
+                                                   <TextField fx:id="txtYPhaseVoltage" editable="false" focusTraversable="false" GridPane.columnIndex="1">
+                                                      <opaqueInsets>
+                                                         <Insets />
+                                                      </opaqueInsets>
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </TextField>
+                                                   <TextField fx:id="txtYPhaseCurrent" editable="false" focusTraversable="false" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                                      <opaqueInsets>
+                                                         <Insets />
+                                                      </opaqueInsets>
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </TextField>
+                                                   <TextField fx:id="txtYPhaseWatts" editable="false" focusTraversable="false" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                                      <opaqueInsets>
+                                                         <Insets />
+                                                      </opaqueInsets>
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </TextField>
+                                                   <TextField fx:id="txtYPhaseVA" editable="false" focusTraversable="false" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                                                      <opaqueInsets>
+                                                         <Insets />
+                                                      </opaqueInsets>
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </TextField>
+                                                   <TextField fx:id="txtYPhasePF" editable="false" focusTraversable="false" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                                                      <opaqueInsets>
+                                                         <Insets />
+                                                      </opaqueInsets>
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </TextField>
+                                                   <Label alignment="CENTER" prefHeight="18.0" prefWidth="66.0" text="V" GridPane.columnIndex="2" />
+                                                   <Label alignment="CENTER" prefHeight="18.0" prefWidth="66.0" text="A" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                                   <Label alignment="CENTER" prefHeight="18.0" prefWidth="66.0" text="W" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                                                   <Label alignment="CENTER" prefHeight="18.0" prefWidth="66.0" text="VA" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                                                </children>
+                                             </GridPane>
+                                             <Label layoutX="44.0" layoutY="18.0" text="Real time Update ?" />
+                                             <ToggleButton fx:id="toggle_AutoYPhase" layoutX="186.0" layoutY="14.0" mnemonicParsing="false" text="AUTO" />
+                                             <ProgressIndicator fx:id="pi_AutoYPhase" layoutX="287.0" layoutY="19.0" prefHeight="16.0" prefWidth="16.0" visible="false" />
+                                          </children>
+                                       </AnchorPane>
+                                    </content>
+                                    <font>
+                                       <Font name="System Bold" size="12.0" />
+                                    </font>
+                                 </TitledPane>
+                                 <Pane prefHeight="320.0" prefWidth="25.0" />
+                                 <TitledPane animated="false" collapsible="false" prefHeight="320.0" prefWidth="320.0" style="-fx-background-color: #ffb800; -fx-border-color: #246EB9; -fx-border-width: 1;" text="B Phase Readings" textFill="#0090fc">
+                                    <content>
+                                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                          <children>
+                                             <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#21c8ff" height="294.0" opacity="0.5" stroke="BLACK" strokeType="INSIDE" width="319.0" />
+                                             <GridPane layoutY="46.0" prefHeight="242.0" prefWidth="310.0">
+                                                <columnConstraints>
+                                                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="150.0" minWidth="10.0" prefWidth="150.0" />
+                                                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="140.0" minWidth="10.0" prefWidth="140.0" />
+                                                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="40.0" minWidth="10.0" prefWidth="40.0" />
+                                                </columnConstraints>
+                                                <rowConstraints>
+                                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                </rowConstraints>
+                                                <children>
+                                                   <Button fx:id="btnBPhaseVoltage" mnemonicParsing="false" onAction="#btnBPhaseVoltageOnClick" prefHeight="90.0" prefWidth="108.0" text="VOLTAGE">
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </Button>
+                                                   <Button fx:id="btnBPhaseCurrent" mnemonicParsing="false" onAction="#btnBPhaseCurrentOnClick" prefHeight="81.0" prefWidth="108.0" text="CURRENT" GridPane.rowIndex="1">
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </Button>
+                                                   <Button fx:id="btnBPhaseWatts" mnemonicParsing="false" onAction="#btnBPhaseWattsOnClick" prefHeight="59.0" prefWidth="108.0" text="WATTS" GridPane.rowIndex="2">
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </Button>
+                                                   <Button fx:id="btnBPhaseVA" mnemonicParsing="false" onAction="#btnBPhaseVAOnClick" prefHeight="61.0" prefWidth="108.0" text="VA" GridPane.rowIndex="3">
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </Button>
+                                                   <Button fx:id="btnBPhasePF" mnemonicParsing="false" onAction="#btnBPhasePFOnClick" prefHeight="68.0" prefWidth="108.0" text="PF" GridPane.rowIndex="4">
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </Button>
+                                                   <TextField fx:id="txtBPhaseVoltage" editable="false" focusTraversable="false" GridPane.columnIndex="1">
+                                                      <opaqueInsets>
+                                                         <Insets />
+                                                      </opaqueInsets>
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </TextField>
+                                                   <TextField fx:id="txtBPhaseCurrent" editable="false" focusTraversable="false" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                                      <opaqueInsets>
+                                                         <Insets />
+                                                      </opaqueInsets>
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </TextField>
+                                                   <TextField fx:id="txtBPhaseWatts" editable="false" focusTraversable="false" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                                      <opaqueInsets>
+                                                         <Insets />
+                                                      </opaqueInsets>
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </TextField>
+                                                   <TextField fx:id="txtBPhaseVA" editable="false" focusTraversable="false" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                                                      <opaqueInsets>
+                                                         <Insets />
+                                                      </opaqueInsets>
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </TextField>
+                                                   <TextField fx:id="txtBPhasePF" editable="false" focusTraversable="false" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                                                      <opaqueInsets>
+                                                         <Insets />
+                                                      </opaqueInsets>
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </TextField>
+                                                   <Label alignment="CENTER" prefHeight="18.0" prefWidth="66.0" text="V" GridPane.columnIndex="2" />
+                                                   <Label alignment="CENTER" prefHeight="18.0" prefWidth="66.0" text="A" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                                   <Label alignment="CENTER" prefHeight="18.0" prefWidth="66.0" text="W" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                                                   <Label alignment="CENTER" prefHeight="18.0" prefWidth="66.0" text="VA" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                                                </children>
+                                             </GridPane>
+                                             <Label layoutX="44.0" layoutY="18.0" text="Real time Update ?" />
+                                             <ToggleButton fx:id="toggle_AutoBPhase" layoutX="185.0" layoutY="14.0" mnemonicParsing="false" text="AUTO" />
+                                             <ProgressIndicator fx:id="pi_AutoBPhase" layoutX="287.0" layoutY="19.0" prefHeight="16.0" prefWidth="16.0" visible="false" />
+                                          </children>
+                                       </AnchorPane>
+                                    </content>
+                                    <font>
+                                       <Font name="System Bold" size="12.0" />
+                                    </font>
+                                 </TitledPane>
+                                 <Pane prefHeight="320.0" prefWidth="25.0" />
+                              </children>
+                           </HBox>
+                           <Pane prefHeight="12.0" prefWidth="1550.0" />
+                           <HBox prefHeight="320.0" prefWidth="1736.0">
+                              <children>
+                                 <Pane prefHeight="320.0" prefWidth="25.0" />
+                                 <VBox prefHeight="320.0" prefWidth="322.0">
+                                    <children>
+                                       <GridPane prefHeight="104.0" prefWidth="322.0">
+                                         <columnConstraints>
+                                           <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                           <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                         </columnConstraints>
+                                         <rowConstraints>
+                                           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                         </rowConstraints>
+                                          <children>
+                                             <Button fx:id="btnStart" mnemonicParsing="false" onAction="#btnStartOnClick" prefHeight="32.0" prefWidth="151.0" style="-fx-background-color: green;" text="START" textFill="WHITE" GridPane.halignment="CENTER" GridPane.valignment="TOP">
+                                                <font>
+                                                   <Font name="System Bold" size="12.0" />
+                                                </font>
+                                                <GridPane.margin>
+                                                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                </GridPane.margin>
+                                                <opaqueInsets>
+                                                   <Insets />
+                                                </opaqueInsets>
+                                             </Button>
+                                             <Button fx:id="btnStop" mnemonicParsing="false" onAction="#btnStopOnClick" prefHeight="32.0" prefWidth="151.0" style="-fx-background-color: rgb(247, 0, 0);" text="STOP" textFill="WHITE" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="TOP">
+                                                <font>
+                                                   <Font name="System Bold" size="12.0" />
+                                                </font>
+                                                <GridPane.margin>
+                                                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                </GridPane.margin>
+                                             </Button>
+                                          </children>
+                                       </GridPane>
+                                       <TitledPane animated="false" collapsible="false" prefHeight="320.0" prefWidth="320.0" style="-fx-border-color: black; -fx-border-width: 1;" text="Fan">
+                                          <content>
+                                             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                                <children>
+                                                   <GridPane layoutY="45.0" prefHeight="94.0" prefWidth="310.0">
+                                                      <columnConstraints>
+                                                         <ColumnConstraints hgrow="SOMETIMES" maxWidth="150.0" minWidth="10.0" prefWidth="150.0" />
+                                                         <ColumnConstraints hgrow="SOMETIMES" maxWidth="140.0" minWidth="10.0" prefWidth="140.0" />
+                                                         <ColumnConstraints hgrow="SOMETIMES" maxWidth="40.0" minWidth="10.0" prefWidth="40.0" />
+                                                      </columnConstraints>
+                                                      <rowConstraints>
+                                                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      </rowConstraints>
+                                                      <children>
+                                                         <Button fx:id="btnFanRpm" mnemonicParsing="false" onAction="#btnFanRpmOnClick" prefHeight="26.0" prefWidth="108.0" text="RPM">
+                                                            <GridPane.margin>
+                                                               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                            </GridPane.margin>
+                                                         </Button>
+                                                         <TextField fx:id="txtFanRpm" alignment="CENTER" editable="false" focusTraversable="false" GridPane.columnIndex="1">
+                                                            <GridPane.margin>
+                                                               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                            </GridPane.margin>
+                                                         </TextField>
+                                                         <Label alignment="CENTER" prefHeight="18.0" prefWidth="66.0" text="rpm" GridPane.columnIndex="2" GridPane.halignment="CENTER" />
+                                                         <Button fx:id="btnFanWindspeed" mnemonicParsing="false" onAction="#btnFanWindspeedOnClick" prefHeight="26.0" prefWidth="108.0" text="WIND SPEED" GridPane.rowIndex="1">
+                                                            <GridPane.margin>
+                                                               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                            </GridPane.margin>
+                                                         </Button>
+                                                         <TextField fx:id="txtFanWindSpeed" alignment="CENTER" editable="false" focusTraversable="false" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                                            <GridPane.margin>
+                                                               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                            </GridPane.margin>
+                                                         </TextField>
+                                                         <Label alignment="CENTER" prefHeight="18.0" prefWidth="66.0" text="m/s" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                                      </children>
+                                                   </GridPane>
+                                                   <ToggleButton fx:id="toggle_AutoFan" layoutX="186.0" layoutY="11.0" mnemonicParsing="false" text="AUTO" />
+                                                   <Label layoutX="54.0" layoutY="15.0" text="Real time Update ?" />
+                                                   <ProgressIndicator fx:id="pi_AutoFan" layoutX="287.0" layoutY="16.0" prefHeight="16.0" prefWidth="16.0" visible="false" />
+                                                </children>
+                                             </AnchorPane>
+                                          </content>
+                                       </TitledPane>
+                                    </children>
+                                 </VBox>
+                                 <Pane prefHeight="320.0" prefWidth="25.0" />
+                                 <TitledPane animated="false" collapsible="false" prefHeight="320.0" prefWidth="1010.0" style="-fx-background-color: black; -fx-border-color: grey; -fx-border-width: 1;" text="3 Phase Readings">
+                                    <content>
+                                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                          <children>
+                                             <GridPane layoutY="46.0" prefHeight="242.0" prefWidth="450.0">
+                                                <columnConstraints>
+                                                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="180.0" minWidth="10.0" prefWidth="250.0" />
+                                                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="180.0" minWidth="10.0" prefWidth="200.0" />
+                                                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="40.0" minWidth="10.0" prefWidth="40.0" />
+                                                </columnConstraints>
+                                                <rowConstraints>
+                                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                </rowConstraints>
+                                                <children>
+                                                   <Button fx:id="btn3PhaseWattsTotal" mnemonicParsing="false" onAction="#btn3PhaseWattsTotalOnClick" prefHeight="28.0" prefWidth="610.0" text="WATTS TOTAL" GridPane.halignment="CENTER">
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </Button>
+                                                   <Button fx:id="btn3PhaseVATotal" mnemonicParsing="false" onAction="#btn3PhaseVATotalOnClick" prefHeight="28.0" prefWidth="570.0" text="VA TOTAL" GridPane.halignment="CENTER" GridPane.rowIndex="1">
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </Button>
+                                                   <Button fx:id="btn3PhasePFAvg" mnemonicParsing="false" onAction="#btn3PhasePFAvgOnClick" prefHeight="28.0" prefWidth="629.0" text="PF AVG" GridPane.halignment="CENTER" GridPane.rowIndex="2">
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </Button>
+                                                   <Button fx:id="btn3PhaseCurrentAvg" mnemonicParsing="false" onAction="#btn3PhaseCurrentAvgOnClick" prefHeight="28.0" prefWidth="936.0" text="CURRENT AVG" GridPane.halignment="CENTER" GridPane.rowIndex="3">
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </Button>
+                                                   <TextField fx:id="txt3PhaseWattsTotal" editable="false" focusTraversable="false" GridPane.columnIndex="1">
+                                                      <opaqueInsets>
+                                                         <Insets />
+                                                      </opaqueInsets>
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </TextField>
+                                                   <TextField fx:id="txt3PhaseVATotal" editable="false" focusTraversable="false" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                                      <opaqueInsets>
+                                                         <Insets />
+                                                      </opaqueInsets>
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </TextField>
+                                                   <TextField fx:id="txt3PhasePFAvg" editable="false" focusTraversable="false" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                                      <opaqueInsets>
+                                                         <Insets />
+                                                      </opaqueInsets>
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </TextField>
+                                                   <TextField fx:id="txt3PhaseCurrentAvg" editable="false" focusTraversable="false" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                                                      <opaqueInsets>
+                                                         <Insets />
+                                                      </opaqueInsets>
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </TextField>
+                                                   <Label alignment="CENTER" prefHeight="18.0" prefWidth="66.0" text="W" GridPane.columnIndex="2" />
+                                                   <Label alignment="CENTER" prefHeight="18.0" prefWidth="66.0" text="VA" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                                   <Label alignment="CENTER" prefHeight="18.0" prefWidth="66.0" text="A" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                                                </children>
+                                             </GridPane>
+                                             <Label layoutX="86.0" layoutY="18.0" text="Real time Update ?" />
+                                             <ToggleButton fx:id="toggle_Auto3Phase" layoutX="249.0" layoutY="14.0" mnemonicParsing="false" text="AUTO" />
+                                             <GridPane layoutX="504.0" layoutY="46.0" prefHeight="242.0" prefWidth="388.0">
+                                                <columnConstraints>
+                                                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="180.0" minWidth="10.0" prefWidth="180.0" />
+                                                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="180.0" minWidth="10.0" prefWidth="200.0" />
+                                                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="40.0" minWidth="10.0" prefWidth="40.0" />
+                                                </columnConstraints>
+                                                <rowConstraints>
+                                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                </rowConstraints>
+                                                <children>
+                                                   <Button fx:id="btn3PhaseVLL" mnemonicParsing="false" onAction="#btn3PhaseVLLOnClick" prefHeight="90.0" prefWidth="108.0" text="VLL" GridPane.halignment="CENTER">
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </Button>
+                                                   <Button fx:id="btn3PhaseVLN" mnemonicParsing="false" onAction="#btn3PhaseVLNOnClick" prefHeight="81.0" prefWidth="108.0" text="VLN" GridPane.halignment="CENTER" GridPane.rowIndex="1">
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </Button>
+                                                   <Button fx:id="btn3PhaseVRY" mnemonicParsing="false" onAction="#btn3PhaseVRYOnChange" prefHeight="59.0" prefWidth="108.0" text="VRY" GridPane.halignment="CENTER" GridPane.rowIndex="2">
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </Button>
+                                                   <Button fx:id="btn3PhaseVYB" mnemonicParsing="false" onAction="#btn3PhaseVYBOnClick" prefHeight="61.0" prefWidth="108.0" text="VYB" GridPane.halignment="CENTER" GridPane.rowIndex="3">
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </Button>
+                                                   <TextField fx:id="txt3PhaseVLL" editable="false" focusTraversable="false" GridPane.columnIndex="1">
+                                                      <opaqueInsets>
+                                                         <Insets />
+                                                      </opaqueInsets>
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </TextField>
+                                                   <TextField fx:id="txt3PhaseVLN" editable="false" focusTraversable="false" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                                      <opaqueInsets>
+                                                         <Insets />
+                                                      </opaqueInsets>
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </TextField>
+                                                   <TextField fx:id="txt3PhaseVRY" editable="false" focusTraversable="false" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                                      <opaqueInsets>
+                                                         <Insets />
+                                                      </opaqueInsets>
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </TextField>
+                                                   <TextField fx:id="txt3PhaseVYB" editable="false" focusTraversable="false" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                                                      <opaqueInsets>
+                                                         <Insets />
+                                                      </opaqueInsets>
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </TextField>
+                                                   <Label alignment="CENTER" prefHeight="18.0" prefWidth="66.0" text="V" GridPane.columnIndex="2" />
+                                                   <Label alignment="CENTER" prefHeight="18.0" prefWidth="66.0" text="V" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                                   <Label alignment="CENTER" prefHeight="18.0" prefWidth="66.0" text="V" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                                                   <Label alignment="CENTER" prefHeight="18.0" prefWidth="66.0" text="V" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                                                   <Button fx:id="btn3PhaseVBR" mnemonicParsing="false" onAction="#btn3PhaseVBROnClick" prefHeight="61.0" prefWidth="108.0" text="VBR" GridPane.halignment="CENTER" GridPane.rowIndex="4">
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </Button>
+                                                   <TextField fx:id="txt3PhaseVBR" editable="false" focusTraversable="false" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="4">
+                                                      <opaqueInsets>
+                                                         <Insets />
+                                                      </opaqueInsets>
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </TextField>
+                                                   <Label alignment="CENTER" prefHeight="18.0" prefWidth="66.0" text="V" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+                                                </children>
+                                             </GridPane>
+                                             <ProgressIndicator fx:id="pi_Auto3Phase" layoutX="372.0" layoutY="19.0" prefHeight="16.0" prefWidth="16.0" visible="false" />
+                                          </children>
+                                       </AnchorPane>
+                                    </content>
+                                    <font>
+                                       <Font name="System Bold" size="12.0" />
+                                    </font>
+                                 </TitledPane>
+                                 <Pane prefHeight="320.0" prefWidth="25.0" />
+                              </children>
+                           </HBox>
+                        </children>
+                     </VBox>
+                  </children>
+               </AnchorPane>
+         </content>
+       </Tab>
+     </tabs>
+   </TabPane>
+
+</AnchorPane>

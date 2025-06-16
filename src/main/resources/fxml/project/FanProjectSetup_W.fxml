@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane fx:id="AnchorPaneRunningStatus" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="673.0" prefWidth="1624.0" stylesheets="@../../config/style/application_W.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tasnetwork.calibration.energymeter.project.FanProjectSetupController">
+
+ <BorderPane prefHeight="1080" prefWidth="1920">
+      
+
+    <center>
+        <HBox spacing="20">
+            <padding>
+            <Insets bottom="10" left="10" right="10" top="10" />
+         </padding>
+         <TitledPane animated="false" collapsible="false" prefHeight="1074.0" prefWidth="2854.0" text="Fan Testing">
+           <content>
+             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                  <children>
+                     <HBox prefHeight="1022.0" prefWidth="1888.0">
+                        <children>
+                           <HBox prefHeight="1022.0" prefWidth="18.0" />
+                              
+                                    <VBox prefHeight="1022.0" prefWidth="1451.0" spacing="20">
+                              <HBox prefHeight="196.0" prefWidth="1451.0">
+                                    <children>
+                                       <VBox prefHeight="196.0" prefWidth="461.0">
+                                          <children>
+                                             <Pane prefHeight="12.0" prefWidth="386.0" />
+                                          <GridPane prefWidth="426.0">
+                                            <columnConstraints>
+                                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="170.0" minWidth="10.0" prefWidth="170.0" />
+                                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="150.0" minWidth="10.0" prefWidth="150.0" />
+                                                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="150.0" minWidth="10.0" prefWidth="150.0" />
+                                            </columnConstraints>
+                                            <rowConstraints>
+                                              <RowConstraints />
+                                            </rowConstraints>
+                                             <children>
+                                                <TextField fx:id="txtNewModelName">
+                                                      <GridPane.margin>
+                                                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                      </GridPane.margin>
+                                                   </TextField>
+                                                <Button mnemonicParsing="false" onAction="#btnAddModelOnClick" prefHeight="26.0" prefWidth="141.0" text="Add Model" GridPane.columnIndex="1">
+                                                      <GridPane.margin>
+                                                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                      </GridPane.margin>
+                                                   </Button>
+                                                   <Button mnemonicParsing="false" onAction="#btnDeleteModelOnClick" prefHeight="26.0" prefWidth="141.0" text="Delete Model" GridPane.columnIndex="2">
+                                                      <GridPane.margin>
+                                                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                      </GridPane.margin>
+                                                   </Button>
+                                             </children>
+                                          </GridPane>
+                                             <Pane prefHeight="12.0" prefWidth="386.0" />
+                                             <GridPane prefHeight="134.0" prefWidth="410.0">
+                                               <columnConstraints>
+                                                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="170.0" minWidth="10.0" prefWidth="170.0" />
+                                                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="300.0" minWidth="10.0" prefWidth="300.0" />
+                                               </columnConstraints>
+                                               <rowConstraints>
+                                                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                               </rowConstraints>
+                                                <children>
+                                                   <Label alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="18.0" prefWidth="278.0" text="Select Model :" GridPane.halignment="RIGHT">
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin></Label>
+                                                   <ComboBox fx:id="cmbBxModelName" prefWidth="218.0" promptText="Select Model...." GridPane.columnIndex="1" GridPane.halignment="CENTER">
+                                                      <GridPane.margin>
+                                                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                      </GridPane.margin></ComboBox>
+                                                   <Label alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="18.0" prefWidth="233.0" text="Phase :" textAlignment="RIGHT" GridPane.halignment="RIGHT" GridPane.rowIndex="1">
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </Label>
+                                                   <Label alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="18.0" prefWidth="223.0" text="Area of Opening :" GridPane.halignment="RIGHT" GridPane.rowIndex="3">
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </Label>
+                                                   <RadioButton fx:id="radioBtn3Phase" focusTraversable="false" mnemonicParsing="false" mouseTransparent="true" text="Three Phase" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                                      <GridPane.margin>
+                                                         <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+                                                      </GridPane.margin>
+                                                   </RadioButton>
+                                                   <RadioButton fx:id="radioBtn1Phase" focusTraversable="false" mnemonicParsing="false" mouseTransparent="true" text="Single Phase" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="1">
+                                                      <GridPane.margin>
+                                                         <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+                                                      </GridPane.margin>
+                                                   </RadioButton>
+                                                   <Label alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="86.0" prefWidth="146.0" text="Wind Speed Config :" textAlignment="RIGHT" GridPane.halignment="RIGHT" GridPane.rowIndex="2">
+                                                      <GridPane.margin>
+                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                      </GridPane.margin>
+                                                   </Label>
+                                                   <TextField fx:id="txtDisplayWindSpeedConfig" editable="false" focusTraversable="false" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                                      <GridPane.margin>
+                                                         <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
+                                                      </GridPane.margin>
+                                                   </TextField>
+                                                   <TextField fx:id="txtDisplayAreaOfOpening" editable="false" focusTraversable="false" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                                                      <GridPane.margin>
+                                                         <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
+                                                      </GridPane.margin>
+                                                   </TextField>
+                                                </children>
+                                             </GridPane>
+                                          </children>
+                                       </VBox>
+                                       <Pane prefHeight="196.0" prefWidth="25.0" />
+                                    </children>
+                                    <VBox.margin>
+                                       <Insets top="5.0" />
+                                    </VBox.margin></HBox>
+                              <TableView fx:id="tvTestSetup" prefHeight="535.0" prefWidth="1451.0">
+                                 <columns>
+                                       <TableColumn fx:id="colTestSetupSerialNo" prefWidth="49.60003584623337" text="S.No" />
+                                       <TableColumn fx:id="colTestSetupActive" prefWidth="65.59997940063477" text="Active" />
+                                       <TableColumn fx:id="colTestSetupTestPointName" prefWidth="153.59997940063477" text="Test Name" />
+                                       <TableColumn fx:id="colTestSetupTargetVoltage" prefWidth="87.99998474121094" text="Target &#10;Voltage" />
+                                       <TableColumn fx:id="colTestSetupTimeInSec" prefWidth="101.60002136230469" text="Setup Time &#10;in Sec" />
+                                       <TableColumn prefWidth="75.0" text="Rpm">
+                                          <columns>
+                                             <TableColumn fx:id="colTestSetupRpmLowerLimit" prefWidth="75.0" text="Lower &#10;Limit" />
+                                             <TableColumn fx:id="colTestSetupRpmUpperLimit" prefWidth="75.0" text="Upper &#10;Limit" />
+                                          </columns>
+                                       </TableColumn>
+                                       <TableColumn prefWidth="75.0" text="Wind Speed">
+                                          <columns>
+                                             <TableColumn fx:id="colTestSetupWindSpeedLowerLimit" prefWidth="75.0" text="Lower &#10;Limit" />
+                                             <TableColumn fx:id="colTestSetupWindSpeedUpperLimit" prefWidth="75.0" text="Upper &#10;Limit" />
+                                          </columns>
+                                       </TableColumn>
+                                    <TableColumn prefWidth="124.7999267578125" text="Current">
+                                          <columns>
+                                          <TableColumn fx:id="colTestSetupCurrentLowerLimit" minWidth="0.0" prefWidth="94.39996337890625" text="Lower &#10;Limit" />
+                                          <TableColumn fx:id="colTestSetupCurrentUpperLimit" maxWidth="1000.0" prefWidth="77.60003662109375" text="Upper &#10;Limit" />
+                                          </columns></TableColumn>
+                                    <TableColumn prefWidth="204.0" text="Watts">
+                                          <columns>
+                                             <TableColumn fx:id="colTestSetupWattsLowerLimit" minWidth="0.0" prefWidth="94.39996337890625" text="Lower &#10;Limit" />
+                                             <TableColumn fx:id="colTestSetupWattsUpperLimit" maxWidth="1000.0" prefWidth="77.60003662109375" text="Upper &#10;Limit" />
+                                          </columns></TableColumn>
+                                       <TableColumn prefWidth="75.0" text="VA">
+                                          <columns>
+                                             <TableColumn fx:id="colTestSetupActivePowerLowerLimit" prefWidth="75.0" text="Lower &#10;Limit" />
+                                             <TableColumn fx:id="colTestSetupActivePowerUpperLimit" prefWidth="75.0" text="Upper &#10;Limit" />
+                                          </columns>
+                                       </TableColumn>
+                                       <TableColumn prefWidth="178.4000244140625" text="PF">
+                                          <columns>
+                                             <TableColumn fx:id="colTestSetupPfLowerLimit" prefWidth="75.0" text="Lower &#10;Limit" />
+                                             <TableColumn fx:id="colTestSetupPfUpperLimit" prefWidth="75.0" text="Upper &#10;Limit" />
+                                          </columns>
+                                       </TableColumn>
+                                 </columns>
+                              </TableView>
+                              <GridPane prefWidth="1451.0">
+                                <columnConstraints>
+                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                </columnConstraints>
+                                <rowConstraints>
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                </rowConstraints>
+                                 <children>
+                                       <Button fx:id="addTestPointButton" alignment="CENTER" onAction="#btnAddTestPointOnClick" prefHeight="26.0" prefWidth="200.0" text="Add Test Point" GridPane.halignment="CENTER" />
+                                       <Button fx:id="saveButton" onAction="#btnSaveOnClick" prefHeight="25.0" prefWidth="151.0" text="Save" GridPane.columnIndex="1" GridPane.halignment="CENTER" />
+                                 </children>
+                              </GridPane>
+                              </VBox>
+                        </children>
+                     </HBox>
+                  </children>
+               </AnchorPane>
+           </content>
+         </TitledPane>
+        </HBox>
+    </center>
+</BorderPane>
+
+</AnchorPane>

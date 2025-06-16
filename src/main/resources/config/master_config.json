@@ -1,0 +1,29 @@
+{
+	"ConfigFileVersion" : "2.1",
+	"ConfigFileVersionComment1_0" : "Master config initial version",
+
+	"CustomerDetails": {
+		"AppConfigFileNameAA" : "app_config_lecs_dec2022_v1_5.json",
+		"AppConfigFileName4" : "app_config_neolink_dec2022_v1_1.json",
+		"AppConfigFileName2" : "app_config_kigg_Sep2022_v1_2.json",
+		"AppConfigFileName3" : "app_config_sands_jun2021_v1_3.json",
+		"AppConfigFileNameX" : "app_config_nsoft_v1_4.json",
+		"AppConfigFileNameaa" : "app_config_adya_bench1_v1_4.json",
+		"AppConfigFileNamecc"  : "app_config_fuji_v1_6.json",
+		"AppConfigFileName12345"  : "app_config_conveyor_devsys_verific_jan2025_v1_5.json",	
+		"AppConfigFileNamesddd"  : "app_config_conveyor_devsys_calib_jan2025_v1_5.json",
+		"AppConfigFileNamexxx"    : "app_config_conveyor_devsys_noload1_jan2025_v1_5.json",
+		"AppConfigFileNameff"  : "app_config_conveyor_devsys_noload2_jan2025_v1_5.json",
+		"AppConfigFileNamea1"  : "app_config_elmeasure_jan2025_v1_5.json",
+		"AppConfigFileNamehvv"  : "app_config_fuji_v1_6.json",
+		"AppConfigFileNamewer"  : "app_config_lecs_mtester_v1_6.json",
+		"AppConfigFileNamerttt"  : "app_config_lscs_v1_6.json",
+		"AppConfigFileName"  : "app_config_fan_v1_6.json",
+		"AppConfigFileNamesss"  : "app_config_fuji-portable1_v1_6.json",
+		"ConfigFilePath": "config/app/"
+		
+	}	
+
+
+	
+}

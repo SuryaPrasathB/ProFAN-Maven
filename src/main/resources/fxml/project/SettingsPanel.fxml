@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox alignment="CENTER_LEFT" spacing="12.0" style="-fx-padding: 16;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tasnetwork.calibration.energymeter.project.SettingsPanelController">
+    <AnchorPane fx:id="root" prefHeight="300" prefWidth="400" style="-fx-background-color: white; -fx-border-color: #ccc; -fx-border-radius: 6; -fx-background-radius: 6;">
+    <Label layoutX="14.0" style="-fx-font-size: 18px; -fx-font-weight: bold;" text="Settings Panel" />
+
+    <GridPane hgap="10" layoutX="40.0" layoutY="34.0" vgap="10">
+        <Label text="Voltage Tolerance (±V):" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+        <TextField fx:id="txtVoltageTolerance" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+        <Label text="Setup Delay (ms):" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+        <TextField fx:id="txtSetupDelay" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+        <Label text="Max Retry Attempts:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+        <TextField fx:id="txtMaxRetryAttempts" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+        <Label text="Delay Between Retries (ms):" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+        <TextField fx:id="txtRetryDelay" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+        <Label text="Loop Delay (ms):" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+        <TextField fx:id="txtLoopDelay" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+
+        <Label text="Data Logging Frequency (ms):" GridPane.columnIndex="0" GridPane.rowIndex="5" />
+        <TextField fx:id="txtLoggingFrequency" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+         <columnConstraints>
+            <ColumnConstraints />
+            <ColumnConstraints />
+         </columnConstraints>
+         <rowConstraints>
+            <RowConstraints />
+            <RowConstraints />
+            <RowConstraints />
+            <RowConstraints />
+            <RowConstraints />
+            <RowConstraints />
+         </rowConstraints>
+    </GridPane>
+
+    <Button layoutX="155.0" layoutY="252.0" onAction="#onSaveClick" text="Save Settings" />
+    </AnchorPane>
+</VBox>

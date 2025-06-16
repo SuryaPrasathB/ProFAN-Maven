@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.text.Font?>
+
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="320.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tasnetwork.calibration.energymeter.project.ThreePhaseController">
+   <children>
+      <HBox prefHeight="320.0" prefWidth="700.0">
+         <children>
+            <TitledPane animated="false" collapsible="false" prefHeight="320.0" prefWidth="320.0" style="-fx-background-color: black; -fx-border-color: black; -fx-border-width: 1;" text="3 Phase Readings">
+               <content>
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <Label layoutX="54.0" layoutY="18.0" text="Real time Update ?" />
+                        <ToggleButton fx:id="toggle_AutoRPhase" layoutX="196.0" layoutY="14.0" mnemonicParsing="false" text="AUTO" />
+                        <ProgressIndicator fx:id="pi_AutoRPhase" layoutX="287.0" layoutY="19.0" prefHeight="16.0" prefWidth="16.0" visible="false" />
+                        <GridPane layoutX="-3.0" layoutY="49.0" prefHeight="242.0" prefWidth="320.0">
+                           <columnConstraints>
+                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="180.0" minWidth="10.0" prefWidth="157.20001220703125" />
+                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="180.0" minWidth="10.0" prefWidth="134.19998779296873" />
+                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="40.0" minWidth="10.0" prefWidth="37.199951171875" />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                           </rowConstraints>
+                           <children>
+                              <Button fx:id="btn3PhaseVLL" mnemonicParsing="false" onAction="#btn3PhaseVLLOnClick" prefHeight="90.0" prefWidth="108.0" text="VLL" GridPane.halignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                 </GridPane.margin>
+                              </Button>
+                              <Button fx:id="btn3PhaseVLN" mnemonicParsing="false" onAction="#btn3PhaseVLNOnClick" prefHeight="81.0" prefWidth="108.0" text="VLN" GridPane.halignment="CENTER" GridPane.rowIndex="1">
+                                 <GridPane.margin>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                 </GridPane.margin>
+                              </Button>
+                              <Button fx:id="btn3PhaseVRY" mnemonicParsing="false" onAction="#btn3PhaseVRYOnChange" prefHeight="59.0" prefWidth="108.0" text="VRY" GridPane.halignment="CENTER" GridPane.rowIndex="2">
+                                 <GridPane.margin>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                 </GridPane.margin>
+                              </Button>
+                              <Button fx:id="btn3PhaseVYB" mnemonicParsing="false" onAction="#btn3PhaseVYBOnClick" prefHeight="61.0" prefWidth="108.0" text="VYB" GridPane.halignment="CENTER" GridPane.rowIndex="3">
+                                 <GridPane.margin>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                 </GridPane.margin>
+                              </Button>
+                              <TextField fx:id="txt3PhaseVLL" editable="false" focusTraversable="false" GridPane.columnIndex="1">
+                                 <opaqueInsets>
+                                    <Insets />
+                                 </opaqueInsets>
+                                 <GridPane.margin>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                 </GridPane.margin>
+                              </TextField>
+                              <TextField fx:id="txt3PhaseVLN" editable="false" focusTraversable="false" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                 <opaqueInsets>
+                                    <Insets />
+                                 </opaqueInsets>
+                                 <GridPane.margin>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                 </GridPane.margin>
+                              </TextField>
+                              <TextField fx:id="txt3PhaseVRY" editable="false" focusTraversable="false" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                 <opaqueInsets>
+                                    <Insets />
+                                 </opaqueInsets>
+                                 <GridPane.margin>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                 </GridPane.margin>
+                              </TextField>
+                              <TextField fx:id="txt3PhaseVYB" editable="false" focusTraversable="false" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                                 <opaqueInsets>
+                                    <Insets />
+                                 </opaqueInsets>
+                                 <GridPane.margin>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                 </GridPane.margin>
+                              </TextField>
+                              <Label alignment="CENTER" prefHeight="18.0" prefWidth="66.0" text="V" GridPane.columnIndex="2" />
+                              <Label alignment="CENTER" prefHeight="18.0" prefWidth="66.0" text="V" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                              <Label alignment="CENTER" prefHeight="18.0" prefWidth="66.0" text="V" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                              <Label alignment="CENTER" prefHeight="18.0" prefWidth="66.0" text="V" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                              <Button fx:id="btn3PhaseVBR" mnemonicParsing="false" onAction="#btn3PhaseVBROnClick" prefHeight="61.0" prefWidth="108.0" text="VBR" GridPane.halignment="CENTER" GridPane.rowIndex="4">
+                                 <GridPane.margin>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                 </GridPane.margin>
+                              </Button>
+                              <TextField fx:id="txt3PhaseVBR" editable="false" focusTraversable="false" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="4">
+                                 <opaqueInsets>
+                                    <Insets />
+                                 </opaqueInsets>
+                                 <GridPane.margin>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                 </GridPane.margin>
+                              </TextField>
+                              <Label alignment="CENTER" prefHeight="18.0" prefWidth="66.0" text="V" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+                           </children>
+                        </GridPane>
+                     </children>
+                  </AnchorPane>
+               </content>
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+            </TitledPane>
+            <Pane prefHeight="320.0" prefWidth="24.0" />
+            <TitledPane animated="false" collapsible="false" prefHeight="320.0" prefWidth="356.0" style="-fx-background-color: black; -fx-border-color: grey; -fx-border-width: 1;">
+               <content>
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="297.0">
+                     <children>
+                        <GridPane layoutY="46.0" prefHeight="242.0" prefWidth="356.0">
+                           <columnConstraints>
+                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="205.00003051757812" minWidth="10.0" prefWidth="197.20003662109374" />
+                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="220.199951171875" minWidth="10.0" prefWidth="116.39996337890628" />
+                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="43.800048828125" minWidth="10.0" prefWidth="43.800048828125" />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                           </rowConstraints>
+                           <children>
+                              <Button fx:id="btn3PhaseWattsTotal" mnemonicParsing="false" onAction="#btn3PhaseWattsTotalOnClick" prefHeight="28.0" prefWidth="610.0" text="WATTS TOTAL" GridPane.halignment="CENTER">
+                                 <GridPane.margin>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                 </GridPane.margin>
+                              </Button>
+                              <Button fx:id="btn3PhaseVATotal" mnemonicParsing="false" onAction="#btn3PhaseVATotalOnClick" prefHeight="28.0" prefWidth="570.0" text="VA TOTAL" GridPane.halignment="CENTER" GridPane.rowIndex="1">
+                                 <GridPane.margin>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                 </GridPane.margin>
+                              </Button>
+                              <Button fx:id="btn3PhasePFAvg" mnemonicParsing="false" onAction="#btn3PhasePFAvgOnClick" prefHeight="28.0" prefWidth="629.0" text="PF AVG" GridPane.halignment="CENTER" GridPane.rowIndex="2">
+                                 <GridPane.margin>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                 </GridPane.margin>
+                              </Button>
+                              <Button fx:id="btn3PhaseCurrentAvg" mnemonicParsing="false" onAction="#btn3PhaseCurrentAvgOnClick" prefHeight="28.0" prefWidth="936.0" text="CURRENT AVG" GridPane.halignment="CENTER" GridPane.rowIndex="3">
+                                 <GridPane.margin>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                 </GridPane.margin>
+                              </Button>
+                              <TextField fx:id="txt3PhaseWattsTotal" editable="false" focusTraversable="false" GridPane.columnIndex="1">
+                                 <opaqueInsets>
+                                    <Insets />
+                                 </opaqueInsets>
+                                 <GridPane.margin>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                 </GridPane.margin>
+                              </TextField>
+                              <TextField fx:id="txt3PhaseVATotal" editable="false" focusTraversable="false" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                 <opaqueInsets>
+                                    <Insets />
+                                 </opaqueInsets>
+                                 <GridPane.margin>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                 </GridPane.margin>
+                              </TextField>
+                              <TextField fx:id="txt3PhasePFAvg" editable="false" focusTraversable="false" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                 <opaqueInsets>
+                                    <Insets />
+                                 </opaqueInsets>
+                                 <GridPane.margin>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                 </GridPane.margin>
+                              </TextField>
+                              <TextField fx:id="txt3PhaseCurrentAvg" editable="false" focusTraversable="false" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                                 <opaqueInsets>
+                                    <Insets />
+                                 </opaqueInsets>
+                                 <GridPane.margin>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                 </GridPane.margin>
+                              </TextField>
+                              <Label alignment="CENTER" prefHeight="18.0" prefWidth="66.0" text="W" GridPane.columnIndex="2" />
+                              <Label alignment="CENTER" prefHeight="18.0" prefWidth="66.0" text="VA" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                              <Label alignment="CENTER" prefHeight="18.0" prefWidth="66.0" text="A" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                           </children>
+                        </GridPane>
+                        <Label layoutX="86.0" layoutY="18.0" text="Real time Update ?" />
+                        <ToggleButton fx:id="toggle_Auto3Phase" layoutX="249.0" layoutY="14.0" mnemonicParsing="false" text="AUTO" />
+                        <ProgressIndicator fx:id="pi_Auto3Phase" layoutX="372.0" layoutY="19.0" prefHeight="16.0" prefWidth="16.0" visible="false" />
+                     </children>
+                  </AnchorPane>
+               </content>
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+            </TitledPane>
+         </children>
+      </HBox>
+   </children>
+</AnchorPane>

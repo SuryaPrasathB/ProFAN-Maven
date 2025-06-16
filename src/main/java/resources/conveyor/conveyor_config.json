@@ -1,0 +1,8 @@
+{
+	"ConfigFileVersion" : "2.1",
+	"MaxDutSupported" : "6",
+	"OpticalReadingInterfaceEnabled" : true,
+	"DutSerialInterfaceEnabled" : true
+	
+	
+}
