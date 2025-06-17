@@ -18,6 +18,17 @@
 		<maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
 	</properties>
 	<dependencies>
+		<!-- Apache POI for Excel files -->
+	    <dependency>
+	        <groupId>org.apache.poi</groupId>
+	        <artifactId>poi</artifactId>
+	        <version>5.2.3</version> <!-- Use a recent stable version -->
+	    </dependency>
+	    <dependency>
+	        <groupId>org.apache.poi</groupId>
+	        <artifactId>poi-ooxml</artifactId>
+	        <version>5.2.3</version> <!-- Must match the poi version -->
+	    </dependency>
 	    <!-- Spring Boot Dependencies -->
 	    <dependency>
 	        <groupId>org.springframework.boot</groupId>
@@ -101,6 +112,11 @@
 	        <artifactId>javafx-fxml</artifactId>
 	        <version>11.0.2</version>
 	    </dependency>
+	    <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-web</artifactId>
+            <version>11.0.2</version>
+        </dependency>
 	    
 	    <dependency>
 		    <groupId>com.fasterxml.jackson.core</groupId>

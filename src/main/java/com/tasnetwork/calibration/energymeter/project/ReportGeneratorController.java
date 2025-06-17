@@ -6,20 +6,23 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.image.Image; // Still needed if you keep image previews for other elements
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.util.Callback;
+import javafx.scene.web.WebView; // New import for WebView
+import javafx.scene.web.WebEngine; // New import for WebEngine
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import com.tasnetwork.calibration.energymeter.ApplicationLauncher;
+// Apache POI imports for XLSX handling
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 /**
  * Controller class for the Report Generator UI.
@@ -29,8 +32,8 @@ public class ReportGeneratorController implements Initializable {
 
     // FXML UI elements
     @FXML private ListView<String> templateListView;
-    // Changed from ImageView to TextArea for displaying CSV content
-    @FXML private TextArea templatePreviewTextArea;
+    // Changed from TextArea to WebView for displaying rich HTML content (e.g., Excel preview)
+    @FXML private WebView templatePreviewWebView;
     @FXML private Label noPreviewLabel; // Label to show when no template is selected
     @FXML private TextField serialInputTextField;
     @FXML private TableView<Fan> fanTableView;
@@ -49,7 +52,7 @@ public class ReportGeneratorController implements Initializable {
     // IMPORTANT: In a production environment, avoid hardcoding absolute paths like this.
     // Consider using relative paths based on application launch location, user settings,
     // or resource loading mechanisms appropriate for your deployment strategy.
-    private static final String TEMPLATES_DIR_PATH = "D:\\tasworkspace\\ProFAN\\ProFAN-Maven-s0.0.0.7\\src\\main\\resources\\reportTemplates";
+    private static final String TEMPLATES_DIR_PATH = "C:\\Users\\Surya\\git\\ProFAN-Maven-s0.0.0.7\\src\\main\\resources\\reportTemplates";
 
     // This will now be populated dynamically
     private ObservableList<Template> availableTemplates = FXCollections.observableArrayList();
@@ -63,20 +66,20 @@ public class ReportGeneratorController implements Initializable {
             new Fan(104, "SN-00104", "Y-Series", "Faulty", "2023-05-05", false),
             new Fan(105, "SN-00105", "X-Series", "Operational", "2023-06-12", false),
             new Fan(106, "SN-00106", "Z-Series", "Maintenance", "2023-07-20", false),
-            new Fan(107, "SN-00107", "Y-Series", "Operational", "2023-08-01", false),
-            new Fan(108, "SN-00108", "X-Series", "Operational", "2023-09-15", false),
-            new Fan(109, "SN-00109", "Z-Series", "Faulty", "2023-10-10", false),
-            new Fan(110, "SN-00110", "Y-Series", "Operational", "2023-11-20", false),
-            new Fan(111, "SN-00111", "X-Series", "Operational", "2023-12-01", false),
-            new Fan(112, "SN-00112", "Z-Series", "Maintenance", "2024-01-05", false),
-            new Fan(113, "SN-00113", "Y-Series", "Operational", "2024-02-10", false),
-            new Fan(114, "SN-00114", "X-Series", "Operational", "2024-03-15", false),
-            new Fan(115, "SN-00115", "Z-Series", "Operational", "2024-04-20", false),
-            new Fan(116, "SN-00116", "Y-Series", "Operational", "2024-05-01", false),
-            new Fan(117, "SN-00117", "X-Series", "Operational", "2024-06-05", false),
-            new Fan(118, "SN-00118", "Z-Series", "Maintenance", "2024-07-10", false),
-            new Fan(119, "SN-00119", "Y-Series", "Operational", "2024-08-15", false),
-            new Fan(120, "SN-00120", "X-Series", "Faulty", "2024-09-20", false)
+            new Fan(107, "SN-0107", "Y-Series", "Operational", "2023-08-01", false),
+            new Fan(108, "SN-0108", "X-Series", "Operational", "2023-09-15", false),
+            new Fan(109, "SN-0109", "Z-Series", "Faulty", "2023-10-10", false),
+            new Fan(110, "SN-0110", "Y-Series", "Operational", "2023-11-20", false),
+            new Fan(111, "SN-0111", "X-Series", "Operational", "2023-12-01", false),
+            new Fan(112, "SN-0112", "Z-Series", "Maintenance", "2024-01-05", false),
+            new Fan(113, "SN-0113", "Y-Series", "Operational", "2024-02-10", false),
+            new Fan(114, "SN-0114", "X-Series", "Operational", "2024-03-15", false),
+            new Fan(115, "SN-0115", "Z-Series", "Operational", "2024-04-20", false),
+            new Fan(116, "SN-0116", "Y-Series", "Operational", "2024-05-01", false),
+            new Fan(117, "SN-0117", "X-Series", "Operational", "2024-06-05", false),
+            new Fan(118, "SN-0118", "Z-Series", "Maintenance", "2024-07-10", false),
+            new Fan(119, "SN-0119", "Y-Series", "Operational", "2024-08-15", false),
+            new Fan(120, "SN-0120", "X-Series", "Faulty", "2024-09-20", false)
     );
 
     /**
@@ -100,26 +103,26 @@ public class ReportGeneratorController implements Initializable {
 
                 if (selectedTemplate != null && selectedTemplate.getFile() != null) {
                     try {
-                        String csvContent = readCsvContent(selectedTemplate.getFile());
-                        templatePreviewTextArea.setText(csvContent);
-                        templatePreviewTextArea.setVisible(true);
+                        String fileContent = readFileContent(selectedTemplate.getFile());
+                        templatePreviewWebView.getEngine().loadContent(fileContent); // Load content into WebView
+                        templatePreviewWebView.setVisible(true);
                         noPreviewLabel.setVisible(false); // Hide "No Preview" label
                     } catch (IOException e) {
-                        System.err.println("Failed to read CSV content for: " + selectedTemplate.getName() + " - " + e.getMessage());
-                        templatePreviewTextArea.setText("Error: Could not load preview content.");
-                        templatePreviewTextArea.setVisible(true); // Show error in text area
+                        System.err.println("Failed to read file content for: " + selectedTemplate.getName() + " - " + e.getMessage());
+                        templatePreviewWebView.getEngine().loadContent("<h1>Error</h1><p>Could not load preview content: " + escapeHtml(e.getMessage()) + "</p>");
+                        templatePreviewWebView.setVisible(true); // Show error in WebView
                         noPreviewLabel.setVisible(false); // Hide normal "No Preview" label
                     }
                 } else {
-                    templatePreviewTextArea.setText("");
-                    templatePreviewTextArea.setVisible(false);
+                    templatePreviewWebView.getEngine().loadContent(""); // Clear WebView
+                    templatePreviewWebView.setVisible(false);
                     noPreviewLabel.setText("No preview available.");
                     noPreviewLabel.setVisible(true);
                 }
             } else {
                 selectedTemplate = null;
-                templatePreviewTextArea.setText("");
-                templatePreviewTextArea.setVisible(false);
+                templatePreviewWebView.getEngine().loadContent(""); // Clear WebView
+                templatePreviewWebView.setVisible(false);
                 noPreviewLabel.setText("Select a template to see its preview.");
                 noPreviewLabel.setVisible(true);
             }
@@ -181,17 +184,16 @@ public class ReportGeneratorController implements Initializable {
         errorMessageLabel.setText(""); // Clear any initial error message
 
         // Initial state for preview area
-        templatePreviewTextArea.setVisible(false);
+        templatePreviewWebView.setVisible(false);
         noPreviewLabel.setVisible(true);
         noPreviewLabel.setText("Select a template to see its preview.");
     }
 
     /**
-     * Scans the predefined directory for .csv files and creates Template objects.
+     * Scans the predefined directory for .xlsx, .csv, and .txt files and creates Template objects.
      * @return An ObservableList of Template objects found in the directory.
      */
     private ObservableList<Template> loadTemplatesFromDirectory() {
-    	ApplicationLauncher.logger.info("ReportGeneratorController : loadTemplatesFromDirectory : ENTRY");
         ObservableList<Template> templates = FXCollections.observableArrayList();
         File templateDir = new File(TEMPLATES_DIR_PATH);
 
@@ -206,7 +208,11 @@ public class ReportGeneratorController implements Initializable {
             return templates;
         }
 
-        File[] files = templateDir.listFiles((dir, name) -> name.toLowerCase().endsWith(".csv"));
+        // Filter for .xlsx, .csv, and .txt files
+        File[] files = templateDir.listFiles((dir, name) ->
+                name.toLowerCase().endsWith(".xlsx") ||
+                name.toLowerCase().endsWith(".csv") ||
+                name.toLowerCase().endsWith(".txt"));
 
         if (files != null) {
             for (File file : files) {
@@ -220,15 +226,132 @@ public class ReportGeneratorController implements Initializable {
     }
 
     /**
-     * Reads the entire content of a given CSV file into a single String.
-     * Compatible with Java 8.
-     * @param file The CSV file to read.
-     * @return The content of the file as a String.
+     * Reads the content of a given file into a String for preview.
+     * For XLSX files, it generates an HTML representation.
+     * For CSV/TXT files, it reads them as plain text (HTML encoded for display in WebView).
+     *
+     * @param file The file to read.
+     * @return The content of the file as an HTML String.
      * @throws IOException If an I/O error occurs reading the file.
      */
-    private String readCsvContent(File file) throws IOException {
-        // Corrected for Java 8 compatibility:
-        return Files.readAllLines(file.toPath()).stream().collect(Collectors.joining(System.lineSeparator()));
+    private String readFileContent(File file) throws IOException {
+        String fileName = file.getName().toLowerCase();
+        if (fileName.endsWith(".xlsx")) {
+            return generateHtmlPreviewFromXlsx(file);
+        } else if (fileName.endsWith(".csv") || fileName.endsWith(".txt")) {
+            // Read text content and then HTML escape it for safe display in WebView
+            String rawContent = Files.readAllLines(file.toPath()).stream().collect(Collectors.joining(System.lineSeparator()));
+            return "<html><body><pre>" + escapeHtml(rawContent) + "</pre></body></html>";
+        } else {
+            return "<html><body><p>Preview not supported for this file type.</p></body></html>";
+        }
+    }
+
+    /**
+     * Reads the content of the first sheet of an XLSX file using Apache POI
+     * and returns an HTML string representation of its cell values,
+     * resembling an Excel grid with row numbers and column letters.
+     *
+     * @param file The XLSX file to read.
+     * @return An HTML string containing the table representation of the XLSX content.
+     * @throws IOException If an error occurs while reading the file.
+     */
+    private String generateHtmlPreviewFromXlsx(File file) throws IOException {
+        StringBuilder htmlContent = new StringBuilder();
+        htmlContent.append("<!DOCTYPE html>\n<html>\n<head>\n<style>\n");
+        htmlContent.append("body { margin: 0; padding: 0; }\n");
+        htmlContent.append("table { border-collapse: collapse; width: 100%; font-family: 'Monospaced', Courier, monospace; font-size: 12px; }\n");
+        htmlContent.append("th, td { border: 1px solid #ccc; padding: 4px 8px; text-align: left; white-space: pre-wrap; vertical-align: top; }\n"); // pre-wrap to handle newlines within cells
+        htmlContent.append("th { background-color: #e0e0e0; font-weight: bold; }\n"); // Grey background for headers
+        htmlContent.append(".row-header { background-color: #e0e0e0; text-align: right; font-weight: bold; }\n"); // Grey background for row headers
+        htmlContent.append("</style>\n</head>\n<body>\n");
+        htmlContent.append("<table>\n");
+
+        try (FileInputStream fis = new FileInputStream(file);
+             Workbook workbook = new XSSFWorkbook(fis)) {
+
+            Sheet sheet = workbook.getSheetAt(0); // Get the first sheet
+
+            // Determine maximum column index to ensure all columns are displayed
+            int maxColIndex = -1;
+            for (Row row : sheet) {
+                if (row.getLastCellNum() > maxColIndex) {
+                    maxColIndex = row.getLastCellNum() -1; // getLastCellNum is 1-based
+                }
+            }
+            if (maxColIndex < 0) maxColIndex = 0; // Ensure at least one column if sheet is empty
+
+            // Generate column headers (A, B, C...)
+            htmlContent.append("<thead><tr>\n");
+            htmlContent.append("<th class=\"row-header\">&nbsp;</th>"); // Top-left blank cell for corner
+            for (int i = 0; i <= maxColIndex; i++) {
+                char columnChar = (char) ('A' + i);
+                htmlContent.append("<th>").append(columnChar).append("</th>");
+            }
+            htmlContent.append("</tr></thead>\n");
+
+            htmlContent.append("<tbody>\n");
+            FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
+            DataFormatter formatter = new DataFormatter();
+
+            // Iterate over each row in the sheet
+            for (int r = sheet.getFirstRowNum(); r <= sheet.getLastRowNum(); r++) {
+                Row row = sheet.getRow(r);
+                htmlContent.append("<tr>\n");
+                htmlContent.append("<td class=\"row-header\">").append(r + 1).append("</td>"); // Row number
+
+                // Iterate over each cell in the row
+                for (int i = 0; i <= maxColIndex; i++) {
+                    Cell cell = (row == null) ? null : row.getCell(i); // Handle empty rows
+                    String cellValue = getCellValueAsString(cell, evaluator, formatter);
+                    htmlContent.append("<td>").append(escapeHtml(cellValue)).append("</td>");
+                }
+                htmlContent.append("</tr>\n");
+            }
+            htmlContent.append("</tbody>\n");
+
+        } catch (Exception e) {
+            System.err.println("Error generating HTML preview for XLSX file: " + file.getName() + " - " + e.getMessage());
+            return "<html><body><h1>Error</h1><p>Error reading XLSX file: " + escapeHtml(e.getMessage()) + ". Please ensure it's a valid XLSX format.</p></body></html>";
+        }
+        htmlContent.append("</table>\n</body>\n</html>");
+        return htmlContent.toString();
+    }
+
+    /**
+     * Helper method to get cell value as a String, handling different cell types.
+     * This method now uses DataFormatter.formatCellValue(Cell cell, FormulaEvaluator evaluator)
+     * which correctly handles all cell types, including formulas, and applies formatting.
+     *
+     * @param cell The cell to get the value from.
+     * @param evaluator FormulaEvaluator for evaluating formula cells.
+     * @param formatter DataFormatter for general numeric and date formatting.
+     * @return The string representation of the cell's value.
+     */
+    private String getCellValueAsString(Cell cell, FormulaEvaluator evaluator, DataFormatter formatter) {
+        if (cell == null) {
+            return "";
+        }
+        // Use DataFormatter.formatCellValue with the cell and evaluator.
+        // This single call handles STRING, NUMERIC (including dates), BOOLEAN,
+        // BLANK, ERROR, and FORMULA cells correctly by evaluating formulas
+        // and applying the cell's formatting.
+        return formatter.formatCellValue(cell, evaluator);
+    }
+
+    /**
+     * Helper method to escape HTML special characters.
+     * Used to ensure cell values are safely displayed in WebView.
+     * @param text The text to escape.
+     * @return The HTML-escaped string.
+     */
+    private String escapeHtml(String text) {
+        if (text == null) return "";
+        return text.replace("&", "&amp;")
+                   .replace("<", "&lt;")
+                   .replace(">", "&gt;")
+                   .replace("\"", "&quot;")
+                   .replace("'", "&#x27;"); // For single quotes
     }
 
 
