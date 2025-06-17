@@ -21,6 +21,9 @@ public class Result {
 
     @Column(columnDefinition = "VARCHAR(45)")
     private String windSpeed;
+    
+    @Column(columnDefinition = "VARCHAR(45)")
+    private String vibration;
 
     @Column(columnDefinition = "VARCHAR(45)")
     private String current;
@@ -44,13 +47,14 @@ public class Result {
     public Result() {
     }
 
-    public Result(String fanSerialNo, String testPointName, String rpm, String windSpeed, String current,
+    public Result(String fanSerialNo, String testPointName, String rpm, String windSpeed, String vibration, String current,
                   String watts, String va, String powerFactor, String testStatus,
                   ProjectRun projectRun) {
     	this.fanSerialNumber = fanSerialNo;
         this.testPointName = testPointName;
         this.rpm = rpm;
         this.windSpeed = windSpeed;
+        this.vibration = vibration;
         this.current = current;
         this.watts = watts;
         this.va = va;
@@ -96,7 +100,15 @@ public class Result {
         this.windSpeed = windSpeed;
     }
 
-    public String getCurrent() {
+    public String getVibration() {
+		return vibration;
+	}
+
+	public void setVibration(String vibration) {
+		this.vibration = vibration;
+	}
+
+	public String getCurrent() {
         return current;
     }
 
@@ -152,6 +164,7 @@ public class Result {
                 ", testPointName='" + testPointName + '\'' +
                 ", rpm='" + rpm + '\'' +
                 ", windSpeed='" + windSpeed + '\'' +
+                ", vibration='" + vibration + '\'' + 
                 ", current='" + current + '\'' +
                 ", watts='" + watts + '\'' +
                 ", va='" + va + '\'' +

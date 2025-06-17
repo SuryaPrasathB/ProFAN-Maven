@@ -110,6 +110,21 @@ public class FanTestSetup {
 		private SimpleStringProperty windSpeedActualProperty = new SimpleStringProperty();
 	    
 	    @Column(columnDefinition = "VARCHAR(45)", nullable = false) 
+		private String vibrationLowerLimit = "";
+	    @Transient
+		private SimpleStringProperty vibrationLowerLimitProperty = new SimpleStringProperty();
+	    
+	    @Column(columnDefinition = "VARCHAR(45)", nullable = false) 
+		private String vibrationUpperLimit = "";
+	    @Transient
+		private SimpleStringProperty vibrationUpperLimitProperty = new SimpleStringProperty();
+	    
+	    @Column(columnDefinition = "VARCHAR(45)", nullable = false) 
+		private String vibrationActual = "";
+	    @Transient
+		private SimpleStringProperty vibrationActualProperty = new SimpleStringProperty();
+	    
+	    @Column(columnDefinition = "VARCHAR(45)", nullable = false) 
 		private String currentLowerLimit = "";
 	    @Transient
 		private SimpleStringProperty currentLowerLimitProperty = new SimpleStringProperty();
@@ -139,7 +154,54 @@ public class FanTestSetup {
 	    @Transient
 		private SimpleStringProperty wattsActualProperty = new SimpleStringProperty();
 	    
-	    @Column(columnDefinition = "VARCHAR(45)", nullable = false) 
+	    public String getVibrationLowerLimit() {
+			return vibrationLowerLimit;
+		}
+
+		public void setVibrationLowerLimit(String vibrationLowerLimit) {
+			this.vibrationLowerLimit = vibrationLowerLimit;
+		}
+
+		public SimpleStringProperty getVibrationLowerLimitProperty() {
+			return vibrationLowerLimitProperty;
+		}
+
+		public void setVibrationLowerLimitProperty(SimpleStringProperty vibrationLowerLimitProperty) {
+			this.vibrationLowerLimitProperty = vibrationLowerLimitProperty;
+		}
+
+		public String getVibrationUpperLimit() {
+			return vibrationUpperLimit;
+		}
+
+		public void setVibrationUpperLimit(String vibrationUpperLimit) {
+			this.vibrationUpperLimit = vibrationUpperLimit;
+		}
+
+		public SimpleStringProperty getVibrationUpperLimitProperty() {
+			return vibrationUpperLimitProperty;
+		}
+
+		public void setVibrationUpperLimitProperty(SimpleStringProperty vibrationUpperLimitProperty) {
+			this.vibrationUpperLimitProperty = vibrationUpperLimitProperty;
+		}
+
+		public String getVibrationActual() {
+			return vibrationActual;
+		}
+
+		public void setVibrationActual(String vibrationActual) {
+			this.vibrationActual = vibrationActual;
+		}
+
+		public SimpleStringProperty getVibrationActualProperty() {
+			return vibrationActualProperty;
+		}
+
+		public void setVibrationActualProperty(SimpleStringProperty vibrationActualProperty) {
+			this.vibrationActualProperty = vibrationActualProperty;
+		}
+		@Column(columnDefinition = "VARCHAR(45)", nullable = false) 
 		private String activePowerLowerLimit = "";
 	    @Transient
 		private SimpleStringProperty activePowerLowerLimitProperty = new SimpleStringProperty();
@@ -200,6 +262,8 @@ public class FanTestSetup {
 	    private SimpleBooleanProperty rpmValid = new SimpleBooleanProperty(true);
 	    @Transient
 	    private SimpleBooleanProperty windSpeedValid = new SimpleBooleanProperty(true);
+	    @Transient
+	    private SimpleBooleanProperty vibrationValid = new SimpleBooleanProperty(true);
 	    @Transient
 	    private SimpleBooleanProperty currentValid = new SimpleBooleanProperty(true);
 	    @Transient
@@ -609,6 +673,14 @@ public class FanTestSetup {
 
 		public SimpleBooleanProperty getWindSpeedValid() {
 			return windSpeedValid;
+		}
+
+		public SimpleBooleanProperty getVibrationValid() {
+			return vibrationValid;
+		}
+
+		public void setVibrationValid(SimpleBooleanProperty vibrationValid) {
+			this.vibrationValid = vibrationValid;
 		}
 
 		public SimpleBooleanProperty getCurrentValid() {

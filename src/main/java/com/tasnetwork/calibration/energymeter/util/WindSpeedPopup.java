@@ -77,7 +77,7 @@ public class WindSpeedPopup {
                     }
                 } else {
                     tf.setText(oldValue); // Revert to old value if non-numeric character is typed
-                    currentWarningLabel.setText("Only numbers (0-9, decimal point, negative sign) allowed!");
+                    currentWarningLabel.setText("Only numerical allowed!");
                     currentWarningLabel.setVisible(true);
                 }
 

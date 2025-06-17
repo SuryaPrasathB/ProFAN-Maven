@@ -111,7 +111,7 @@ public class FanProjectExecuteController implements Initializable {
 	private boolean isFirstTestPointInSequence = true; // Initialize to true for the very first test point in a new sequence
 
 	// Flag for simulation mode
-	private boolean SIMULATION_MODE = false; //true; // Set to true to bypass hardware calls
+	private boolean SIMULATION_MODE = true; // Set to true to bypass hardware calls
 
 	// FXML Buttons ===============================================================================================================================
 	@FXML private Button btnStart;
@@ -2241,6 +2241,34 @@ public class FanProjectExecuteController implements Initializable {
 	}
 
 	/**
+	 * Opens a non-modal popup containing N labeled TextFields ("Vibration Reading 1", "Vibration Reading 2", …),
+	 * a Save button and a Next/Confirm button. Once the user has entered all values and clicks Save,
+	 * the average of those values is returned.
+	 *
+	 * @param count the number of individual vibration readings to collect
+	 * @return the average of the entered vibration values
+	 */
+	private double promptForVibrationReadings(int count) {
+	    final FutureTask<Double> task = new FutureTask<>(() -> {
+	        // Reusing WindSpeedPopup for simplicity. Ideally, you might create a dedicated
+	        // 'VibrationPopup' class in 'com.tasnetwork.calibration.energymeter.util;'
+	        // if you need different UI or validation logic for vibration.
+	        WindSpeedPopup popup = new WindSpeedPopup(count);
+	        return popup.showAndWaitAndReturnAverage(); // Should be blocking on FX thread
+	    });
+
+	    Platform.runLater(task); // Run UI interaction on FX thread
+
+	    try {
+	        return task.get(); // Wait for result from FX thread
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        ApplicationLauncher.logger.error("Failed to get vibration readings from popup.", e);
+	        return 0.0; // Or some other fallback/default
+	    }
+	}
+	
+	/**
 	 * Executes a single test point by performing measurements such as RPM, Current, Watts,
 	 * Active Power, Power Factor, and Wind Speed. The execution path is controlled by the
 	 * `isStepRun` flag. If true, the function loops with a delay between each set of measurements
@@ -2282,6 +2310,7 @@ public class FanProjectExecuteController implements Initializable {
 				int windSpeedCount = fetchWindSpeedConfigForCurrentModel();
 				double avgWindSpeed;
 				if (SIMULATION_MODE) {
+					promptForWindSpeedReadings(windSpeedCount); // Simulating pop up
 					avgWindSpeed = Double.parseDouble(generateRandomWindSpeed());
 					appendLog("SIMULATION: Windspeed: " + String.format("%.1f", avgWindSpeed), LogLevel.INFO);
 				} else {
@@ -2299,6 +2328,29 @@ public class FanProjectExecuteController implements Initializable {
 						1.0,
 						"WindSpeed"
 						);
+				
+				// Vibration Parameter Logic similar to Wind speed
+				int vibrationCount = fetchWindSpeedConfigForCurrentModel();
+	            double avgVibration;
+	            if (SIMULATION_MODE) {
+	                promptForVibrationReadings(vibrationCount); // Simulating pop up for vibration
+	                avgVibration = Double.parseDouble(generateRandomVibration());
+	                appendLog("SIMULATION: Vibration: " + String.format("%.1f", avgVibration), LogLevel.INFO);
+	            } else {
+	                avgVibration = promptForVibrationReadings(vibrationCount);
+	            }
+	            Supplier<String> vibrationSupplier = () -> String.valueOf(avgVibration);
+
+	            readValidateAndUpdate(
+	                    vibrationSupplier,
+	                    FanTestSetup::getVibrationLowerLimit, // Assumes this method exists
+	                    FanTestSetup::getVibrationUpperLimit, // Assumes this method exists
+	                    FanTestSetup::setVibrationActual,     // Assumes this method exists
+	                    FanTestSetup::getVibrationValid,      // Assumes this method exists
+	                    testPoint,
+	                    1.0, // Adjust progress if other steps follow
+	                    "Vibration"
+	            );
 
 			} catch (InterruptedException e) {
 				appendLog("Measurement loop interrupted.", LogLevel.INFO);
@@ -4405,6 +4457,7 @@ public class FanProjectExecuteController implements Initializable {
 		case "WindSpeed" 	: currentResult.setWindSpeed(finalValue); break;
 		case "Current" 		: currentResult.setCurrent(finalValue); break;
 		case "Watts" 		: currentResult.setWatts(finalValue); break;
+		case "Vibration"	: currentResult.setVibration(finalValue); break;
 		case "ActivePower"  : currentResult.setVa(finalValue); break;
 		case "PowerFactor"  : currentResult.setPowerFactor(finalValue); break;
 		}
@@ -4665,6 +4718,12 @@ public class FanProjectExecuteController implements Initializable {
 	public static String generateRandomWindSpeed() {
 		double windSpeed = 1 + (random.nextDouble() * 19); // Random value between 1 and 20
 		return String.format("%.1f", windSpeed);  // Format to one decimal place
+	}
+	
+	// Method to generate random Vibration value (e.g., in the range of 0.1 to 5.0 g)
+	public static String generateRandomVibration() {
+	    double vibration = 0.1 + (random.nextDouble() * 4.9); // Random value between 0.1 and 5.0
+	    return String.format("%.1f", vibration);  // Format to one decimal place
 	}
 
 	// Method to generate random voltage value (e.g., in the range of 0 to 415)
