@@ -4,9 +4,11 @@ import java.io.IOException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -105,7 +107,9 @@ public class FanProjectExecuteController implements Initializable {
 	
 	private ProjectRun currentProjectRun;
 	
-	
+	// Flag for simulation mode
+	private boolean SIMULATION_MODE = true; // Set to true to bypass hardware calls
+
 	// FXML Buttons ===============================================================================================================================
 	@FXML private Button btnStart;
 	static private Button ref_btnStart;
@@ -885,7 +889,7 @@ public class FanProjectExecuteController implements Initializable {
 
 		tvTestSetup.setItems(dummyData);*/
 
-		/*    	colPmPalletBatchNo.setCellValueFactory(data -> data.getValue().getPalletBatchNoProperty().asObject());
+		/* colPmPalletBatchNo.setCellValueFactory(data -> data.getValue().getPalletBatchNoProperty().asObject());
 		colPmPalletActive.setStyle( "-fx-alignment: CENTER;");
 		colPmPalletActive.setCellValueFactory(new PalletBayTestPalletActive_CheckBoxValueFactory());
 		colPmPalletQrId.setCellValueFactory(data -> data.getValue().getPalletQrIdProperty());*/
@@ -1577,12 +1581,19 @@ public class FanProjectExecuteController implements Initializable {
 	        String testPointName = tp.getTestPointName();
 
 	        // Check if result already exists with INPROGRESS
-	        Result existingResult = DeviceDataManagerController.getResultService()
-	            .findByFanSerialNumberAndTestPointNameAndProjectRunAndTestStatus(
-	                fanSerialNumber, testPointName, currentProjectRun, ConstantStatus.IN_PROG
-	            );
+			/*
+			 * Result existingResult = DeviceDataManagerController.getResultService()
+			 * .findByFanSerialNumberAndTestPointNameAndProjectRunAndTestStatus(
+			 * fanSerialNumber, testPointName, currentProjectRun, ConstantStatus.IN_PROG );
+			 */
+	        
+			/*
+			 * Result existingResult = DeviceDataManagerController.getResultService()
+			 * .findByFanSerialNumberAndTestPointNameAndProjectRunAndTestStatus(
+			 * fanSerialNumber, testPointName, currentProjectRun, ConstantStatus.IN_PROG );
+			 */
 
-	        if (existingResult == null) {
+	        if (existingResults == null) {
 	            createResult(fanSerialNumber, testPointName, defaultStatus, currentProjectRun);
 	        } else {
 	            appendLog("Skipping creation for test point " + testPointName + " (already INPROGRESS)", LogLevel.DEBUG);
@@ -1693,9 +1704,14 @@ public class FanProjectExecuteController implements Initializable {
 	    isRunning = false;
 	    isStopped = true;
 
-	    appendLog("Set Voltage : 0", LogLevel.INFO);
-	    TestPointUtils.setVoltage("0");
-	    ApplicationLauncher.logger.info("Execution stopped manually. Voltage set to 0.");
+	    // Reset voltage to 0 only if not in simulation mode
+	    if (!SIMULATION_MODE) {
+	        appendLog("Set Voltage : 0", LogLevel.INFO);
+	        TestPointUtils.setVoltage("0");
+	        ApplicationLauncher.logger.info("Execution stopped manually. Voltage set to 0.");
+	    } else {
+	        appendLog("SIMULATION: Voltage reset skipped.", LogLevel.INFO);
+	    }
 
 	    setControlsDisabled(false); // Re-enable all buttons
 	}
@@ -1772,7 +1788,7 @@ public class FanProjectExecuteController implements Initializable {
 	    FanTestSetup testPoint = testPoints.get(currentIndex);
 		// Update results to DB
 	    updateResultMeasurements(
-	    		currentProjectRun, 
+	    		//currentProjectRun, 
 	    		fanSerialNumber, 
 	    		testPoint.getTestPointName(), 
 	    		currentResult.getRpm(), 
@@ -1855,6 +1871,52 @@ public class FanProjectExecuteController implements Initializable {
 	    }
 	}
 
+	/**
+	 * Updates measurement values for a specific Result entry.
+	 *
+	 * @param projectRun      The associated ProjectRun instance.
+	 * @param fanSerialNumber The fan's serial number.
+	 * @param testPointName   The test point name to identify the result.
+	 * @param rpm             Measured RPM.
+	 * @param windspeed       Measured windspeed.
+	 * @param watts           Measured watts.
+	 * @param va              Measured VA.
+	 * @param current         Measured current.
+	 * @param powerFactor     Measured power factor.
+	 * @param status          Final test status ("Completed", "Failed", etc.).
+	 */
+	public void updateResultMeasurements(String fanSerialNumber, String testPointName,
+	                                     String rpm, String windspeed, String watts, String va, String current,
+	                                     String powerFactor, String status) {
+
+		
+		/*Result test1 = displayDataObj.getResultService()
+	            .findByProjectRunAndTestPointName(projectRun,testPointName);
+		
+		if (test1 != null) {
+			ApplicationLauncher.logger.debug("Test 1 Found : By Project Run and Test Point Name") ;
+		}*/
+		
+	    Result result = DeviceDataManagerController.getResultService()
+	            .findByFanSerialNumberAndTestPointName(fanSerialNumber, testPointName);
+
+	    if (result != null) {
+	        result.setRpm(rpm);
+	        result.setWindSpeed(windspeed);
+	        result.setWatts(watts);
+	        result.setVa(va);
+	        result.setCurrent(current);
+	        result.setPowerFactor(powerFactor);
+	        result.setTestStatus(status);
+
+	        DeviceDataManagerController.getResultService().saveToDb(result);
+	    } else {
+	    	ApplicationLauncher.logger.debug("Fan Serial Number : " + fanSerialNumber);
+	    	ApplicationLauncher.logger.debug("Test Point Name : " + testPointName);
+	        appendLog("Result not found for test point: " + testPointName, LogLevel.INFO);
+	        ApplicationLauncher.logger.debug("Result not found for test point: " + testPointName);
+	    }
+	}
 
 	// Call this method to disable or enable test control buttons
 	private void setControlsDisabled(boolean disabled) {
@@ -1897,7 +1959,31 @@ public class FanProjectExecuteController implements Initializable {
                 	e.printStackTrace();
                 }
             }
+            // After all test points are completed and not stopped
+            if (!isStopped && currentIndex == testPoints.size()) {
+                Platform.runLater(() -> {
+                    appendLog("All test points completed. Updating project status and serial number.", LogLevel.INFO);
+                    updateProjectRunStatus(ConstantStatus.COMPLETED); // Mark project run as completed
+                    updateNextSerialNumber(); // Increment serial number after completion
+                    setControlsDisabled(false); // Re-enable controls
+                });
+            }
         }).start();
+	}
+	
+	// updateProjectRunStatus function
+	/**
+	 * Updates the status of the current ProjectRun.
+	 */
+	private void updateProjectRunStatus(String status) {
+	    if (currentProjectRun != null) {
+	        currentProjectRun.setExecutionStatus(status);
+	        currentProjectRun.setEndTime(String.valueOf(LocalDateTime.now())); // Set end time when status changes to completed/stopped/failed
+	        displayDataObj.getProjectRunService().saveToDb(currentProjectRun);
+	        appendLog("Project Run status updated to: " + status, LogLevel.INFO);
+	    } else {
+	        appendLog("No active Project Run to update status.", LogLevel.DEBUG);
+	    }
 	}
 
 	/**
@@ -1923,9 +2009,16 @@ public class FanProjectExecuteController implements Initializable {
 	    appendLog("Setting Voltage : " + targetVoltage, LogLevel.INFO);
 	    Platform.runLater(() -> testPoint.setProgress(0.1));
 
-	    boolean voltageSet = TestPointUtils.setVoltage(targetVoltage);
-	    if (!voltageSet || TestPointUtils.getLastErrorMessage().contains("COM") || TestPointUtils.getLastErrorMessage().contains("not found")) {
-	        handleExecutionFailure(testPoint, "COM PORT NOT FOUND. Stopping execution.");
+	    boolean voltageSet;
+	    if (SIMULATION_MODE) {
+	        appendLog("SIMULATION: Setting Voltage (no actual hardware call): " + targetVoltage, LogLevel.INFO);
+	        voltageSet = true; // Simulate success
+	    } else {
+	        voltageSet = TestPointUtils.setVoltage(targetVoltage);
+	    }
+	    
+	    if (!voltageSet || (!SIMULATION_MODE && (TestPointUtils.getLastErrorMessage().contains("COM") || TestPointUtils.getLastErrorMessage().contains("not found")))) {
+	        handleExecutionFailure(testPoint, "COM PORT NOT FOUND. Stopping execution." + (SIMULATION_MODE ? " (Simulated)" : ""));
 	        return;
 	    }
 
@@ -1941,16 +2034,25 @@ public class FanProjectExecuteController implements Initializable {
 	    String actualVoltage = "";
 
 	    for (int attempt = 1; attempt <= MAX_ATTEMPTS && !isStopped; attempt++) {
-	    	
-	    	if (modelPhase.equals("1")) {
-	    		appendLog("Reading R phase Voltage", LogLevel.INFO);
-	    		actualVoltage = TestPointUtils.readRPhaseVoltage();
-			} else if (modelPhase.equals("3")) {
-				appendLog("Reading 3 phase Voltage", LogLevel.INFO);
-				actualVoltage = TestPointUtils.readRYVoltage();
-			}
-	    	
-	        //actualVoltage = TestPointUtils.readRPhaseVoltage();
+	    	if (SIMULATION_MODE) {
+	            // Simulate voltage near target
+	            try {
+	                double target = Double.parseDouble(targetVoltage.trim());
+	                double simulatedVoltage = target + (random.nextDouble() * 10 - 5); // +/- 5V simulation
+	                actualVoltage = String.format("%.2f", simulatedVoltage);
+	            } catch (NumberFormatException e) {
+	                actualVoltage = "230.0"; // Default simulated voltage
+	            }
+	            appendLog("SIMULATION: Read Voltage: " + actualVoltage, LogLevel.INFO);
+	        } else {
+	    	    if (modelPhase.equals("1")) {
+	    		    appendLog("Reading R phase Voltage", LogLevel.INFO);
+	    		    actualVoltage = TestPointUtils.readRPhaseVoltage();
+			    } else if (modelPhase.equals("3")) {
+				    appendLog("Reading 3 phase Voltage", LogLevel.INFO);
+				    actualVoltage = TestPointUtils.readRYVoltage();
+			    }
+	        }
 	    	
 	        try {
 	            double actual = Double.parseDouble(actualVoltage.trim());
@@ -2005,7 +2107,7 @@ public class FanProjectExecuteController implements Initializable {
 	    
 	    // Update results to DB
 	    updateResultMeasurements(
-	    		currentProjectRun, 
+	    		//currentProjectRun, 
 	    		fanSerialNumber, 
 	    		testPoint.getTestPointName(), 
 	    		currentResult.getRpm(), 
@@ -2028,11 +2130,12 @@ public class FanProjectExecuteController implements Initializable {
 	    });
 
 	    // Reset voltage only if not step run (optional logic)
-	    if (!isStepRun && currentIndex >= testPoints.size() - 1) {
+	    // This part is moved to runTestPointsSequentially after all tests are done
+	    /* if (!isStepRun && currentIndex >= testPoints.size() - 1) {
 	        TestPointUtils.setVoltage("0");
 	        appendLog("All test points completed. Voltage set to 0.", LogLevel.INFO);
 	        setControlsDisabled(false);
-	    }	        
+	    } */	        
 	}
 	
 	/**
@@ -2087,31 +2190,43 @@ public class FanProjectExecuteController implements Initializable {
      * PASSED or FAILED based on all validation flags.
      *
      * @param testPoint       the current test point containing expected limits and setters
-     * @param currentResult   the result object to update the final test status
      * @param isStepRun       boolean flag to control step-run looping mode
      * @throws InterruptedException if the loop is interrupted during sleep
      */
     private void executeTestPoint(FanTestSetup testPoint, boolean isStepRun) {
         Runnable runAllValidations = () -> {
             try {
-                readValidateAndUpdate(TestPointUtils::readRpm, FanTestSetup::getRpmLowerLimit, FanTestSetup::getRpmUpperLimit,
+                // Determine the correct data source (simulation or actual hardware) based on SIMULATION_MODE
+                Supplier<String> rpmReadFunc = SIMULATION_MODE ? FanProjectExecuteController::generateRandomRpm : TestPointUtils::readRpm;
+                Supplier<String> currentReadFunc = SIMULATION_MODE ? FanProjectExecuteController::generateRandomCurrent : TestPointUtils::readCurrent;
+                Supplier<String> wattsReadFunc = SIMULATION_MODE ? FanProjectExecuteController::generateRandomWatts : TestPointUtils::readWatts;
+                Supplier<String> activePowerReadFunc = SIMULATION_MODE ? FanProjectExecuteController::generateRandomActivePower : TestPointUtils::readActivePower;
+                Supplier<String> powerFactorReadFunc = SIMULATION_MODE ? FanProjectExecuteController::generateRandomPowerFactor : TestPointUtils::readPowerFactor;
+
+                readValidateAndUpdate(rpmReadFunc, FanTestSetup::getRpmLowerLimit, FanTestSetup::getRpmUpperLimit,
                         FanTestSetup::setRpmActual, FanTestSetup::getRpmValid, testPoint, 0.7, "RPM");
 
-                readValidateAndUpdate(TestPointUtils::readCurrent, FanTestSetup::getCurrentLowerLimit, FanTestSetup::getCurrentUpperLimit,
+                readValidateAndUpdate(currentReadFunc, FanTestSetup::getCurrentLowerLimit, FanTestSetup::getCurrentUpperLimit,
                         FanTestSetup::setCurrentActual, FanTestSetup::getCurrentValid, testPoint, 0.75, "Current");
 
-                readValidateAndUpdate(TestPointUtils::readWatts, FanTestSetup::getWattsLowerLimit, FanTestSetup::getWattsUpperLimit,
+                readValidateAndUpdate(wattsReadFunc, FanTestSetup::getWattsLowerLimit, FanTestSetup::getWattsUpperLimit,
                         FanTestSetup::setWattsActual, FanTestSetup::getWattsValid, testPoint, 0.80, "Watts");
 
-                readValidateAndUpdate(TestPointUtils::readActivePower, FanTestSetup::getActivePowerLowerLimit, FanTestSetup::getActivePowerUpperLimit,
+                readValidateAndUpdate(activePowerReadFunc, FanTestSetup::getActivePowerLowerLimit, FanTestSetup::getActivePowerUpperLimit,
                         FanTestSetup::setActivePowerActual, FanTestSetup::getActivePowerValid, testPoint, 0.85, "ActivePower");
 
-                readValidateAndUpdate(TestPointUtils::readPowerFactor, FanTestSetup::getPowerFactorLowerLimit, FanTestSetup::getPowerFactorUpperLimit,
+                readValidateAndUpdate(powerFactorReadFunc, FanTestSetup::getPowerFactorLowerLimit, FanTestSetup::getPowerFactorUpperLimit,
                         FanTestSetup::setPowerFactorActual, FanTestSetup::getPowerFactorValid, testPoint, 0.90, "PowerFactor");
 
                 // Wind speed logic
                 int windSpeedCount = fetchWindSpeedConfigForCurrentModel();
-                double avgWindSpeed = promptForWindSpeedReadings(windSpeedCount);
+                double avgWindSpeed;
+                if (SIMULATION_MODE) {
+                    avgWindSpeed = Double.parseDouble(generateRandomWindSpeed());
+                    appendLog("SIMULATION: Windspeed: " + String.format("%.1f", avgWindSpeed), LogLevel.INFO);
+                } else {
+                    avgWindSpeed = promptForWindSpeedReadings(windSpeedCount);
+                }
                 Supplier<String> windSpeedSupplier = () -> String.valueOf(avgWindSpeed);
 
                 readValidateAndUpdate(
@@ -2167,7 +2282,7 @@ public class FanProjectExecuteController implements Initializable {
 	        testPoint.setIsRunning(false);
 	        tvTestSetup.refresh();
 
-	        Alert alert = new Alert(Alert.AlertType.ERROR);
+	        Alert alert = new Alert(AlertType.ERROR);
 	        alert.setTitle("Execution Error");
 	        alert.setHeaderText(null);
 	        alert.setContentText(errorMsg);
@@ -2203,6 +2318,43 @@ public class FanProjectExecuteController implements Initializable {
 
 	}
 	
+	/**
+     * Automatically updates the fan serial number in the text field to the next sequential number.
+     * Assumes serial numbers are in the format "SN" followed by a number (e.g., "SN100").
+     */
+    private void updateNextSerialNumber() {
+        String currentSerialNumber = ref_txtNewFanSerialNo.getText();
+        if (currentSerialNumber != null && currentSerialNumber.startsWith("SN") && currentSerialNumber.length() > 2) {
+            try {
+                // Extract the numeric part of the serial number
+                String numericPartStr = currentSerialNumber.substring(2);
+                int numericPart = Integer.parseInt(numericPartStr);
+
+                // Increment the numeric part
+                int nextNumericPart = numericPart + 1;
+
+                // Format the new serial number back to "SN" + incremented number (with leading zeros if necessary)
+                // This assumes a fixed width for the numeric part, or you can adjust formatting as needed.
+                // For example, if "SN100" becomes "SN101", "SN001" becomes "SN002"
+                String formatString = "SN%0" + numericPartStr.length() + "d";
+                String newSerialNumber = String.format(formatString, nextNumericPart);
+
+                // Set the new serial number to the text field on the JavaFX Application Thread
+                Platform.runLater(() -> {
+                    ref_txtNewFanSerialNo.setText(newSerialNumber);
+                    appendLog("Fan serial number updated to: " + newSerialNumber, LogLevel.INFO);
+                });
+
+            } catch (NumberFormatException e) {
+                appendLog("Failed to parse serial number for increment: " + currentSerialNumber + ". Error: " + e.getMessage(), LogLevel.ERROR);
+            } catch (Exception e) {
+                appendLog("An unexpected error occurred while updating serial number: " + e.getMessage(), LogLevel.ERROR);
+            }
+        } else {
+            appendLog("Current serial number format is not 'SNXXX' or is empty. Cannot automatically increment: " + currentSerialNumber, LogLevel.DEBUG);
+        }
+    }
+
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 	public void saveToDbTask() {
@@ -2741,7 +2893,12 @@ public class FanProjectExecuteController implements Initializable {
             DeviceDataManagerController.setDutCommandData(dutCommand);
 
             boolean isDataAppend = false;
-            dutCommandExecuteStart("", isDataAppend);
+            // Only call hardware command if not in simulation mode
+            if (!SIMULATION_MODE) {
+                dutCommandExecuteStart("", isDataAppend);
+            } else {
+                appendLog("SIMULATION: Start command skipped.", LogLevel.INFO);
+            }
         }
     }
 
@@ -2761,7 +2918,12 @@ public class FanProjectExecuteController implements Initializable {
             DeviceDataManagerController.setDutCommandData(dutCommand);
 
             boolean isDataAppend = false;
-            dutCommandExecuteStart("", isDataAppend);
+            // Only call hardware command if not in simulation mode
+            if (!SIMULATION_MODE) {
+                dutCommandExecuteStart("", isDataAppend);
+            } else {
+                appendLog("SIMULATION: Stop command skipped.", LogLevel.INFO);
+            }
         }
     }
 
@@ -2787,7 +2949,12 @@ public class FanProjectExecuteController implements Initializable {
             }
             
             boolean isDataAppend = true;
-            dutCommandExecuteStart(appendData, isDataAppend);
+            // Only call hardware command if not in simulation mode
+            if (!SIMULATION_MODE) {
+                dutCommandExecuteStart(appendData, isDataAppend);
+            } else {
+                appendLog("SIMULATION: Dimmer Forward skipped (data: " + appendData + ").", LogLevel.INFO);
+            }
         }
 
         Platform.runLater(() -> {
@@ -2818,7 +2985,12 @@ public class FanProjectExecuteController implements Initializable {
             }
             
             boolean isDataAppend = true;
-            dutCommandExecuteStart(appendData, isDataAppend);
+            // Only call hardware command if not in simulation mode
+            if (!SIMULATION_MODE) {
+                dutCommandExecuteStart(appendData, isDataAppend);
+            } else {
+                appendLog("SIMULATION: Dimmer Reverse skipped (data: " + appendData + ").", LogLevel.INFO);
+            }
         }
 
         Platform.runLater(() -> {
@@ -2839,7 +3011,13 @@ public class FanProjectExecuteController implements Initializable {
             DeviceDataManagerController.setDutCommandData(dutCommand);
 
             boolean isDataAppend = false;
-            boolean result = dutCommandExecuteStart("", isDataAppend);
+            boolean result;
+            if (SIMULATION_MODE) {
+                result = random.nextBoolean(); // Simulate random true/false
+                appendLog("SIMULATION: Dimmer Is Min returned " + result, LogLevel.INFO);
+            } else {
+                result = dutCommandExecuteStart("", isDataAppend);
+            }
 
             Platform.runLater(() -> {
                 if (clickedButtonRef == ref_btnDimmerIsMin) {
@@ -2871,18 +3049,25 @@ public class FanProjectExecuteController implements Initializable {
             DeviceDataManagerController.setDutCommandData(dutCommand);
 
             boolean isDataAppend = false;
-            boolean result = dutCommandExecuteStart("", isDataAppend);
+            boolean result;
+            if (SIMULATION_MODE) {
+                result = true; // Simulate success
+                appendLog("SIMULATION: Dimmer Set Min successful.", LogLevel.INFO);
+            } else {
+                result = dutCommandExecuteStart("", isDataAppend);
+            }
 
             Platform.runLater(() -> {
-                if (clickedButtonRef == ref_btnDimmerIsMin) {
+                if (clickedButtonRef == ref_btnDimmerIsMin) { // Note: this might be a copy-paste error, should be SetMin related buttons
                     ref_btnDimmerIsMin.setStyle(result 
                         ? ConstantCSS.FX_BACKGROUND_COLOR + ConstantCSS.COLOR_GREEN_SEMI_COLON
                         : ConstantCSS.FX_BACKGROUND_COLOR + ConstantCSS.COLOR_RED_SEMI_COLON);
-                } else if (clickedButtonRef == ref_btnDimmerIsMinExecute) {
+                } else if (clickedButtonRef == ref_btnDimmerIsMinExecute) { // Same here
                     ref_btnDimmerIsMinExecute.setStyle(result 
                         ? ConstantCSS.FX_BACKGROUND_COLOR + ConstantCSS.COLOR_GREEN_SEMI_COLON
                         : ConstantCSS.FX_BACKGROUND_COLOR + ConstantCSS.COLOR_RED_SEMI_COLON);
                 }
+                // Potentially, add specific styles for btnDimmerSetMin and btnDimmerSetMinExecute if they exist
             });
         }
 
@@ -2911,7 +3096,12 @@ public class FanProjectExecuteController implements Initializable {
             }
             
             boolean isDataAppend = true;
-            dutCommandExecuteStart(appendData, isDataAppend);
+            // Only call hardware command if not in simulation mode
+            if (!SIMULATION_MODE) {
+                dutCommandExecuteStart(appendData, isDataAppend);
+            } else {
+                appendLog("SIMULATION: Set Voltage skipped (data: " + appendData + ").", LogLevel.INFO);
+            }
         }
 
         Platform.runLater(() -> clickedButtonRef.setDisable(false));
@@ -2938,7 +3128,12 @@ public class FanProjectExecuteController implements Initializable {
             }
             
             boolean isDataAppend = true;
-            dutCommandExecuteStart(appendData, isDataAppend);
+            // Only call hardware command if not in simulation mode
+            if (!SIMULATION_MODE) {
+                dutCommandExecuteStart(appendData, isDataAppend);
+            } else {
+                appendLog("SIMULATION: Test Voltage skipped (data: " + appendData + ").", LogLevel.INFO);
+            }
         }
 
         Platform.runLater(() -> clickedButtonRef.setDisable(false));
@@ -2957,7 +3152,12 @@ public class FanProjectExecuteController implements Initializable {
             DeviceDataManagerController.setDutCommandData(dutCommand);
 
             boolean isDataAppend = false;
-            dutCommandExecuteStart("", isDataAppend);
+            // Only call hardware command if not in simulation mode
+            if (!SIMULATION_MODE) {
+                dutCommandExecuteStart("", isDataAppend);
+            } else {
+                appendLog("SIMULATION: Maintain Voltage skipped.", LogLevel.INFO);
+            }
         }
 
         Platform.runLater(() -> clickedButtonRef.setDisable(false));
@@ -2966,611 +3166,781 @@ public class FanProjectExecuteController implements Initializable {
     public void rPhaseVoltageTask() {
         Platform.runLater(() -> ref_btnRPhaseVoltage.setDisable(true));
 
-        String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-        String testCaseName = ConstantArduinoCommands.R_PHASE_VOLTAGE;
-        Optional<DutCommand> opt = DeviceDataManagerController
-                .getDutCommandService()
-                .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+        String value;
+        if (SIMULATION_MODE) {
+            value = generateRandomVoltage(); // Simulate a random voltage
+            appendLog("SIMULATION: R Phase Voltage: " + value, LogLevel.INFO);
+        } else {
+            String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+            String testCaseName = ConstantArduinoCommands.R_PHASE_VOLTAGE;
+            Optional<DutCommand> opt = DeviceDataManagerController
+                    .getDutCommandService()
+                    .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
 
-        if (opt.isPresent()) {
-            DeviceDataManagerController.setDutCommandData(opt.get());
+            if (opt.isPresent()) {
+                DeviceDataManagerController.setDutCommandData(opt.get());
 
-            Map<String, Object> resp = new DutSerialDataManager()
-                    .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
+                Map<String, Object> resp = new DutSerialDataManager()
+                        .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
 
-            boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
-            String value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
-
-            Platform.runLater(() -> ref_txtRPhaseVoltage.setText(value));
+                boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
+                value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
+            } else {
+                value = ConstantArduinoCommands.CMD_FAILED;
+            }
         }
 
+        Platform.runLater(() -> ref_txtRPhaseVoltage.setText(value));
         Platform.runLater(() -> ref_btnRPhaseVoltage.setDisable(false));
     }
 
     public void rPhaseCurrentTask() {
         Platform.runLater(() -> ref_btnRPhaseCurrent.setDisable(true));
 
-        String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-        String testCaseName = ConstantArduinoCommands.R_PHASE_CURRENT;
-        Optional<DutCommand> opt = DeviceDataManagerController
-                .getDutCommandService()
-                .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
-
-        if (opt.isPresent()) {
-            DeviceDataManagerController.setDutCommandData(opt.get());
-
-            Map<String, Object> resp = new DutSerialDataManager()
-                    .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
-
-            boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
-            String value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
-
-            Platform.runLater(() -> ref_txtRPhaseCurrent.setText(value));
+        String value;
+        if (SIMULATION_MODE) {
+            value = generateRandomCurrent(); // Simulate random current
+            appendLog("SIMULATION: R Phase Current: " + value, LogLevel.INFO);
         } else {
-            Platform.runLater(() -> ref_txtRPhaseCurrent.setText(ConstantArduinoCommands.CMD_FAILED));
+            String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+            String testCaseName = ConstantArduinoCommands.R_PHASE_CURRENT;
+            Optional<DutCommand> opt = DeviceDataManagerController
+                    .getDutCommandService()
+                    .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+
+            if (opt.isPresent()) {
+                DeviceDataManagerController.setDutCommandData(opt.get());
+
+                Map<String, Object> resp = new DutSerialDataManager()
+                        .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
+
+                boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
+                value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
+            } else {
+                value = ConstantArduinoCommands.CMD_FAILED;
+            }
         }
 
+        Platform.runLater(() -> ref_txtRPhaseCurrent.setText(value));
         Platform.runLater(() -> ref_btnRPhaseCurrent.setDisable(false));
     }
 
     public void rPhaseWattsTask() {
         Platform.runLater(() -> ref_btnRPhaseWatts.setDisable(true));
 
-        String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-        String testCaseName = ConstantArduinoCommands.R_PHASE_WATTS;
-        Optional<DutCommand> opt = DeviceDataManagerController
-                .getDutCommandService()
-                .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+        String value;
+        if (SIMULATION_MODE) {
+            value = generateRandomWatts(); // Simulate random watts
+            appendLog("SIMULATION: R Phase Watts: " + value, LogLevel.INFO);
+        } else {
+            String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+            String testCaseName = ConstantArduinoCommands.R_PHASE_WATTS;
+            Optional<DutCommand> opt = DeviceDataManagerController
+                    .getDutCommandService()
+                    .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
 
-        if (opt.isPresent()) {
-            DeviceDataManagerController.setDutCommandData(opt.get());
+            if (opt.isPresent()) {
+                DeviceDataManagerController.setDutCommandData(opt.get());
 
-            Map<String, Object> resp = new DutSerialDataManager()
-                    .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
+                Map<String, Object> resp = new DutSerialDataManager()
+                        .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
 
-            boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
-            String value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
-
-            Platform.runLater(() -> ref_txtRPhaseWatts.setText(value));
+                boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
+                value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
+            } else {
+                value = ConstantArduinoCommands.CMD_FAILED;
+            }
         }
 
+        Platform.runLater(() -> ref_txtRPhaseWatts.setText(value));
         Platform.runLater(() -> ref_btnRPhaseWatts.setDisable(false));
     }
 
     public void rPhaseVATask() {
         Platform.runLater(() -> ref_btnRPhaseVA.setDisable(true));
 
-        String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-        String testCaseName = ConstantArduinoCommands.R_PHASE_VA;
-        Optional<DutCommand> opt = DeviceDataManagerController
-                .getDutCommandService()
-                .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+        String value;
+        if (SIMULATION_MODE) {
+            value = generateRandomActivePower(); // Simulate random VA
+            appendLog("SIMULATION: R Phase VA: " + value, LogLevel.INFO);
+        } else {
+            String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+            String testCaseName = ConstantArduinoCommands.R_PHASE_VA;
+            Optional<DutCommand> opt = DeviceDataManagerController
+                    .getDutCommandService()
+                    .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
 
-        if (opt.isPresent()) {
-            DeviceDataManagerController.setDutCommandData(opt.get());
+            if (opt.isPresent()) {
+                DeviceDataManagerController.setDutCommandData(opt.get());
 
-            Map<String, Object> resp = new DutSerialDataManager()
-                    .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
+                Map<String, Object> resp = new DutSerialDataManager()
+                        .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
 
-            boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
-            String value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
-
-            Platform.runLater(() -> ref_txtRPhaseVA.setText(value));
+                boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
+                value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
+            } else {
+                value = ConstantArduinoCommands.CMD_FAILED;
+            }
         }
 
+        Platform.runLater(() -> ref_txtRPhaseVA.setText(value));
         Platform.runLater(() -> ref_btnRPhaseVA.setDisable(false));
     }
 
     public void rPhasePFTask() {
         Platform.runLater(() -> ref_btnRPhasePF.setDisable(true));
 
-        String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-        String testCaseName = ConstantArduinoCommands.R_PHASE_PF;
-        Optional<DutCommand> opt = DeviceDataManagerController
-                .getDutCommandService()
-                .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+        String value;
+        if (SIMULATION_MODE) {
+            value = generateRandomPowerFactor(); // Simulate random power factor
+            appendLog("SIMULATION: R Phase PF: " + value, LogLevel.INFO);
+        } else {
+            String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+            String testCaseName = ConstantArduinoCommands.R_PHASE_PF;
+            Optional<DutCommand> opt = DeviceDataManagerController
+                    .getDutCommandService()
+                    .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
 
-        if (opt.isPresent()) {
-            DeviceDataManagerController.setDutCommandData(opt.get());
+            if (opt.isPresent()) {
+                DeviceDataManagerController.setDutCommandData(opt.get());
 
-            Map<String, Object> resp = new DutSerialDataManager()
-                    .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
+                Map<String, Object> resp = new DutSerialDataManager()
+                        .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
 
-            boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
-            String value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
-
-            Platform.runLater(() -> ref_txtRPhasePF.setText(value));
+                boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
+                value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
+            } else {
+                value = ConstantArduinoCommands.CMD_FAILED;
+            }
         }
 
+        Platform.runLater(() -> ref_txtRPhasePF.setText(value));
         Platform.runLater(() -> ref_btnRPhasePF.setDisable(false));
     }
 
     public void yPhaseVoltageTask() {
         Platform.runLater(() -> ref_btnYPhaseVoltage.setDisable(true));
 
-        String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-        String testCaseName = ConstantArduinoCommands.Y_PHASE_VOLTAGE;
-        Optional<DutCommand> opt = DeviceDataManagerController
-                .getDutCommandService()
-                .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+        String value;
+        if (SIMULATION_MODE) {
+            value = generateRandomVoltage(); // Simulate random voltage
+            appendLog("SIMULATION: Y Phase Voltage: " + value, LogLevel.INFO);
+        } else {
+            String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+            String testCaseName = ConstantArduinoCommands.Y_PHASE_VOLTAGE;
+            Optional<DutCommand> opt = DeviceDataManagerController
+                    .getDutCommandService()
+                    .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
 
-        if (opt.isPresent()) {
-            DeviceDataManagerController.setDutCommandData(opt.get());
+            if (opt.isPresent()) {
+                DeviceDataManagerController.setDutCommandData(opt.get());
 
-            Map<String, Object> resp = new DutSerialDataManager()
-                    .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
+                Map<String, Object> resp = new DutSerialDataManager()
+                        .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
 
-            boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
-            String value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
-
-            Platform.runLater(() -> ref_txtYPhaseVoltage.setText(value));
+                boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
+                value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
+            } else {
+                value = ConstantArduinoCommands.CMD_FAILED;
+            }
         }
 
+        Platform.runLater(() -> ref_txtYPhaseVoltage.setText(value));
         Platform.runLater(() -> ref_btnYPhaseVoltage.setDisable(false));
     }
 
     public void yPhaseCurrentTask() {
         Platform.runLater(() -> ref_btnYPhaseCurrent.setDisable(true));
 
-        String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-        String testCaseName = ConstantArduinoCommands.Y_PHASE_CURRENT;
-        Optional<DutCommand> opt = DeviceDataManagerController
-                .getDutCommandService()
-                .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
-
-        if (opt.isPresent()) {
-            DeviceDataManagerController.setDutCommandData(opt.get());
-
-            Map<String, Object> resp = new DutSerialDataManager()
-                    .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
-
-            boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
-            String value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
-
-            Platform.runLater(() -> ref_txtYPhaseCurrent.setText(value));
+        String value;
+        if (SIMULATION_MODE) {
+            value = generateRandomCurrent(); // Simulate random current
+            appendLog("SIMULATION: Y Phase Current: " + value, LogLevel.INFO);
         } else {
-            Platform.runLater(() -> ref_txtYPhaseCurrent.setText(ConstantArduinoCommands.CMD_FAILED));
+            String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+            String testCaseName = ConstantArduinoCommands.Y_PHASE_CURRENT;
+            Optional<DutCommand> opt = DeviceDataManagerController
+                    .getDutCommandService()
+                    .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+
+            if (opt.isPresent()) {
+                DeviceDataManagerController.setDutCommandData(opt.get());
+
+                Map<String, Object> resp = new DutSerialDataManager()
+                        .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
+
+                boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
+                value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
+            } else {
+                value = ConstantArduinoCommands.CMD_FAILED;
+            }
         }
 
+        Platform.runLater(() -> ref_txtYPhaseCurrent.setText(value));
         Platform.runLater(() -> ref_btnYPhaseCurrent.setDisable(false));
     }
 
     public void yPhaseWattsTask() {
         Platform.runLater(() -> ref_btnYPhaseWatts.setDisable(true));
 
-        String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-        String testCaseName = ConstantArduinoCommands.Y_PHASE_WATTS;
-        Optional<DutCommand> opt = DeviceDataManagerController
-                .getDutCommandService()
-                .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+        String value;
+        if (SIMULATION_MODE) {
+            value = generateRandomWatts(); // Simulate random watts
+            appendLog("SIMULATION: Y Phase Watts: " + value, LogLevel.INFO);
+        } else {
+            String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+            String testCaseName = ConstantArduinoCommands.Y_PHASE_WATTS;
+            Optional<DutCommand> opt = DeviceDataManagerController
+                    .getDutCommandService()
+                    .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
 
-        if (opt.isPresent()) {
-            DeviceDataManagerController.setDutCommandData(opt.get());
+            if (opt.isPresent()) {
+                DeviceDataManagerController.setDutCommandData(opt.get());
 
-            Map<String, Object> resp = new DutSerialDataManager()
-                    .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
+                Map<String, Object> resp = new DutSerialDataManager()
+                        .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
 
-            boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
-            String value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
-
-            Platform.runLater(() -> ref_txtYPhaseWatts.setText(value));
+                boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
+                value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
+            } else {
+                value = ConstantArduinoCommands.CMD_FAILED;
+            }
         }
 
+        Platform.runLater(() -> ref_txtYPhaseWatts.setText(value));
         Platform.runLater(() -> ref_btnYPhaseWatts.setDisable(false));
     }
 
     public void yPhaseVATask() {
         Platform.runLater(() -> ref_btnYPhaseVA.setDisable(true));
 
-        String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-        String testCaseName = ConstantArduinoCommands.Y_PHASE_VA;
-        Optional<DutCommand> opt = DeviceDataManagerController
-                .getDutCommandService()
-                .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+        String value;
+        if (SIMULATION_MODE) {
+            value = generateRandomActivePower(); // Simulate random VA
+            appendLog("SIMULATION: Y Phase VA: " + value, LogLevel.INFO);
+        } else {
+            String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+            String testCaseName = ConstantArduinoCommands.Y_PHASE_VA;
+            Optional<DutCommand> opt = DeviceDataManagerController
+                    .getDutCommandService()
+                    .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
 
-        if (opt.isPresent()) {
-            DeviceDataManagerController.setDutCommandData(opt.get());
+            if (opt.isPresent()) {
+                DeviceDataManagerController.setDutCommandData(opt.get());
 
-            Map<String, Object> resp = new DutSerialDataManager()
-                    .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
+                Map<String, Object> resp = new DutSerialDataManager()
+                        .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
 
-            boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
-            String value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
-
-            Platform.runLater(() -> ref_txtYPhaseVA.setText(value));
+                boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
+                value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
+            } else {
+                value = ConstantArduinoCommands.CMD_FAILED;
+            }
         }
 
+        Platform.runLater(() -> ref_txtYPhaseVA.setText(value));
         Platform.runLater(() -> ref_btnYPhaseVA.setDisable(false));
     }
 
     public void yPhasePFTask() {
         Platform.runLater(() -> ref_btnYPhasePF.setDisable(true));
 
-        String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-        String testCaseName = ConstantArduinoCommands.Y_PHASE_PF;
-        Optional<DutCommand> opt = DeviceDataManagerController
-                .getDutCommandService()
-                .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+        String value;
+        if (SIMULATION_MODE) {
+            value = generateRandomPowerFactor(); // Simulate random power factor
+            appendLog("SIMULATION: Y Phase PF: " + value, LogLevel.INFO);
+        } else {
+            String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+            String testCaseName = ConstantArduinoCommands.Y_PHASE_PF;
+            Optional<DutCommand> opt = DeviceDataManagerController
+                    .getDutCommandService()
+                    .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
 
-        if (opt.isPresent()) {
-            DeviceDataManagerController.setDutCommandData(opt.get());
+            if (opt.isPresent()) {
+                DeviceDataManagerController.setDutCommandData(opt.get());
 
-            Map<String, Object> resp = new DutSerialDataManager()
-                    .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
+                Map<String, Object> resp = new DutSerialDataManager()
+                        .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
 
-            boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
-            String value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
-
-            Platform.runLater(() -> ref_txtYPhasePF.setText(value));
+                boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
+                value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
+            } else {
+                value = ConstantArduinoCommands.CMD_FAILED;
+            }
         }
 
+        Platform.runLater(() -> ref_txtYPhasePF.setText(value));
         Platform.runLater(() -> ref_btnYPhasePF.setDisable(false));
     }
 
     public void bPhaseVoltageTask() {
         Platform.runLater(() -> ref_btnBPhaseVoltage.setDisable(true));
 
-        String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-        String testCaseName = ConstantArduinoCommands.B_PHASE_VOLTAGE;
-        Optional<DutCommand> opt = DeviceDataManagerController
-                .getDutCommandService()
-                .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+        String value;
+        if (SIMULATION_MODE) {
+            value = generateRandomVoltage(); // Simulate random voltage
+            appendLog("SIMULATION: B Phase Voltage: " + value, LogLevel.INFO);
+        } else {
+            String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+            String testCaseName = ConstantArduinoCommands.B_PHASE_VOLTAGE;
+            Optional<DutCommand> opt = DeviceDataManagerController
+                    .getDutCommandService()
+                    .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
 
-        if (opt.isPresent()) {
-            DeviceDataManagerController.setDutCommandData(opt.get());
+            if (opt.isPresent()) {
+                DeviceDataManagerController.setDutCommandData(opt.get());
 
-            Map<String, Object> resp = new DutSerialDataManager()
-                    .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
+                Map<String, Object> resp = new DutSerialDataManager()
+                        .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
 
-            boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
-            String value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
-
-            Platform.runLater(() -> ref_txtBPhaseVoltage.setText(value));
+                boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
+                value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
+            } else {
+                value = ConstantArduinoCommands.CMD_FAILED;
+            }
         }
 
+        Platform.runLater(() -> ref_txtBPhaseVoltage.setText(value));
         Platform.runLater(() -> ref_btnBPhaseVoltage.setDisable(false));
     }
 
     public void bPhaseCurrentTask() {
         Platform.runLater(() -> ref_btnBPhaseCurrent.setDisable(true));
 
-        String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-        String testCaseName = ConstantArduinoCommands.B_PHASE_CURRENT;
-        Optional<DutCommand> opt = DeviceDataManagerController
-                .getDutCommandService()
-                .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
-
-        if (opt.isPresent()) {
-            DeviceDataManagerController.setDutCommandData(opt.get());
-
-            Map<String, Object> resp = new DutSerialDataManager()
-                    .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
-
-            boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
-            String value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
-
-            Platform.runLater(() -> ref_txtBPhaseCurrent.setText(value));
+        String value;
+        if (SIMULATION_MODE) {
+            value = generateRandomCurrent(); // Simulate random current
+            appendLog("SIMULATION: B Phase Current: " + value, LogLevel.INFO);
         } else {
-            Platform.runLater(() -> ref_txtBPhaseCurrent.setText(ConstantArduinoCommands.CMD_FAILED));
+            String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+            String testCaseName = ConstantArduinoCommands.B_PHASE_CURRENT;
+            Optional<DutCommand> opt = DeviceDataManagerController
+                    .getDutCommandService()
+                    .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+
+            if (opt.isPresent()) {
+                DeviceDataManagerController.setDutCommandData(opt.get());
+
+                Map<String, Object> resp = new DutSerialDataManager()
+                        .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
+
+                boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
+                value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
+            } else {
+                value = ConstantArduinoCommands.CMD_FAILED;
+            }
         }
 
+        Platform.runLater(() -> ref_txtBPhaseCurrent.setText(value));
         Platform.runLater(() -> ref_btnBPhaseCurrent.setDisable(false));
     }
 
     public void bPhaseWattsTask() {
         Platform.runLater(() -> ref_btnBPhaseWatts.setDisable(true));
 
-        String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-        String testCaseName = ConstantArduinoCommands.B_PHASE_WATTS;
-        Optional<DutCommand> opt = DeviceDataManagerController
-                .getDutCommandService()
-                .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+        String value;
+        if (SIMULATION_MODE) {
+            value = generateRandomWatts(); // Simulate random watts
+            appendLog("SIMULATION: B Phase Watts: " + value, LogLevel.INFO);
+        } else {
+            String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+            String testCaseName = ConstantArduinoCommands.B_PHASE_WATTS;
+            Optional<DutCommand> opt = DeviceDataManagerController
+                    .getDutCommandService()
+                    .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
 
-        if (opt.isPresent()) {
-            DeviceDataManagerController.setDutCommandData(opt.get());
+            if (opt.isPresent()) {
+                DeviceDataManagerController.setDutCommandData(opt.get());
 
-            Map<String, Object> resp = new DutSerialDataManager()
-                    .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
+                Map<String, Object> resp = new DutSerialDataManager()
+                        .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
 
-            boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
-            String value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
-
-            Platform.runLater(() -> ref_txtBPhaseWatts.setText(value));
+                boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
+                value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
+            } else {
+                value = ConstantArduinoCommands.CMD_FAILED;
+            }
         }
 
+        Platform.runLater(() -> ref_txtBPhaseWatts.setText(value));
         Platform.runLater(() -> ref_btnBPhaseWatts.setDisable(false));
     }
 
     public void bPhaseVATask() {
         Platform.runLater(() -> ref_btnBPhaseVA.setDisable(true));
 
-        String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-        String testCaseName = ConstantArduinoCommands.B_PHASE_VA;
-        Optional<DutCommand> opt = DeviceDataManagerController
-                .getDutCommandService()
-                .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+        String value;
+        if (SIMULATION_MODE) {
+            value = generateRandomActivePower(); // Simulate random VA
+            appendLog("SIMULATION: B Phase VA: " + value, LogLevel.INFO);
+        } else {
+            String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+            String testCaseName = ConstantArduinoCommands.B_PHASE_VA;
+            Optional<DutCommand> opt = DeviceDataManagerController
+                    .getDutCommandService()
+                    .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
 
-        if (opt.isPresent()) {
-            DeviceDataManagerController.setDutCommandData(opt.get());
+            if (opt.isPresent()) {
+                DeviceDataManagerController.setDutCommandData(opt.get());
 
-            Map<String, Object> resp = new DutSerialDataManager()
-                    .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
+                Map<String, Object> resp = new DutSerialDataManager()
+                        .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
 
-            boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
-            String value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
-
-            Platform.runLater(() -> ref_txtBPhaseVA.setText(value));
+                boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
+                value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
+            } else {
+                value = ConstantArduinoCommands.CMD_FAILED;
+            }
         }
 
+        Platform.runLater(() -> ref_txtBPhaseVA.setText(value));
         Platform.runLater(() -> ref_btnBPhaseVA.setDisable(false));
     }
 
     public void bPhasePFTask() {
         Platform.runLater(() -> ref_btnBPhasePF.setDisable(true));
 
-        String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-        String testCaseName = ConstantArduinoCommands.B_PHASE_PF;
-        Optional<DutCommand> opt = DeviceDataManagerController
-                .getDutCommandService()
-                .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+        String value;
+        if (SIMULATION_MODE) {
+            value = generateRandomPowerFactor(); // Simulate random power factor
+            appendLog("SIMULATION: B Phase PF: " + value, LogLevel.INFO);
+        } else {
+            String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+            String testCaseName = ConstantArduinoCommands.B_PHASE_PF;
+            Optional<DutCommand> opt = DeviceDataManagerController
+                    .getDutCommandService()
+                    .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
 
-        if (opt.isPresent()) {
-            DeviceDataManagerController.setDutCommandData(opt.get());
+            if (opt.isPresent()) {
+                DeviceDataManagerController.setDutCommandData(opt.get());
 
-            Map<String, Object> resp = new DutSerialDataManager()
-                    .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
+                Map<String, Object> resp = new DutSerialDataManager()
+                        .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
 
-            boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
-            String value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
-
-            Platform.runLater(() -> ref_txtBPhasePF.setText(value));
+                boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
+                value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
+            } else {
+                value = ConstantArduinoCommands.CMD_FAILED;
+            }
         }
 
+        Platform.runLater(() -> ref_txtBPhasePF.setText(value));
         Platform.runLater(() -> ref_btnBPhasePF.setDisable(false));
     }
 
     public void phase3CurrentAvgTask() {
         Platform.runLater(() -> ref_btn3PhaseCurrentAvg.setDisable(true));
 
-        String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-        String testCaseName = ConstantArduinoCommands.PHASE_3_CURRENT_AVG;
-        Optional<DutCommand> opt = DeviceDataManagerController
-                .getDutCommandService()
-                .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+        String value;
+        if (SIMULATION_MODE) {
+            value = generateRandomCurrent(); // Simulate random current
+            appendLog("SIMULATION: 3 Phase Current Avg: " + value, LogLevel.INFO);
+        } else {
+            String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+            String testCaseName = ConstantArduinoCommands.PHASE_3_CURRENT_AVG;
+            Optional<DutCommand> opt = DeviceDataManagerController
+                    .getDutCommandService()
+                    .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
 
-        if (opt.isPresent()) {
-            DeviceDataManagerController.setDutCommandData(opt.get());
+            if (opt.isPresent()) {
+                DeviceDataManagerController.setDutCommandData(opt.get());
 
-            Map<String, Object> resp = new DutSerialDataManager()
-                    .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
+                Map<String, Object> resp = new DutSerialDataManager()
+                        .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
 
-            boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
-            String value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
-
-            Platform.runLater(() -> ref_txt3PhaseCurrentAvg.setText(value));
+                boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
+                value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
+            } else {
+                value = ConstantArduinoCommands.CMD_FAILED;
+            }
         }
 
+        Platform.runLater(() -> ref_txt3PhaseCurrentAvg.setText(value));
         Platform.runLater(() -> ref_btn3PhaseCurrentAvg.setDisable(false));
     }
 
     public void phase3PFAvgTask() {
         Platform.runLater(() -> ref_btn3PhasePFAvg.setDisable(true));
 
-        String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-        String testCaseName = ConstantArduinoCommands.PHASE_3_PF_AVG;
-        Optional<DutCommand> opt = DeviceDataManagerController
-                .getDutCommandService()
-                .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+        String value;
+        if (SIMULATION_MODE) {
+            value = generateRandomPowerFactor(); // Simulate random power factor
+            appendLog("SIMULATION: 3 Phase PF Avg: " + value, LogLevel.INFO);
+        } else {
+            String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+            String testCaseName = ConstantArduinoCommands.PHASE_3_PF_AVG;
+            Optional<DutCommand> opt = DeviceDataManagerController
+                    .getDutCommandService()
+                    .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
 
-        if (opt.isPresent()) {
-            DeviceDataManagerController.setDutCommandData(opt.get());
+            if (opt.isPresent()) {
+                DeviceDataManagerController.setDutCommandData(opt.get());
 
-            Map<String, Object> resp = new DutSerialDataManager()
-                    .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
+                Map<String, Object> resp = new DutSerialDataManager()
+                        .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
 
-            boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
-            String value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
-
-            Platform.runLater(() -> ref_txt3PhasePFAvg.setText(value));
+                boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
+                value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
+            } else {
+                value = ConstantArduinoCommands.CMD_FAILED;
+            }
         }
 
+        Platform.runLater(() -> ref_txt3PhasePFAvg.setText(value));
         Platform.runLater(() -> ref_btn3PhasePFAvg.setDisable(false));
     }
 
     public void phase3VATotalTask() {
         Platform.runLater(() -> ref_btn3PhaseVATotal.setDisable(true));
 
-        String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-        String testCaseName = ConstantArduinoCommands.PHASE_3_VA_TOTAL;
-        Optional<DutCommand> opt = DeviceDataManagerController
-                .getDutCommandService()
-                .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+        String value;
+        if (SIMULATION_MODE) {
+            value = generateRandomActivePower(); // Simulate random VA
+            appendLog("SIMULATION: 3 Phase VA Total: " + value, LogLevel.INFO);
+        } else {
+            String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+            String testCaseName = ConstantArduinoCommands.PHASE_3_VA_TOTAL;
+            Optional<DutCommand> opt = DeviceDataManagerController
+                    .getDutCommandService()
+                    .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
 
-        if (opt.isPresent()) {
-            DeviceDataManagerController.setDutCommandData(opt.get());
+            if (opt.isPresent()) {
+                DeviceDataManagerController.setDutCommandData(opt.get());
 
-            Map<String, Object> resp = new DutSerialDataManager()
-                    .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
+                Map<String, Object> resp = new DutSerialDataManager()
+                        .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
 
-            boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
-            String value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
-
-            Platform.runLater(() -> ref_txt3PhaseVATotal.setText(value));
+                boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
+                value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
+            } else {
+                value = ConstantArduinoCommands.CMD_FAILED;
+            }
         }
 
+        Platform.runLater(() -> ref_txt3PhaseVATotal.setText(value));
         Platform.runLater(() -> ref_btn3PhaseVATotal.setDisable(false));
     }
 
     public void phase3VBRTask() {
         Platform.runLater(() -> ref_btn3PhaseVBR.setDisable(true));
 
-        String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-        String testCaseName = ConstantArduinoCommands.PHASE_3_VBR;
-        Optional<DutCommand> opt = DeviceDataManagerController
-                .getDutCommandService()
-                .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+        String value;
+        if (SIMULATION_MODE) {
+            value = generateRandomVoltage(); // Simulate random voltage
+            appendLog("SIMULATION: 3 Phase VBR: " + value, LogLevel.INFO);
+        } else {
+            String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+            String testCaseName = ConstantArduinoCommands.PHASE_3_VBR;
+            Optional<DutCommand> opt = DeviceDataManagerController
+                    .getDutCommandService()
+                    .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
 
-        if (opt.isPresent()) {
-            DeviceDataManagerController.setDutCommandData(opt.get());
+            if (opt.isPresent()) {
+                DeviceDataManagerController.setDutCommandData(opt.get());
 
-            Map<String, Object> resp = new DutSerialDataManager()
-                    .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
+                Map<String, Object> resp = new DutSerialDataManager()
+                        .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
 
-            boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
-            String value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
-
-            Platform.runLater(() -> ref_txt3PhaseVBR.setText(value));
+                boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
+                value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
+            } else {
+                value = ConstantArduinoCommands.CMD_FAILED;
+            }
         }
 
+        Platform.runLater(() -> ref_txt3PhaseVBR.setText(value));
         Platform.runLater(() -> ref_btn3PhaseVBR.setDisable(false));
     }
 
     public void phase3VLLTask() {
         Platform.runLater(() -> ref_btn3PhaseVLL.setDisable(true));
 
-        String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-        String testCaseName = ConstantArduinoCommands.PHASE_3_VLL;
-        Optional<DutCommand> opt = DeviceDataManagerController
-                .getDutCommandService()
-                .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+        String value;
+        if (SIMULATION_MODE) {
+            value = generateRandomVoltage(); // Simulate random voltage
+            appendLog("SIMULATION: 3 Phase VLL: " + value, LogLevel.INFO);
+        } else {
+            String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+            String testCaseName = ConstantArduinoCommands.PHASE_3_VLL;
+            Optional<DutCommand> opt = DeviceDataManagerController
+                    .getDutCommandService()
+                    .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
 
-        if (opt.isPresent()) {
-            DeviceDataManagerController.setDutCommandData(opt.get());
+            if (opt.isPresent()) {
+                DeviceDataManagerController.setDutCommandData(opt.get());
 
-            Map<String, Object> resp = new DutSerialDataManager()
-                    .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
+                Map<String, Object> resp = new DutSerialDataManager()
+                        .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
 
-            boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
-            String value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
-
-            Platform.runLater(() -> ref_txt3PhaseVLL.setText(value));
+                boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
+                value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
+            } else {
+                value = ConstantArduinoCommands.CMD_FAILED;
+            }
         }
 
+        Platform.runLater(() -> ref_txt3PhaseVLL.setText(value));
         Platform.runLater(() -> ref_btn3PhaseVLL.setDisable(false));
     }
 
     public void phase3VLNTask() {
         Platform.runLater(() -> ref_btn3PhaseVLN.setDisable(true));
 
-        String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-        String testCaseName = ConstantArduinoCommands.PHASE_3_VLN;
-        Optional<DutCommand> opt = DeviceDataManagerController
-                .getDutCommandService()
-                .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+        String value;
+        if (SIMULATION_MODE) {
+            value = generateRandomVoltage(); // Simulate random voltage
+            appendLog("SIMULATION: 3 Phase VLN: " + value, LogLevel.INFO);
+        } else {
+            String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+            String testCaseName = ConstantArduinoCommands.PHASE_3_VLN;
+            Optional<DutCommand> opt = DeviceDataManagerController
+                    .getDutCommandService()
+                    .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
 
-        if (opt.isPresent()) {
-            DeviceDataManagerController.setDutCommandData(opt.get());
+            if (opt.isPresent()) {
+                DeviceDataManagerController.setDutCommandData(opt.get());
 
-            Map<String, Object> resp = new DutSerialDataManager()
-                    .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
+                Map<String, Object> resp = new DutSerialDataManager()
+                        .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
 
-            boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
-            String value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
-
-            Platform.runLater(() -> ref_txt3PhaseVLN.setText(value));
+                boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
+                value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
+            } else {
+                value = ConstantArduinoCommands.CMD_FAILED;
+            }
         }
 
+        Platform.runLater(() -> ref_txt3PhaseVLN.setText(value));
         Platform.runLater(() -> ref_btn3PhaseVLN.setDisable(false));
     }
 
     public void phase3VRYTask() {
         Platform.runLater(() -> ref_btn3PhaseVRY.setDisable(true));
 
-        String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-        String testCaseName = ConstantArduinoCommands.PHASE_3_VRY;
-        Optional<DutCommand> opt = DeviceDataManagerController
-                .getDutCommandService()
-                .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+        String value;
+        if (SIMULATION_MODE) {
+            value = generateRandomVoltage(); // Simulate random voltage
+            appendLog("SIMULATION: 3 Phase VRY: " + value, LogLevel.INFO);
+        } else {
+            String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+            String testCaseName = ConstantArduinoCommands.PHASE_3_VRY;
+            Optional<DutCommand> opt = DeviceDataManagerController
+                    .getDutCommandService()
+                    .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
 
-        if (opt.isPresent()) {
-            DeviceDataManagerController.setDutCommandData(opt.get());
+            if (opt.isPresent()) {
+                DeviceDataManagerController.setDutCommandData(opt.get());
 
-            Map<String, Object> resp = new DutSerialDataManager()
-                    .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
+                Map<String, Object> resp = new DutSerialDataManager()
+                        .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
 
-            boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
-            String value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
-
-            Platform.runLater(() -> ref_txt3PhaseVRY.setText(value));
+                boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
+                value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
+            } else {
+                value = ConstantArduinoCommands.CMD_FAILED;
+            }
         }
 
+        Platform.runLater(() -> ref_txt3PhaseVRY.setText(value));
         Platform.runLater(() -> ref_btn3PhaseVRY.setDisable(false));
     }
 
     public void phase3VYBTask() {
         Platform.runLater(() -> ref_btn3PhaseVYB.setDisable(true));
 
-        String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-        String testCaseName = ConstantArduinoCommands.PHASE_3_VYB;
-        Optional<DutCommand> opt = DeviceDataManagerController
-                .getDutCommandService()
-                .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+        String value;
+        if (SIMULATION_MODE) {
+            value = generateRandomVoltage(); // Simulate random voltage
+            appendLog("SIMULATION: 3 Phase VYB: " + value, LogLevel.INFO);
+        } else {
+            String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+            String testCaseName = ConstantArduinoCommands.PHASE_3_VYB;
+            Optional<DutCommand> opt = DeviceDataManagerController
+                    .getDutCommandService()
+                    .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
 
-        if (opt.isPresent()) {
-            DeviceDataManagerController.setDutCommandData(opt.get());
+            if (opt.isPresent()) {
+                DeviceDataManagerController.setDutCommandData(opt.get());
 
-            Map<String, Object> resp = new DutSerialDataManager()
-                    .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
+                Map<String, Object> resp = new DutSerialDataManager()
+                        .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
 
-            boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
-            String value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
-
-            Platform.runLater(() -> ref_txt3PhaseVYB.setText(value));
+                boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
+                value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
+            } else {
+                value = ConstantArduinoCommands.CMD_FAILED;
+            }
         }
 
+        Platform.runLater(() -> ref_txt3PhaseVYB.setText(value));
         Platform.runLater(() -> ref_btn3PhaseVYB.setDisable(false));
     }
 
     public void phase3WattsTotalTask() {
         Platform.runLater(() -> ref_btn3PhaseWattsTotal.setDisable(true));
 
-        String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-        String testCaseName = ConstantArduinoCommands.PHASE_3_WATTS_TOTAL;
-        Optional<DutCommand> opt = DeviceDataManagerController
-                .getDutCommandService()
-                .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+        String value;
+        if (SIMULATION_MODE) {
+            value = generateRandomWatts(); // Simulate random watts
+            appendLog("SIMULATION: 3 Phase Watts Total: " + value, LogLevel.INFO);
+        } else {
+            String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+            String testCaseName = ConstantArduinoCommands.PHASE_3_WATTS_TOTAL;
+            Optional<DutCommand> opt = DeviceDataManagerController
+                    .getDutCommandService()
+                    .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
 
-        if (opt.isPresent()) {
-            DeviceDataManagerController.setDutCommandData(opt.get());
+            if (opt.isPresent()) {
+                DeviceDataManagerController.setDutCommandData(opt.get());
 
-            Map<String, Object> resp = new DutSerialDataManager()
-                    .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
+                Map<String, Object> resp = new DutSerialDataManager()
+                        .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
 
-            boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
-            String value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
-
-            Platform.runLater(() -> ref_txt3PhaseWattsTotal.setText(value));
+                boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
+                value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
+            } else {
+                value = ConstantArduinoCommands.CMD_FAILED;
+            }
         }
 
+        Platform.runLater(() -> ref_txt3PhaseWattsTotal.setText(value));
         Platform.runLater(() -> ref_btn3PhaseWattsTotal.setDisable(false));
     }
 
     public void fanRpmTask() {
         Platform.runLater(() -> clickedButtonRef.setDisable(true));
 
-        String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-        String testCaseName = ConstantArduinoCommands.FAN_RPM;
-        Optional<DutCommand> opt = DeviceDataManagerController
-                .getDutCommandService()
-                .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+        String value;
+        if (SIMULATION_MODE) {
+            value = generateRandomRpm(); // Simulate random RPM
+            appendLog("SIMULATION: Fan RPM: " + value, LogLevel.INFO);
+        } else {
+            String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+            String testCaseName = ConstantArduinoCommands.FAN_RPM;
+            Optional<DutCommand> opt = DeviceDataManagerController
+                    .getDutCommandService()
+                    .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
 
-        if (opt.isPresent()) {
-            DeviceDataManagerController.setDutCommandData(opt.get());
+            if (opt.isPresent()) {
+                DeviceDataManagerController.setDutCommandData(opt.get());
 
-            Map<String, Object> resp = new DutSerialDataManager()
-                    .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
+                Map<String, Object> resp = new DutSerialDataManager()
+                        .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
 
-            boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
-            String value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
-
-            Platform.runLater(() -> {
-                if (clickedButtonRef == ref_btnFanRpm) {
-                    ref_txtFanRpm.setText(value);
-                } else if (clickedButtonRef == ref_btnFanRpmExecute) {
-                    ref_txtFanRpmExecute.setText(value);
-                }
-            });
+                boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
+                value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
+            } else {
+                value = ConstantArduinoCommands.CMD_FAILED;
+            }
         }
+
+        Platform.runLater(() -> {
+            if (clickedButtonRef == ref_btnFanRpm) {
+                ref_txtFanRpm.setText(value);
+            } else if (clickedButtonRef == ref_btnFanRpmExecute) {
+                ref_txtFanRpmExecute.setText(value);
+            }
+        });
 
         Platform.runLater(() -> clickedButtonRef.setDisable(false));
     }
@@ -3578,29 +3948,37 @@ public class FanProjectExecuteController implements Initializable {
     public void fanWindspeedTask() {
         Platform.runLater(() -> clickedButtonRef.setDisable(true));
 
-        String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-        String testCaseName = ConstantArduinoCommands.FAN_WINDSPEED;
-        Optional<DutCommand> opt = DeviceDataManagerController
-                .getDutCommandService()
-                .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+        String value;
+        if (SIMULATION_MODE) {
+            value = generateRandomWindSpeed(); // Simulate random windspeed
+            appendLog("SIMULATION: Fan Windspeed: " + value, LogLevel.INFO);
+        } else {
+            String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+            String testCaseName = ConstantArduinoCommands.FAN_WINDSPEED;
+            Optional<DutCommand> opt = DeviceDataManagerController
+                    .getDutCommandService()
+                    .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
 
-        if (opt.isPresent()) {
-            DeviceDataManagerController.setDutCommandData(opt.get());
+            if (opt.isPresent()) {
+                DeviceDataManagerController.setDutCommandData(opt.get());
 
-            Map<String, Object> resp = new DutSerialDataManager()
-                    .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
+                Map<String, Object> resp = new DutSerialDataManager()
+                        .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
 
-            boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
-            String value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
-
-            Platform.runLater(() -> {
-                if (clickedButtonRef == ref_btnFanWindspeed) {
-                    ref_txtFanWindSpeed.setText(value);
-                } else if (clickedButtonRef == ref_btnFanWindspeedExecute) {
-                    ref_txtFanWindSpeedExecute.setText(value);
-                }
-            });
+                boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
+                value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
+            } else {
+                value = ConstantArduinoCommands.CMD_FAILED;
+            }
         }
+
+        Platform.runLater(() -> {
+            if (clickedButtonRef == ref_btnFanWindspeed) {
+                ref_txtFanWindSpeed.setText(value);
+            } else if (clickedButtonRef == ref_btnFanWindspeedExecute) {
+                ref_txtFanWindSpeedExecute.setText(value);
+            }
+        });
 
         Platform.runLater(() -> clickedButtonRef.setDisable(false));
     }
@@ -3614,34 +3992,33 @@ public class FanProjectExecuteController implements Initializable {
      *
      * These methods manage periodic data fetching for the various measurement
      * phases (R, Y, B), the combined 3-phase metrics, and the fan metrics.
-     * 
-     * In normal operation these would run in parallel (each sub-task scheduled
+     * * In normal operation these would run in parallel (each sub-task scheduled
      * independently on a pool of threads), but for testing they have been
      * shifted into a single serial sequence.
      *
      * startAutoXUpdate():
-     *   1. Makes the corresponding progress indicator visible.
-     *   2. Creates a ScheduledExecutorService (single-threaded for series testing,
-     *      or a pool for true parallel runs).
-     *   3. Schedules its metric-specific tasks (voltage, current, watts, VA, PF,
-     *      etc.) at a fixed rate (every 3 seconds). In series mode, all subtasks
-     *      are invoked one after another inside one Runnable; in parallel mode,
-     *      each Runnable is scheduled separately.
+     * 1. Makes the corresponding progress indicator visible.
+     * 2. Creates a ScheduledExecutorService (single-threaded for series testing,
+     * or a pool for true parallel runs).
+     * 3. Schedules its metric-specific tasks (voltage, current, watts, VA, PF,
+     * etc.) at a fixed rate (every 3 seconds). In series mode, all subtasks
+     * are invoked one after another inside one Runnable; in parallel mode,
+     * each Runnable is scheduled separately.
      *
      * stopAutoXUpdate():
-     *   1. Hides the corresponding progress indicator.
-     *   2. Uses Platform.runLater() to re-enable each metric button on the
-     *      JavaFX Application Thread.
-     *   3. Calls stopAutoUpdateGracefully() to shut down the executor:
-     *        • Attempts a graceful shutdown (awaits termination up to 3 seconds).
-     *        • If still running, forces shutdownNow().
-     *        • Logs the outcome under the given phase/fan tag.
+     * 1. Hides the corresponding progress indicator.
+     * 2. Uses Platform.runLater() to re-enable each metric button on the
+     * JavaFX Application Thread.
+     * 3. Calls stopAutoUpdateGracefully() to shut down the executor:
+     * • Attempts a graceful shutdown (awaits termination up to 3 seconds).
+     * • If still running, forces shutdownNow().
+     * • Logs the outcome under the given phase/fan tag.
      *
      * stopAutoUpdateGracefully(executor, tag):
-     *   - Initiates executor.shutdown().
-     *   - Spawns a background thread to await termination.
-     *   - If not terminated within 3 seconds, calls executor.shutdownNow().
-     *   - Catches InterruptedException to force shutdown and resets thread interrupt.
+     * - Initiates executor.shutdown().
+     * - Spawns a background thread to await termination.
+     * - If not terminated within 3 seconds, calls executor.shutdownNow().
+     * - Catches InterruptedException to force shutdown and resets thread interrupt.
      */
     
   /*private void startAutoRPhaseUpdate() {
@@ -3821,7 +4198,7 @@ public class FanProjectExecuteController implements Initializable {
      * updates the actual value and validity in the test point, updates UI progress,
      * and stores the result. Used for test point measurements like RPM, current, etc.
      *
-     * @param readFunc            Function to read the parameter value (from hardware)
+     * @param readFunc            Function to read the parameter value (from hardware or simulation)
      * @param lowerLimitGetter    Function to get the lower limit for the parameter
      * @param upperLimitGetter    Function to get the upper limit for the parameter
      * @param actualSetter        Consumer to update the actual value in the test point
@@ -3882,12 +4259,12 @@ public class FanProjectExecuteController implements Initializable {
 
     	 // Step 6: Update result object based on label
     	    switch (label) {
-    	        case "RPM" 			: currentResult.setRpm(finalValue);
-    	        case "WindSpeed" 	: currentResult.setWindSpeed(finalValue);
-    	        case "Current" 		: currentResult.setCurrent(finalValue);
-    	        case "Watts" 		: currentResult.setWatts(finalValue);
-    	        case "ActivePower"  : currentResult.setVa(finalValue);
-    	        case "PowerFactor"  : currentResult.setPowerFactor(finalValue);
+    	        case "RPM" 			: currentResult.setRpm(finalValue); break;
+    	        case "WindSpeed" 	: currentResult.setWindSpeed(finalValue); break;
+    	        case "Current" 		: currentResult.setCurrent(finalValue); break;
+    	        case "Watts" 		: currentResult.setWatts(finalValue); break;
+    	        case "ActivePower"  : currentResult.setVa(finalValue); break;
+    	        case "PowerFactor"  : currentResult.setPowerFactor(finalValue); break;
     	    }
 
     	 // Step 7: Small delay between updates
@@ -3898,14 +4275,14 @@ public class FanProjectExecuteController implements Initializable {
 
     /**
 	 * appendLog:
-	 *   Safely appends a log message to the JavaFX TextArea on the UI thread.
+	 * Safely appends a log message to the JavaFX TextArea on the UI thread.
 	 *
-	 *   1. Wraps updates in Platform.runLater() to ensure execution on the
-	 *      JavaFX Application Thread.
-	 *   2. Checks that the textAreaLogs control is non-null before use.
-	 *   3. Generates a timestamp (HH:mm:ss, without nanoseconds) via LocalTime.
-	 *   4. Prepends the timestamp to the message in square brackets and
-	 *      adds a newline, then appends it to the TextArea.
+	 * 1. Wraps updates in Platform.runLater() to ensure execution on the
+	 * JavaFX Application Thread.
+	 * 2. Checks that the textAreaLogs control is non-null before use.
+	 * 3. Generates a timestamp (HH:mm:ss, without nanoseconds) via LocalTime.
+	 * 4. Prepends the timestamp to the message in square brackets and
+	 * adds a newline, then appends it to the TextArea.
 	 *//*
 	public void appendLog(String message) {
 	    Platform.runLater(() -> {
@@ -3918,8 +4295,8 @@ public class FanProjectExecuteController implements Initializable {
     
     /**
      * appendLog:
-     *   Adds a timestamped log message to the top of a ListView.
-     *   Maintains fast updates and avoids UI thread bloat.
+     * Adds a timestamped log message to the top of a ListView.
+     * Maintains fast updates and avoids UI thread bloat.
      */
     public void appendLog(String message, LogLevel level) {
         LogEntry entry = new LogEntry(message, level);
@@ -4097,15 +4474,27 @@ public class FanProjectExecuteController implements Initializable {
 		dutSerialDataManager.dutExecuteCommand(dutInterfaceId,appendData,  isDataAppend);
 	}*/
 
+	// dutCommandExecuteStart function (Fixed for Java 1.8)
 	public boolean dutCommandExecuteStart(String appendData, boolean isDataAppend) {
-		DeviceDataManagerController.getDutCommandData().getTotalDutExecutionTimeInSec();
-		DutSerialDataManager dutSerialDataManager = new DutSerialDataManager();
+	    DeviceDataManagerController.getDutCommandData().getTotalDutExecutionTimeInSec();
+	    DutSerialDataManager dutSerialDataManager = new DutSerialDataManager();
 
-		int dutInterfaceId = ConstantAppConfig.DUT_COMMAND_INTERFACE_ID;
-		Map<String, Object> resultMap = dutSerialDataManager.dutExecuteCommand(dutInterfaceId, appendData, isDataAppend);
+	    int dutInterfaceId = ConstantAppConfig.DUT_COMMAND_INTERFACE_ID;
+	    Map<String, Object> resultMap;
 
-		Object status = resultMap.get("status");
-		return status instanceof Boolean && (Boolean) status;
+	    if (SIMULATION_MODE) {
+	        appendLog("SIMULATION: dutCommandExecuteStart skipped (data: " + appendData + ").", LogLevel.INFO);
+	        // Fix for Java 1.8: Use HashMap instead of Map.of()
+	        Map<String, Object> simulatedResponse = new HashMap<>();
+	        simulatedResponse.put("status", true);
+	        simulatedResponse.put("result", "SIM_OK");
+	        resultMap = simulatedResponse;
+	    } else {
+	        resultMap = dutSerialDataManager.dutExecuteCommand(dutInterfaceId, appendData, isDataAppend);
+	    }
+
+	    Object status = resultMap.get("status");
+	    return status instanceof Boolean && (Boolean) status;
 	}
 
 
@@ -4132,6 +4521,12 @@ public class FanProjectExecuteController implements Initializable {
     public static String generateRandomWindSpeed() {
         double windSpeed = 1 + (random.nextDouble() * 19); // Random value between 1 and 20
         return String.format("%.1f", windSpeed);  // Format to one decimal place
+    }
+    
+    // Method to generate random voltage value (e.g., in the range of 0 to 415)
+    public static String generateRandomVoltage() {
+        int voltage = random.nextInt(416); // Random number between 0 and 415
+        return String.valueOf(voltage);
     }
 
     // Method to generate random current value (e.g., in the range of 0 to 5 amps)

@@ -27,7 +27,10 @@ public class ResultService {
 	public Result findByProjectRunAndFanSerialNumberAndTestPointName(ProjectRun projectRun, String fanSerialNumber,
 			String testPointName) {
 		return resultRepo.findByProjectRunAndFanSerialNumberAndTestPointName(projectRun, fanSerialNumber, testPointName);
-
+	}
+	
+	public Result findByFanSerialNumberAndTestPointName(String fanSerialNumber, String testPointName) {
+		return resultRepo.findByFanSerialNumberAndTestPointName(fanSerialNumber, testPointName);
 	}
 
 	public Result findByFanSerialNumberAndTestPointNameAndProjectRunAndTestStatus(

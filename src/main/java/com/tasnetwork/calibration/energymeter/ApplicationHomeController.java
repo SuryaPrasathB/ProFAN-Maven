@@ -346,7 +346,8 @@ public class ApplicationHomeController implements Initializable {
 				childPane.getChildren().add(nodeFromFXML);
 				update_left_status("Calibration Mode",ConstantApp.LEFT_STATUS_DEBUG);
 			}else{*/
-				Parent nodeFromFXML = getNodeFromFXML("/fxml/testreport/Results" + ConstantApp.THEME_FXML);
+			Parent nodeFromFXML = getNodeFromFXML("/fxml/project/ReportGenerator" + ConstantApp.THEME_FXML);
+			//	Parent nodeFromFXML = getNodeFromFXML("/fxml/testreport/Results" + ConstantApp.THEME_FXML);
 			//	Parent nodeFromFXML = getNodeFromFXML("/fxml/testreport/Results02" + ConstantApp.THEME_FXML);
 				//Parent nodeFromFXML = getNodeFromFXML("/fxml/testreport/ReportsTable" + ConstantApp.THEME_FXML);			 
 				childPane.getChildren().add(nodeFromFXML);
