@@ -4,6 +4,9 @@ public class ConstantArduinoCommands {
 
     public static final String START = "Start_";
     public static final String STOP = "Stop_";
+    public static final String MAINS_ON = "MainsOn_";
+    public static final String MAINS_OFF = "MainsOff_";
+    
     public static final String DIMMER_FORWARD_VOLT = "DimmerForwardVolt_";
     public static final String DIMMER_REVERSE_VOLT = "DimmerReverseVolt_";
     public static final String DIMMER_IS_MIN = "DimmerIsMin_";

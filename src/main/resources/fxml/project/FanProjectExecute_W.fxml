@@ -171,52 +171,87 @@
                                                             </content>
                                                          </TitledPane>
                                                          <Pane prefHeight="256.0" prefWidth="21.0" />
-                                                         <TitledPane animated="false" collapsible="false" prefHeight="320.0" prefWidth="320.0" style="-fx-border-color: black; -fx-border-width: 1;" text="Fan">
-                                                            <content>
-                                                               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                                                                  <children>
-                                                                     <GridPane layoutY="45.0" prefHeight="94.0" prefWidth="310.0">
-                                                                        <columnConstraints>
-                                                                           <ColumnConstraints hgrow="SOMETIMES" maxWidth="150.0" minWidth="10.0" prefWidth="150.0" />
-                                                                           <ColumnConstraints hgrow="SOMETIMES" maxWidth="140.0" minWidth="10.0" prefWidth="140.0" />
-                                                                           <ColumnConstraints hgrow="SOMETIMES" maxWidth="40.0" minWidth="10.0" prefWidth="40.0" />
-                                                                        </columnConstraints>
-                                                                        <rowConstraints>
-                                                                           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                                           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                                        </rowConstraints>
+                                                         <VBox prefHeight="320.0" prefWidth="327.0">
+                                                            <children>
+                                                               <TitledPane animated="false" collapsible="false" prefHeight="320.0" prefWidth="320.0" style="-fx-border-color: black; -fx-border-width: 1;" text="Fan">
+                                                                  <content>
+                                                                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                                                         <children>
-                                                                           <Button fx:id="btnFanRpmExecute" mnemonicParsing="false" onAction="#btnFanRpmOnClick" prefHeight="26.0" prefWidth="108.0" text="RPM">
-                                                                              <GridPane.margin>
-                                                                                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                                                                              </GridPane.margin>
-                                                                           </Button>
-                                                                           <TextField fx:id="txtFanRpmExecute" alignment="CENTER" editable="false" focusTraversable="false" GridPane.columnIndex="1">
-                                                                              <GridPane.margin>
-                                                                                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                                                                              </GridPane.margin>
-                                                                           </TextField>
-                                                                           <Label alignment="CENTER" prefHeight="18.0" prefWidth="66.0" text="rpm" GridPane.columnIndex="2" GridPane.halignment="CENTER" />
-                                                                           <Button fx:id="btnFanWindspeedExecute" mnemonicParsing="false" onAction="#btnFanWindspeedOnClick" prefHeight="26.0" prefWidth="108.0" text="WIND SPEED" GridPane.rowIndex="1">
-                                                                              <GridPane.margin>
-                                                                                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                                                                              </GridPane.margin>
-                                                                           </Button>
-                                                                           <TextField fx:id="txtFanWindSpeedExecute" alignment="CENTER" editable="false" focusTraversable="false" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                                                                              <GridPane.margin>
-                                                                                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                                                                              </GridPane.margin>
-                                                                           </TextField>
-                                                                           <Label alignment="CENTER" prefHeight="18.0" prefWidth="66.0" text="m/s" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                                                           <GridPane layoutY="45.0" prefHeight="94.0" prefWidth="310.0">
+                                                                              <columnConstraints>
+                                                                                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="150.0" minWidth="10.0" prefWidth="150.0" />
+                                                                                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="140.0" minWidth="10.0" prefWidth="140.0" />
+                                                                                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="40.0" minWidth="10.0" prefWidth="40.0" />
+                                                                              </columnConstraints>
+                                                                              <rowConstraints>
+                                                                                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                              </rowConstraints>
+                                                                              <children>
+                                                                                 <Button fx:id="btnFanRpmExecute" mnemonicParsing="false" onAction="#btnFanRpmOnClick" prefHeight="26.0" prefWidth="108.0" text="RPM">
+                                                                                    <GridPane.margin>
+                                                                                       <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                                                    </GridPane.margin>
+                                                                                 </Button>
+                                                                                 <TextField fx:id="txtFanRpmExecute" alignment="CENTER" editable="false" focusTraversable="false" GridPane.columnIndex="1">
+                                                                                    <GridPane.margin>
+                                                                                       <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                                                    </GridPane.margin>
+                                                                                 </TextField>
+                                                                                 <Label alignment="CENTER" prefHeight="18.0" prefWidth="66.0" text="rpm" GridPane.columnIndex="2" GridPane.halignment="CENTER" />
+                                                                                 <Button fx:id="btnFanWindspeedExecute" mnemonicParsing="false" onAction="#btnFanWindspeedOnClick" prefHeight="26.0" prefWidth="108.0" text="WIND SPEED" GridPane.rowIndex="1">
+                                                                                    <GridPane.margin>
+                                                                                       <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                                                    </GridPane.margin>
+                                                                                 </Button>
+                                                                                 <TextField fx:id="txtFanWindSpeedExecute" alignment="CENTER" editable="false" focusTraversable="false" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                                                                    <GridPane.margin>
+                                                                                       <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                                                    </GridPane.margin>
+                                                                                 </TextField>
+                                                                                 <Label alignment="CENTER" prefHeight="18.0" prefWidth="66.0" text="m/s" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                                                              </children>
+                                                                           </GridPane>
+                                                                           <ToggleButton fx:id="toggle_AutoFanExecute" layoutX="186.0" layoutY="11.0" mnemonicParsing="false" text="AUTO" />
+                                                                           <Label layoutX="54.0" layoutY="15.0" text="Real time Update ?" />
+                                                                           <ProgressIndicator fx:id="pi_AutoFan1" layoutX="287.0" layoutY="16.0" prefHeight="16.0" prefWidth="16.0" visible="false" />
                                                                         </children>
-                                                                     </GridPane>
-                                                                     <ToggleButton fx:id="toggle_AutoFanExecute" layoutX="186.0" layoutY="11.0" mnemonicParsing="false" text="AUTO" />
-                                                                     <Label layoutX="54.0" layoutY="15.0" text="Real time Update ?" />
-                                                                     <ProgressIndicator fx:id="pi_AutoFan1" layoutX="287.0" layoutY="16.0" prefHeight="16.0" prefWidth="16.0" visible="false" />
-                                                                  </children>
-                                                               </AnchorPane>
-                                                            </content>
-                                                         </TitledPane>
+                                                                     </AnchorPane>
+                                                                  </content>
+                                                               </TitledPane>
+                                                               <Pane minHeight="-Infinity" prefHeight="4.0" prefWidth="319.0" />
+                                                               <TitledPane animated="false" collapsible="false" layoutX="10.0" layoutY="10.0" prefHeight="190.0" prefWidth="319.0" style="-fx-border-color: black; -fx-border-width: 1;" text="Voltage">
+                                                                  <content>
+                                                                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="95.0" prefWidth="315.0">
+                                                                        <children>
+                                                                           <GridPane layoutX="3.0" layoutY="10.0" prefHeight="44.0" prefWidth="310.0">
+                                                                              <columnConstraints>
+                                                                                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="175.0" minWidth="10.0" prefWidth="142.0" />
+                                                                                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="148.0" minWidth="10.0" prefWidth="148.0" />
+                                                                              </columnConstraints>
+                                                                              <rowConstraints>
+                                                                                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                              </rowConstraints>
+                                                                              <children>
+                                                                                 <Button fx:id="btnVoltageMainsOn" mnemonicParsing="false" onAction="#btnVoltageMainsOnOnClick" prefHeight="26.0" prefWidth="108.0" text="MAINS ON" GridPane.halignment="CENTER">
+                                                                                    <GridPane.margin>
+                                                                                       <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                                                    </GridPane.margin>
+                                                                                 </Button>
+                                                                                 <Button fx:id="btnVoltageMainsOff" mnemonicParsing="false" onAction="#btnVoltageMainsOffOnClick" prefHeight="26.0" prefWidth="108.0" text="MAINS OFF" GridPane.columnIndex="1" GridPane.halignment="CENTER">
+                                                                                    <GridPane.margin>
+                                                                                       <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                                                    </GridPane.margin>
+                                                                                 </Button>
+                                                                              </children>
+                                                                           </GridPane>
+                                                                           <ProgressIndicator fx:id="pi_AutoFan11" layoutX="287.0" layoutY="16.0" prefHeight="16.0" prefWidth="16.0" visible="false" />
+                                                                        </children>
+                                                                     </AnchorPane>
+                                                                  </content>
+                                                               </TitledPane>
+                                                            </children>
+                                                         </VBox>
                                                          <Pane prefHeight="256.0" prefWidth="21.0" />
                                                          <AnchorPane fx:id="dynamicContentPane" prefHeight="272.0" prefWidth="700.0" />
                                                          <Pane prefHeight="256.0" prefWidth="21.0" />

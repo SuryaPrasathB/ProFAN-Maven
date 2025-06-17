@@ -104,19 +104,22 @@ import javafx.stage.Stage;
  * including voltage control, phase measurements, and test point execution.
  */
 public class FanProjectExecuteController implements Initializable {
-	
+
 	private ProjectRun currentProjectRun;
-	
+
+	// It MUST be set to 'true' at the beginning of a new overall test run (e.g., when the user clicks 'Start Test').
+	private boolean isFirstTestPointInSequence = true; // Initialize to true for the very first test point in a new sequence
+
 	// Flag for simulation mode
-	private boolean SIMULATION_MODE = true; // Set to true to bypass hardware calls
+	private boolean SIMULATION_MODE = false; //true; // Set to true to bypass hardware calls
 
 	// FXML Buttons ===============================================================================================================================
 	@FXML private Button btnStart;
 	static private Button ref_btnStart;
-	
+
 	@FXML private Button btnStop;
 	static private Button ref_btnStop;
-	
+
 	// Dimmer Controls
 	@FXML private Button btnDimmerIsMin;
 	static private Button ref_btnDimmerIsMin;
@@ -127,7 +130,7 @@ public class FanProjectExecuteController implements Initializable {
 
 	@FXML private Button btnDimmerReverse;
 	static private Button ref_btnDimmerReverse;
-	
+
 	@FXML private Button btnDimmerIsMinExecute;
 	static private Button ref_btnDimmerIsMinExecute;
 
@@ -188,12 +191,19 @@ public class FanProjectExecuteController implements Initializable {
 
 	@FXML private Button btnFanWindspeed;
 	static private Button ref_btnFanWindspeed;
-	
+
 	@FXML private Button btnFanRpmExecute;
 	static private Button ref_btnFanRpmExecute;
 
 	@FXML private Button btnFanWindspeedExecute;
 	static private Button ref_btnFanWindspeedExecute;
+
+	// Mains Control
+	@FXML private Button btnVoltageMainOn;
+	static private Button ref_btnVoltageMainOn;
+
+	@FXML private Button btnVoltageMainOff;
+	static private Button ref_btnVoltageMainOff;
 
 	// R Phase
 	@FXML private Button btnRPhaseCurrent;
@@ -257,19 +267,19 @@ public class FanProjectExecuteController implements Initializable {
 
 	@FXML private ToggleButton toggle_AutoYPhase;
 	@FXML private ProgressIndicator pi_AutoYPhase;
-	
+
 	private Button clickedButtonRef; // track which button was clicked
 
 	// ────────────────────────────────────────────────────────────────────────
 	// Executors
 	// ────────────────────────────────────────────────────────────────────────
-	
+
 	private ScheduledExecutorService autoRPhaseExecutor;
 	private ScheduledExecutorService autoYPhaseExecutor;
 	private ScheduledExecutorService autoBPhaseExecutor;
 	private ScheduledExecutorService auto3PhaseExecutor;
 	private ScheduledExecutorService autoFanExecutor;
-	
+
 	// FXML TextFields ===============================================================================================================================
 	// Forward/Reverse Timing
 	@FXML private TextField txtForwardInMsec;
@@ -277,7 +287,7 @@ public class FanProjectExecuteController implements Initializable {
 
 	@FXML private TextField txtReverseInMsec;
 	static private TextField ref_txtReverseInMsec;
-	
+
 	@FXML private TextField txtForwardInMsecExecute;
 	static private TextField ref_txtForwardInMsecExecute;
 
@@ -366,7 +376,7 @@ public class FanProjectExecuteController implements Initializable {
 
 	@FXML private TextField txtTestVoltage;
 	static private TextField ref_txtTestVoltage;
-	
+
 	@FXML private TextField txtSetVoltageExecute;
 	static private TextField ref_txtSetVoltageExecute;
 
@@ -388,7 +398,7 @@ public class FanProjectExecuteController implements Initializable {
 	// TIMERS =====================================================================================================================================
 	private Timer startTimer;
 	private Timer stopTimer;
-	
+
 	// =========================== Dimmer Timers ===================================
 	private Timer dimmerForwardTimer;
 	private Timer dimmerReverseTimer;
@@ -431,6 +441,10 @@ public class FanProjectExecuteController implements Initializable {
 	private Timer fanRpmTimer;
 	private Timer fanWindspeedTimer;
 
+	// =========================== Mains Timers ======================================
+	private Timer mainsOnTimer;
+	private Timer mainsOffTimer;
+
 	// =========================== Voltage Control Timers ===========================
 	private Timer setVoltageTimer;
 	private Timer testVoltageTimer;
@@ -438,7 +452,7 @@ public class FanProjectExecuteController implements Initializable {
 
 	// =========================== Utility Timers ==================================
 	private Timer saveOnClickTimer;
-	
+
 	// ===============================================================================================================
 
 
@@ -448,7 +462,7 @@ public class FanProjectExecuteController implements Initializable {
 
 	@FXML
 	private Button addTestPointButton;
-	
+
 	@FXML
 	private Button btnSettings;
 
@@ -458,43 +472,43 @@ public class FanProjectExecuteController implements Initializable {
 
 	@FXML
 	private TableColumn<FanTestSetup, String> colTestSetupStatus;
-	
+
 	@FXML
 	private TableColumn<FanTestSetup, Double> colTestSetupProgress;
-	
+
 	@FXML
 	private TableColumn<FanTestSetup, String> colTestSetupTestPointName;
-	
+
 	@FXML
 	private TableColumn<FanTestSetup, Integer> colTestSetupSerialNo;
-	
+
 	@FXML private TableColumn<FanTestSetup, String> colTestSetupTargetVoltage;
 
 	@FXML private TableColumn<FanTestSetup, Integer> colTestSetupTimeInSec;
-	
+
 	@FXML private TableColumn<FanTestSetup, String> colTestSetupRpmActual;
 
 	@FXML private TableColumn<FanTestSetup, String> colTestSetupWindSpeedActual;
-	
+
 	@FXML private TableColumn<FanTestSetup, String> colTestSetupCurrentActual;
-	
+
 	@FXML private TableColumn<FanTestSetup, String> colTestSetupWattsActual;
 
 	@FXML private TableColumn<FanTestSetup, String> colTestSetupActivePowerActual;
-	
+
 	@FXML private TableColumn<FanTestSetup, String> colTestSetupPfActual;
 
-	
+
 	// TEST EXECUTION ===================================================================================
 	@FXML private Button btnTestPointCloseProject;
-    @FXML private Button btnTestPointResume;
-    @FXML private Button btnTestPointStart;
-    @FXML private Button btnTestPointStepRun;
-    @FXML private Button btnTestPointStop;
-    
-    /*@FXML
+	@FXML private Button btnTestPointResume;
+	@FXML private Button btnTestPointStart;
+	@FXML private Button btnTestPointStepRun;
+	@FXML private Button btnTestPointStop;
+
+	/*@FXML
     private ProgressBar progressBarTestPoint;*/	
-    
+
 	@FXML
 	private TableView<FanTestSetup> tvTestSetup;
 	static private TableView<FanTestSetup> ref_tvTestSetup;
@@ -505,7 +519,7 @@ public class FanProjectExecuteController implements Initializable {
 	private boolean isRunning = false;
 	private boolean isStopped = false;
 	private boolean isStepRun = false;
-	
+
 	private String fanSerialNumber = "";
 	private String modelPhase = "";
 	private volatile Integer requestedResumeIndex = null;
@@ -513,20 +527,20 @@ public class FanProjectExecuteController implements Initializable {
 	@FXML
 	private TextField txtNewFanSerialNo;
 	static private TextField ref_txtNewFanSerialNo;
-	
+
 	@FXML
 	private TextArea textAreaLogs;
-	
+
 	@FXML
 	private ListView<LogEntry> listViewLogs;
 
 	private final ObservableList<LogEntry> logItems = FXCollections.observableArrayList();
 
-	
+
 	// RESULTS
 	private Result currentResult;
 	private boolean allValid ;
-	
+
 	// DYNAMIC CONTROLS PANEL
 	@FXML
 	private AnchorPane dynamicContentPane;
@@ -534,12 +548,12 @@ public class FanProjectExecuteController implements Initializable {
 	// ============================================================================================================
 
 	/**
-     * Initializes the controller and sets up the GUI components.
-     * - Sets up table columns and their properties
-     * - Initializes UI controls and their event handlers
-     * - Loads initial data from database
-     * - Sets up validation rules for input fields
-     */
+	 * Initializes the controller and sets up the GUI components.
+	 * - Sets up table columns and their properties
+	 * - Initializes UI controls and their event handlers
+	 * - Loads initial data from database
+	 * - Sets up validation rules for input fields
+	 */
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 
@@ -552,87 +566,87 @@ public class FanProjectExecuteController implements Initializable {
 	}
 
 	/**
-     * Initializes the GUI components and their properties.
-     * - Sets up table columns with custom cell factories
-     * - Configures progress indicators and status displays
-     * - Sets up editable columns and their validation
-     * - Initializes button states and event handlers
-     */
+	 * Initializes the GUI components and their properties.
+	 * - Sets up table columns with custom cell factories
+	 * - Configures progress indicators and status displays
+	 * - Sets up editable columns and their validation
+	 * - Initializes button states and event handlers
+	 */
 	private void guiInit() {
-		
+
 		listViewLogs.setItems(logItems);
 		listViewLogs.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 		listViewLogs.setCellFactory(lv -> new ListCell<LogEntry>() {
-		    @Override
-		    protected void updateItem(LogEntry item, boolean empty) {
-		        super.updateItem(item, empty);
-		        if (empty || item == null) {
-		            setText(null);
-		            setStyle("");
-		        } else {
-		            setText(item.getMessage());
-		            switch (item.getLevel()) {
-		                case ERROR:
-		                    setTextFill(Color.RED);
-		                    break;
-		                case DEBUG:
-		                    setTextFill(Color.ORANGE);
-		                    break;
-		                default:
-		                    setTextFill(Color.BLACK);
-		                    break;
-		            }
-		        }
-		    }
+			@Override
+			protected void updateItem(LogEntry item, boolean empty) {
+				super.updateItem(item, empty);
+				if (empty || item == null) {
+					setText(null);
+					setStyle("");
+				} else {
+					setText(item.getMessage());
+					switch (item.getLevel()) {
+					case ERROR:
+						setTextFill(Color.RED);
+						break;
+					case DEBUG:
+						setTextFill(Color.ORANGE);
+						break;
+					default:
+						setTextFill(Color.BLACK);
+						break;
+					}
+				}
+			}
 		});
 
 
-		
-	 // TEXT BOX VALIDATION ===============================================================================
+
+		// TEXT BOX VALIDATION ===============================================================================
 		addNumericRangeValidation(txtForwardInMsec, "Forward time (ms)");
-	    addNumericRangeValidation(txtReverseInMsec, "Reverse time (ms)");
-	    addNumericRangeValidationAllowZero(txtSetVoltage, "Set Voltage (V)");
-	    addNumericRangeValidationAllowZero(txtTestVoltage, "Test Voltage (V)");
-	    
-	    addTextValidation(txtNewFanSerialNo, "Fan Serial No");
-	    
-		
-	 // Table row factory for highlighting running test points
+		addNumericRangeValidation(txtReverseInMsec, "Reverse time (ms)");
+		addNumericRangeValidationAllowZero(txtSetVoltage, "Set Voltage (V)");
+		addNumericRangeValidationAllowZero(txtTestVoltage, "Test Voltage (V)");
+
+		addTextValidation(txtNewFanSerialNo, "Fan Serial No");
+
+
+		// Table row factory for highlighting running test points
 		tvTestSetup.setRowFactory(tv -> {
-		    TableRow<FanTestSetup> row = new TableRow<FanTestSetup>() { // Specify the type explicitly
-		        @Override
-		        protected void updateItem(FanTestSetup item, boolean empty) {
-		            super.updateItem(item, empty);
-		            if (item == null || empty) {
-		                setStyle("");
-		            } else {
-		                if (item.isRunning()) {
-		                    setStyle(ConstantCSS.FX_BACKGROUND_COLOR + ConstantCSS.COLOR_LIGHT_GREEN_SEMI_COLON);
-		                } else {
-		                    setStyle("");
-		                }
-		            }
-		        }
-		    };
-		 // Double-click to jump to test point
-		    row.setOnMouseClicked(event -> {
-		        if (event.getClickCount() == 2 && !row.isEmpty()) {
-		            FanTestSetup selected = row.getItem();
-		            int selectedIndex = tvTestSetup.getItems().indexOf(selected);
-		            ApplicationLauncher.logger.debug("User requested to jump to Test Point Index: " + selectedIndex);
+			TableRow<FanTestSetup> row = new TableRow<FanTestSetup>() { // Specify the type explicitly
+				@Override
+				protected void updateItem(FanTestSetup item, boolean empty) {
+					super.updateItem(item, empty);
+					if (item == null || empty) {
+						setStyle("");
+					} else {
+						if (item.isRunning()) {
+							setStyle(ConstantCSS.FX_BACKGROUND_COLOR + ConstantCSS.COLOR_LIGHT_GREEN_SEMI_COLON);
+						} else {
+							setStyle("");
+						}
+					}
+				}
+			};
+			// Double-click to jump to test point
+			row.setOnMouseClicked(event -> {
+				if (event.getClickCount() == 2 && !row.isEmpty()) {
+					FanTestSetup selected = row.getItem();
+					int selectedIndex = tvTestSetup.getItems().indexOf(selected);
+					ApplicationLauncher.logger.debug("User requested to jump to Test Point Index: " + selectedIndex);
 
-		            if (isRunning && selectedIndex != currentIndex) {
-		                ApplicationLauncher.logger.info("Resume requested to Test Point Index: " + selectedIndex);
-		                requestedResumeIndex = selectedIndex;
-		            }
-		        }
-		    });
+					if (isRunning && selectedIndex != currentIndex) {
+						ApplicationLauncher.logger.info("Resume requested to Test Point Index: " + selectedIndex);
+						requestedResumeIndex = selectedIndex;
+					}
+				}
+			});
 
-		    return row;
+			return row;
 		});
 
 		/*// RIGHT CLICK MENU FOR LOG AREA ======================================================================
-		
+
 		ContextMenu contextMenu = new ContextMenu();
 
 	    MenuItem copyItem = new MenuItem("Copy");
@@ -656,46 +670,46 @@ public class FanProjectExecuteController implements Initializable {
 
 	    // Also initialize the correct state on startup
 	    copyItem.setDisable(true);*/
-	    
+
 		// RIGHT CLICK MENU FOR LIST LOG AREA ======================================================================
 		ContextMenu contextMenuList = new ContextMenu();
 
 		MenuItem copyItemList = new MenuItem("Copy");
 		copyItemList.setOnAction(e -> {
-		    LogEntry selected = listViewLogs.getSelectionModel().getSelectedItem();
-		    if (selected != null) {
-		        Clipboard clipboard = Clipboard.getSystemClipboard();
-		        ClipboardContent content = new ClipboardContent();
-		        content.putString(selected.getMessage());  // ✅ Fixed
-		        clipboard.setContent(content);
-		    }
+			LogEntry selected = listViewLogs.getSelectionModel().getSelectedItem();
+			if (selected != null) {
+				Clipboard clipboard = Clipboard.getSystemClipboard();
+				ClipboardContent content = new ClipboardContent();
+				content.putString(selected.getMessage());  // ✅ Fixed
+				clipboard.setContent(content);
+			}
 		});
-		
+
 		MenuItem previewAndCopyItem = new MenuItem("Preview & Copy");
 		previewAndCopyItem.setOnAction(e -> {
-		    ObservableList<LogEntry> selectedItems = listViewLogs.getSelectionModel().getSelectedItems();
-		    if (!selectedItems.isEmpty()) {
-		        String preview = selectedItems.stream()
-		                .map(LogEntry::getMessage)
-		                .collect(Collectors.joining("\n"));
+			ObservableList<LogEntry> selectedItems = listViewLogs.getSelectionModel().getSelectedItems();
+			if (!selectedItems.isEmpty()) {
+				String preview = selectedItems.stream()
+						.map(LogEntry::getMessage)
+						.collect(Collectors.joining("\n"));
 
-		        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-		        alert.setTitle("Copy Preview");
-		        alert.setHeaderText("Do you want to copy the selected log(s)?");
-		        TextArea textArea = new TextArea(preview);
-		        textArea.setEditable(false);
-		        textArea.setWrapText(true);
-		        textArea.setMaxWidth(Double.MAX_VALUE);
-		        textArea.setMaxHeight(Double.MAX_VALUE);
-		        alert.getDialogPane().setContent(textArea);
+				Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+				alert.setTitle("Copy Preview");
+				alert.setHeaderText("Do you want to copy the selected log(s)?");
+				TextArea textArea = new TextArea(preview);
+				textArea.setEditable(false);
+				textArea.setWrapText(true);
+				textArea.setMaxWidth(Double.MAX_VALUE);
+				textArea.setMaxHeight(Double.MAX_VALUE);
+				alert.getDialogPane().setContent(textArea);
 
-		        Optional<ButtonType> result = alert.showAndWait();
-		        if (result.isPresent() && result.get() == ButtonType.OK) {
-		            ClipboardContent content = new ClipboardContent();
-		            content.putString(preview);
-		            Clipboard.getSystemClipboard().setContent(content);
-		        }
-		    }
+				Optional<ButtonType> result = alert.showAndWait();
+				if (result.isPresent() && result.get() == ButtonType.OK) {
+					ClipboardContent content = new ClipboardContent();
+					content.putString(preview);
+					Clipboard.getSystemClipboard().setContent(content);
+				}
+			}
 		});
 
 		MenuItem selectAllItemList = new MenuItem("Select All");
@@ -707,181 +721,181 @@ public class FanProjectExecuteController implements Initializable {
 		clearItemList.setOnAction(e -> logItems.clear());
 
 		contextMenuList.getItems().addAll(
-			    previewAndCopyItem,  // New
-			    selectAllItemList,
-			    separatorList,
-			    clearItemList
-			);
+				previewAndCopyItem,  // New
+				selectAllItemList,
+				separatorList,
+				clearItemList
+				);
 
 		// Attach context menu
 		listViewLogs.setContextMenu(contextMenuList);
 
 		// Enable/Disable Copy based on selection
 		listViewLogs.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-		    copyItemList.setDisable(newVal == null);
+			copyItemList.setDisable(newVal == null);
 		});
 
 		copyItemList.setDisable(true);  // Initially disabled
 
 
-	    
-	    // ====================================================================================================
 
-	 // Model selection listener		
+		// ====================================================================================================
+
+		// Model selection listener		
 		ref_cmbBxModelName.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
 			if (newVal != null) {
 				updateTestSetupTableForModel(newVal);
 				testPoints = ref_tvTestSetup.getItems();
-			    modelPhase = DeviceDataManagerController.getDutMasterDataService().findByModelName(newVal).getPhase();
-			    //appendLog("Model Phase = " + modelPhase);
-			    
-			    loadPhaseContent(modelPhase);
+				modelPhase = DeviceDataManagerController.getDutMasterDataService().findByModelName(newVal).getPhase();
+				//appendLog("Model Phase = " + modelPhase);
+
+				loadPhaseContent(modelPhase);
 			}
 		});
-		
+
 		ref_tvTestSetup.setEditable(false);
-		
+
 		colTestSetupRpmActual.setCellValueFactory(cellData -> cellData.getValue().rpmActualProperty());
 		colTestSetupRpmActual.setCellFactory(col -> new TableCell<FanTestSetup, String>() {
-		    @Override
-		    protected void updateItem(String item, boolean empty) {
-		        super.updateItem(item, empty);
-		        setText(null);
-		        setStyle("");
-		        getStyleClass().remove("blinking-cell");
+			@Override
+			protected void updateItem(String item, boolean empty) {
+				super.updateItem(item, empty);
+				setText(null);
+				setStyle("");
+				getStyleClass().remove("blinking-cell");
 
-		        if (!empty && item != null) {
-		            setText(item);
-		            FanTestSetup tp = getTableView().getItems().get(getIndex());
-		            setStyle(ConstantCSS.FX_TEST_FILL + (tp.rpmValidProperty().get() ? ConstantCSS.COLOR_GREEN_SEMI_COLON : ConstantCSS.COLOR_RED_SEMI_COLON));
-		            if (tp.rpmBlinkProperty().get() && !getStyleClass().contains("blinking-cell")) {
-		                getStyleClass().add("blinking-cell");
-		            }
-		        }
-		    }
+				if (!empty && item != null) {
+					setText(item);
+					FanTestSetup tp = getTableView().getItems().get(getIndex());
+					setStyle(ConstantCSS.FX_TEST_FILL + (tp.rpmValidProperty().get() ? ConstantCSS.COLOR_GREEN_SEMI_COLON : ConstantCSS.COLOR_RED_SEMI_COLON));
+					if (tp.rpmBlinkProperty().get() && !getStyleClass().contains("blinking-cell")) {
+						getStyleClass().add("blinking-cell");
+					}
+				}
+			}
 		});
 
 		colTestSetupWindSpeedActual.setCellValueFactory(cellData -> cellData.getValue().windSpeedActualProperty());
 		colTestSetupWindSpeedActual.setCellFactory(col -> new TableCell<FanTestSetup, String>() {
-		    @Override
-		    protected void updateItem(String item, boolean empty) {
-		        super.updateItem(item, empty);
-		        setText(null);
-		        setStyle("");
-		        getStyleClass().remove("blinking-cell");
+			@Override
+			protected void updateItem(String item, boolean empty) {
+				super.updateItem(item, empty);
+				setText(null);
+				setStyle("");
+				getStyleClass().remove("blinking-cell");
 
-		        if (!empty && item != null) {
-		            setText(item);
-		            FanTestSetup tp = getTableView().getItems().get(getIndex());
-		            setStyle(ConstantCSS.FX_TEST_FILL + (tp.rpmValidProperty().get() ? ConstantCSS.COLOR_GREEN_SEMI_COLON : ConstantCSS.COLOR_RED_SEMI_COLON));
-		            if (tp.windSpeedBlinkProperty().get() && !getStyleClass().contains("blinking-cell")) {
-		                getStyleClass().add("blinking-cell");
-		            }
-		        }
-		    }
+				if (!empty && item != null) {
+					setText(item);
+					FanTestSetup tp = getTableView().getItems().get(getIndex());
+					setStyle(ConstantCSS.FX_TEST_FILL + (tp.rpmValidProperty().get() ? ConstantCSS.COLOR_GREEN_SEMI_COLON : ConstantCSS.COLOR_RED_SEMI_COLON));
+					if (tp.windSpeedBlinkProperty().get() && !getStyleClass().contains("blinking-cell")) {
+						getStyleClass().add("blinking-cell");
+					}
+				}
+			}
 		});
 
 		colTestSetupCurrentActual.setCellValueFactory(cellData -> cellData.getValue().currentActualProperty());
 		colTestSetupCurrentActual.setCellFactory(col -> new TableCell<FanTestSetup, String>() {
-		    @Override
-		    protected void updateItem(String item, boolean empty) {
-		        super.updateItem(item, empty);
-		        setText(null);
-		        setStyle("");
-		        getStyleClass().remove("blinking-cell");
+			@Override
+			protected void updateItem(String item, boolean empty) {
+				super.updateItem(item, empty);
+				setText(null);
+				setStyle("");
+				getStyleClass().remove("blinking-cell");
 
-		        if (!empty && item != null) {
-		            setText(item);
-		            FanTestSetup tp = getTableView().getItems().get(getIndex());
-		            setStyle(ConstantCSS.FX_TEST_FILL + (tp.rpmValidProperty().get() ? ConstantCSS.COLOR_GREEN_SEMI_COLON : ConstantCSS.COLOR_RED_SEMI_COLON));
-		            if (tp.currentBlinkProperty().get() && !getStyleClass().contains("blinking-cell")) {
-		                getStyleClass().add("blinking-cell");
-		            }
-		        }
-		    }
+				if (!empty && item != null) {
+					setText(item);
+					FanTestSetup tp = getTableView().getItems().get(getIndex());
+					setStyle(ConstantCSS.FX_TEST_FILL + (tp.rpmValidProperty().get() ? ConstantCSS.COLOR_GREEN_SEMI_COLON : ConstantCSS.COLOR_RED_SEMI_COLON));
+					if (tp.currentBlinkProperty().get() && !getStyleClass().contains("blinking-cell")) {
+						getStyleClass().add("blinking-cell");
+					}
+				}
+			}
 		});
 
 		colTestSetupWattsActual.setCellValueFactory(cellData -> cellData.getValue().wattsActualProperty());
 		colTestSetupWattsActual.setCellFactory(col -> new TableCell<FanTestSetup, String>() {
-		    @Override
-		    protected void updateItem(String item, boolean empty) {
-		        super.updateItem(item, empty);
-		        setText(null);
-		        setStyle("");
-		        getStyleClass().remove("blinking-cell");
+			@Override
+			protected void updateItem(String item, boolean empty) {
+				super.updateItem(item, empty);
+				setText(null);
+				setStyle("");
+				getStyleClass().remove("blinking-cell");
 
-		        if (!empty && item != null) {
-		            setText(item);
-		            FanTestSetup tp = getTableView().getItems().get(getIndex());
-		            setStyle(ConstantCSS.FX_TEST_FILL + (tp.rpmValidProperty().get() ? ConstantCSS.COLOR_GREEN_SEMI_COLON : ConstantCSS.COLOR_RED_SEMI_COLON));
-		            if (tp.wattsBlinkProperty().get() && !getStyleClass().contains("blinking-cell")) {
-		                getStyleClass().add("blinking-cell");
-		            }
-		        }
-		    }
+				if (!empty && item != null) {
+					setText(item);
+					FanTestSetup tp = getTableView().getItems().get(getIndex());
+					setStyle(ConstantCSS.FX_TEST_FILL + (tp.rpmValidProperty().get() ? ConstantCSS.COLOR_GREEN_SEMI_COLON : ConstantCSS.COLOR_RED_SEMI_COLON));
+					if (tp.wattsBlinkProperty().get() && !getStyleClass().contains("blinking-cell")) {
+						getStyleClass().add("blinking-cell");
+					}
+				}
+			}
 		});
 
 		colTestSetupActivePowerActual.setCellValueFactory(cellData -> cellData.getValue().activePowerActualProperty());
 		colTestSetupActivePowerActual.setCellFactory(col -> new TableCell<FanTestSetup, String>() {
-		    @Override
-		    protected void updateItem(String item, boolean empty) {
-		        super.updateItem(item, empty);
-		        setText(null);
-		        setStyle("");
-		        getStyleClass().remove("blinking-cell");
+			@Override
+			protected void updateItem(String item, boolean empty) {
+				super.updateItem(item, empty);
+				setText(null);
+				setStyle("");
+				getStyleClass().remove("blinking-cell");
 
-		        if (!empty && item != null) {
-		            setText(item);
-		            FanTestSetup tp = getTableView().getItems().get(getIndex());
-		            setStyle(ConstantCSS.FX_TEST_FILL + (tp.rpmValidProperty().get() ? ConstantCSS.COLOR_GREEN_SEMI_COLON : ConstantCSS.COLOR_RED_SEMI_COLON));
-		            if (tp.vaBlinkProperty().get() && !getStyleClass().contains("blinking-cell")) {
-		                getStyleClass().add("blinking-cell");
-		            }
-		        }
-		    }
+				if (!empty && item != null) {
+					setText(item);
+					FanTestSetup tp = getTableView().getItems().get(getIndex());
+					setStyle(ConstantCSS.FX_TEST_FILL + (tp.rpmValidProperty().get() ? ConstantCSS.COLOR_GREEN_SEMI_COLON : ConstantCSS.COLOR_RED_SEMI_COLON));
+					if (tp.vaBlinkProperty().get() && !getStyleClass().contains("blinking-cell")) {
+						getStyleClass().add("blinking-cell");
+					}
+				}
+			}
 		});
 
 		colTestSetupPfActual.setCellValueFactory(cellData -> cellData.getValue().powerFactorActualProperty());
 		colTestSetupPfActual.setCellFactory(col -> new TableCell<FanTestSetup, String>() {
-		    @Override
-		    protected void updateItem(String item, boolean empty) {
-		        super.updateItem(item, empty);
-		        setText(null);
-		        setStyle("");
-		        getStyleClass().remove("blinking-cell");
+			@Override
+			protected void updateItem(String item, boolean empty) {
+				super.updateItem(item, empty);
+				setText(null);
+				setStyle("");
+				getStyleClass().remove("blinking-cell");
 
-		        if (!empty && item != null) {
-		            setText(item);
-		            FanTestSetup tp = getTableView().getItems().get(getIndex());
-		            setStyle(ConstantCSS.FX_TEST_FILL + (tp.rpmValidProperty().get() ? ConstantCSS.COLOR_GREEN_SEMI_COLON : ConstantCSS.COLOR_RED_SEMI_COLON));
-		            if (tp.pfBlinkProperty().get() && !getStyleClass().contains("blinking-cell")) {
-		                getStyleClass().add("blinking-cell");
-		            }
-		        }
-		    }
+				if (!empty && item != null) {
+					setText(item);
+					FanTestSetup tp = getTableView().getItems().get(getIndex());
+					setStyle(ConstantCSS.FX_TEST_FILL + (tp.rpmValidProperty().get() ? ConstantCSS.COLOR_GREEN_SEMI_COLON : ConstantCSS.COLOR_RED_SEMI_COLON));
+					if (tp.pfBlinkProperty().get() && !getStyleClass().contains("blinking-cell")) {
+						getStyleClass().add("blinking-cell");
+					}
+				}
+			}
 		});
 
 
 		ref_cmbBxModelName.setPromptText("Select Model");
-		
-		
+
+
 		/*ObservableList<FanTestSetup> dummyData = FXCollections.observableArrayList();
-		
+
 		for (int i = 1; i <= 3; i++) {
 		    FanTestSetup point = new FanTestSetup();
 		    point.setStatus("In Progress");
 		    point.setTestPointName("Test Point " + i);
 		    point.setTargetVoltage(String.valueOf(10*i + 200));
 		    point.setSetupTimeInSec(60);
-		    
+
 		    point.setRpmActual(generateRandomRpm());
 	        point.setWindSpeedActual(generateRandomWindSpeed());
 	        point.setCurrentActual(generateRandomCurrent());
 	        point.setWattsActual(generateRandomWatts());
 	        point.setActivePowerActual(generateRandomActivePower());	
 	        point.setPowerFactorActual(generateRandomPowerFactor());
-	        
-	        
+
+
 
 		    point.setIsRunning(false);
 		    dummyData.add(point);
@@ -901,54 +915,54 @@ public class FanProjectExecuteController implements Initializable {
 		colTestSetupStatus.setCellValueFactory(cellData -> cellData.getValue().statusProperty());
 
 		colTestSetupStatus.setCellFactory(column -> new TableCell<FanTestSetup, String>() {
-		    @Override
-		    protected void updateItem(String status, boolean empty) {
-		        super.updateItem(status, empty);
+			@Override
+			protected void updateItem(String status, boolean empty) {
+				super.updateItem(status, empty);
 
-		        if (empty || status == null) {
-		            setText(null);
-		            setStyle("");
-		        } else {
-		            setText(status);
-		            if (ConstantStatus.COMPLETED.equalsIgnoreCase(status)) {
-		                setTextFill(Color.GREEN);
-		            } else if (ConstantStatus.IN_PROG.equalsIgnoreCase(status)) {
-		                setTextFill(Color.ORANGE);
-		            } else if (ConstantStatus.FAILED.equalsIgnoreCase(status)) {
-		            	setTextFill(Color.RED);
-		            }else {
-		                setTextFill(Color.BLACK);
-		            }
-		        }
-		    }
+				if (empty || status == null) {
+					setText(null);
+					setStyle("");
+				} else {
+					setText(status);
+					if (ConstantStatus.COMPLETED.equalsIgnoreCase(status)) {
+						setTextFill(Color.GREEN);
+					} else if (ConstantStatus.IN_PROG.equalsIgnoreCase(status)) {
+						setTextFill(Color.ORANGE);
+					} else if (ConstantStatus.FAILED.equalsIgnoreCase(status)) {
+						setTextFill(Color.RED);
+					}else {
+						setTextFill(Color.BLACK);
+					}
+				}
+			}
 		});
 
 		colTestSetupProgress.setCellValueFactory(cellData -> cellData.getValue().progressProperty().asObject());
 
 		colTestSetupProgress.setCellFactory(column -> new TableCell<FanTestSetup, Double>() {
-		    private final ProgressBar progressBar = new ProgressBar();
+			private final ProgressBar progressBar = new ProgressBar();
 
-		    @Override
-		    protected void updateItem(Double progress, boolean empty) {
-		        super.updateItem(progress, empty);
+			@Override
+			protected void updateItem(Double progress, boolean empty) {
+				super.updateItem(progress, empty);
 
-		        if (empty || progress == null) {
-		            setGraphic(null);
-		        } else {
-		            progressBar.setProgress(progress);
+				if (empty || progress == null) {
+					setGraphic(null);
+				} else {
+					progressBar.setProgress(progress);
 
-		            FanTestSetup testPoint = getTableView().getItems().get(getIndex());
-		            if (ConstantStatus.COMPLETED.equalsIgnoreCase(testPoint.getStatus())) {
-		                progressBar.setStyle(ConstantCSS.FX_ACCENT + ConstantCSS.COLOR_GREEN_SEMI_COLON);
-		            } else if ("Failed".equalsIgnoreCase(testPoint.getStatus())) {
-		                progressBar.setStyle(ConstantCSS.FX_ACCENT + ConstantCSS.COLOR_RED_SEMI_COLON);
-		            } else {
-		                progressBar.setStyle(""); // Default style
-		            }
+					FanTestSetup testPoint = getTableView().getItems().get(getIndex());
+					if (ConstantStatus.COMPLETED.equalsIgnoreCase(testPoint.getStatus())) {
+						progressBar.setStyle(ConstantCSS.FX_ACCENT + ConstantCSS.COLOR_GREEN_SEMI_COLON);
+					} else if ("Failed".equalsIgnoreCase(testPoint.getStatus())) {
+						progressBar.setStyle(ConstantCSS.FX_ACCENT + ConstantCSS.COLOR_RED_SEMI_COLON);
+					} else {
+						progressBar.setStyle(""); // Default style
+					}
 
-		            setGraphic(progressBar);
-		        }
-		    }
+					setGraphic(progressBar);
+				}
+			}
 		});
 
 
@@ -1107,7 +1121,7 @@ public class FanProjectExecuteController implements Initializable {
 			}
 		});*/
 
-		
+
 
 		/*		colTestSetupActivePowerUpperLimit.setCellValueFactory(data -> data.getValue().getActivePowerUpperLimitProperty());
 		colTestSetupActivePowerUpperLimit.setCellFactory(TextFieldTableCell.forTableColumn());
@@ -1186,8 +1200,8 @@ public class FanProjectExecuteController implements Initializable {
 	}
 
 	/**
-     * Configures table columns with cell factories and value factories.
-     */
+	 * Configures table columns with cell factories and value factories.
+	 */
 	/*private void updateTestSetupTableForModel(String selectedModelName) {
 		List<DutMasterData> dutMasterDataList = DeviceDataManagerController.getDutMasterDataService().findAll();
 
@@ -1205,29 +1219,29 @@ public class FanProjectExecuteController implements Initializable {
 		});
 	}*/
 	// Sort by serial number
-    private void updateTestSetupTableForModel(String selectedModelName) {
-        List<DutMasterData> dutMasterDataList = DeviceDataManagerController.getDutMasterDataService().findAll();
+	private void updateTestSetupTableForModel(String selectedModelName) {
+		List<DutMasterData> dutMasterDataList = DeviceDataManagerController.getDutMasterDataService().findAll();
 
-        Optional<DutMasterData> selectedDutOpt = dutMasterDataList.stream()
-                .filter(d -> d.getModelName().equals(selectedModelName))
-                .findFirst();
+		Optional<DutMasterData> selectedDutOpt = dutMasterDataList.stream()
+				.filter(d -> d.getModelName().equals(selectedModelName))
+				.findFirst();
 
-        selectedDutOpt.ifPresent(dut -> {
-            List<FanTestSetup> fanList = dut.getFanTestSetupList();
-            if (fanList != null) {
-                // Sort the list by serial number
-                fanList.sort(Comparator.comparingInt(FanTestSetup::getSerialNo)); // Assuming getSerialNo() returns int
+		selectedDutOpt.ifPresent(dut -> {
+			List<FanTestSetup> fanList = dut.getFanTestSetupList();
+			if (fanList != null) {
+				// Sort the list by serial number
+				fanList.sort(Comparator.comparingInt(FanTestSetup::getSerialNo)); // Assuming getSerialNo() returns int
 
-                ref_tvTestSetup.getItems().clear();
-                ref_tvTestSetup.getItems().addAll(fanList);
-                serialNoAtomic.set(fanList.size() + 1);
-            }
-        });
-    }
+				ref_tvTestSetup.getItems().clear();
+				ref_tvTestSetup.getItems().addAll(fanList);
+				serialNoAtomic.set(fanList.size() + 1);
+			}
+		});
+	}
 
 	/**
-     * Loads model data from the database and populates the UI.
-     */
+	 * Loads model data from the database and populates the UI.
+	 */
 	private void loadDataFromDb() {
 		List<DutMasterData> dutMasterDataList = DeviceDataManagerController.getDutMasterDataService().findAll();
 		List<String> modelList = new ArrayList<String>();
@@ -1257,19 +1271,19 @@ public class FanProjectExecuteController implements Initializable {
 	}
 
 	/**
-     * Assigns references to static fields for UI components.
-     */
+	 * Assigns references to static fields for UI components.
+	 */
 	private void refAssignment() {
 		ref_txtNewFanSerialNo = txtNewFanSerialNo;
 		ref_cmbBxModelName = cmbBxModelName;
 		ref_tvTestSetup = tvTestSetup;
-		
+
 		ref_btnStart			 = btnStart;
 		ref_btnStop				 = btnStop;
 
 		ref_btnDimmerForward     = btnDimmerForward;
 		ref_btnDimmerReverse     = btnDimmerReverse;
-		
+
 		ref_btnDimmerForwardExecute     = btnDimmerForwardExecute;
 		ref_btnDimmerReverseExecute     = btnDimmerReverseExecute;
 
@@ -1293,9 +1307,13 @@ public class FanProjectExecuteController implements Initializable {
 		ref_btnDimmerIsMinExecute       = btnDimmerIsMinExecute;
 		ref_btnFanRpm            = btnFanRpm;
 		ref_btnFanWindspeed      = btnFanWindspeed;
-		
+
 		ref_btnFanRpmExecute            = btnFanRpmExecute;
 		ref_btnFanWindspeedExecute      = btnFanWindspeedExecute;
+
+		ref_btnVoltageMainOn	= btnVoltageMainOn;
+		ref_btnVoltageMainOff	= btnVoltageMainOff;
+
 
 		ref_btnRPhaseCurrent     = btnRPhaseCurrent;
 		ref_btnRPhasePF          = btnRPhasePF;
@@ -1305,7 +1323,7 @@ public class FanProjectExecuteController implements Initializable {
 
 		ref_btnSetVoltage        = btnSetVoltage;
 		ref_btnTestVoltage       = btnTestVoltage;
-		
+
 		ref_btnSetVoltageExecute        = btnSetVoltageExecute;
 		ref_btnTestVoltageExecute       = btnTestVoltageExecute;
 
@@ -1325,7 +1343,7 @@ public class FanProjectExecuteController implements Initializable {
 		ref_txtReverseInMsec     = txtReverseInMsec;
 		ref_txtForwardInMsecExecute     = txtForwardInMsecExecute;
 		ref_txtReverseInMsecExecute     = txtReverseInMsecExecute;
-		
+
 		ref_txt3PhaseCurrentAvg  = txt3PhaseCurrentAvg;
 		ref_txt3PhasePFAvg       = txt3PhasePFAvg;
 		ref_txt3PhaseVATotal     = txt3PhaseVATotal;
@@ -1369,57 +1387,57 @@ public class FanProjectExecuteController implements Initializable {
 		//ref_btnStop.setDisable(true);
 
 	}
-	
+
 	/**
-     * Sets up listeners for UI component events.
-     */
+	 * Sets up listeners for UI component events.
+	 */
 	public void listenersAssignment() {
 		toggle_AutoRPhase.selectedProperty().addListener((obs, wasSelected, isSelected) -> {
-		    if (isSelected) {
-		        startAutoRPhaseUpdate();
-		    } else {
-		        stopAutoRPhaseUpdate();
-		    }
+			if (isSelected) {
+				startAutoRPhaseUpdate();
+			} else {
+				stopAutoRPhaseUpdate();
+			}
 		});
 
 		toggle_AutoYPhase.selectedProperty().addListener((obs, wasSelected, isSelected) -> {
-		    if (isSelected) {
-		        startAutoYPhaseUpdate();
-		    } else {
-		        stopAutoYPhaseUpdate();
-		    }
+			if (isSelected) {
+				startAutoYPhaseUpdate();
+			} else {
+				stopAutoYPhaseUpdate();
+			}
 		});
-		
+
 		toggle_AutoBPhase.selectedProperty().addListener((obs, wasSelected, isSelected) -> {
-		    if (isSelected) {
-		        startAutoBPhaseUpdate();
-		    } else {
-		        stopAutoBPhaseUpdate();
-		    }
+			if (isSelected) {
+				startAutoBPhaseUpdate();
+			} else {
+				stopAutoBPhaseUpdate();
+			}
 		});
-		
+
 		toggle_Auto3Phase.selectedProperty().addListener((obs, wasSelected, isSelected) -> {
-		    if (isSelected) {
-		        startAuto3PhaseUpdate();
-		    } else {
-		        stopAuto3PhaseUpdate();
-		    }
+			if (isSelected) {
+				startAuto3PhaseUpdate();
+			} else {
+				stopAuto3PhaseUpdate();
+			}
 		});
-		
+
 		toggle_AutoFan.selectedProperty().addListener((obs, wasSelected, isSelected) -> {
-		    if (isSelected) {
-		        startAutoFanUpdate();
-		    } else {
-		        stopAutoFanUpdate();
-		    }
+			if (isSelected) {
+				startAutoFanUpdate();
+			} else {
+				stopAutoFanUpdate();
+			}
 		});
-		
-		
+
+
 	}
 
 	/**
-     * Adds a new model to the database and updates the combo box.
-     */
+	 * Adds a new model to the database and updates the combo box.
+	 */
 	@FXML
 	void btnAddModelOnClick(ActionEvent event) {
 
@@ -1469,8 +1487,8 @@ public class FanProjectExecuteController implements Initializable {
 
 
 	/**
-     * Saves test setup data to the database.
-     */
+	 * Saves test setup data to the database.
+	 */
 	@FXML
 	public void btnSaveOnClick() {
 
@@ -1489,7 +1507,7 @@ public class FanProjectExecuteController implements Initializable {
 
 		}
 	}
-	
+
 	// ================================== TEST EXECUTION ================================
 
 	/**
@@ -1502,111 +1520,111 @@ public class FanProjectExecuteController implements Initializable {
 	 */
 	@FXML
 	private void btnTestPointStartOnClick() {
-	    appendLog("Start Execution", LogLevel.INFO);
-	    setControlsDisabled(true); // Disable all except stop
+		appendLog("Start Execution", LogLevel.INFO);
+		setControlsDisabled(true); // Disable all except stop
 
-	    isRunning = true;
-	    isStopped = false;
-	    currentIndex = 0;
+		isRunning = true;
+		isStopped = false;
+		currentIndex = 0;
 
-	    // To be implemented:
-	    // Create ProjectRun entry	  
-	    String projectName = cmbBxModelName.getSelectionModel().getSelectedItem();
-	    
-	    // Check if model selected
-	    if (projectName == null || projectName.isEmpty()) {
-	    	Alert alert = new Alert(Alert.AlertType.ERROR);
-	    	alert.setTitle("Missing Project Name");
-	    	alert.setHeaderText(null);
-	    	alert.setContentText("Please select model.");
-	    	alert.showAndWait();
-	    	setControlsDisabled(false); // Re-enable buttons if previously disabled
-	    	return; // Exit early
-	    }
-	    
-	    String fanSerialNumber = ref_txtNewFanSerialNo.getText();
+		// To be implemented:
+		// Create ProjectRun entry	  
+		String projectName = cmbBxModelName.getSelectionModel().getSelectedItem();
 
-	    // Check if serial number is empty
-	    if (fanSerialNumber.isEmpty()) {
-	    	Alert alert = new Alert(Alert.AlertType.ERROR);
-	    	alert.setTitle("Missing Serial Number");
-	    	alert.setHeaderText(null);
-	    	alert.setContentText("Please enter a valid fan serial number before starting the test.");
-	    	alert.showAndWait();
-	    	setControlsDisabled(false); // Re-enable buttons if previously disabled
-	    	return; // Exit early
-	    }
-	    
-	    // Check if serial number already exists
-        // If exist prompt user and ask consent
-        List<Result> existingResults = DeviceDataManagerController.getResultService().findByFanSerialNumber(fanSerialNumber);
-	    
-        if (existingResults != null && !existingResults.isEmpty()) {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Serial Number Exists");
-            alert.setHeaderText("The fan serial number '" + fanSerialNumber + "' already has test results.");
-            alert.setContentText("Do you want to continue with this serial number? This may overwrite or append to existing results.");
+		// Check if model selected
+		if (projectName == null || projectName.isEmpty()) {
+			Alert alert = new Alert(Alert.AlertType.ERROR);
+			alert.setTitle("Missing Project Name");
+			alert.setHeaderText(null);
+			alert.setContentText("Please select model.");
+			alert.showAndWait();
+			setControlsDisabled(false); // Re-enable buttons if previously disabled
+			return; // Exit early
+		}
 
-            Optional<ButtonType> result = alert.showAndWait();
-            if (result.isPresent() && result.get() == ButtonType.OK) {
-                appendLog("User consented to use existing serial number: " + fanSerialNumber, LogLevel.INFO);
-            } else {
-                appendLog("User cancelled due to existing serial number: " + fanSerialNumber, LogLevel.ERROR);
-                setControlsDisabled(false); // Re-enable buttons
-                return; // Exit early
-            }
-        }	    
+		String fanSerialNumber = ref_txtNewFanSerialNo.getText();
 
-	    // Check for existing INPROGRESS project run
-	    ProjectRun existingInProgressRun = displayDataObj.getProjectRunService()
-	    		.findTopByProjectNameAndExecutionStatusOrderByDeploymentIdDesc(projectName, "Not Started");
+		// Check if serial number is empty
+		if (fanSerialNumber.isEmpty()) {
+			Alert alert = new Alert(Alert.AlertType.ERROR);
+			alert.setTitle("Missing Serial Number");
+			alert.setHeaderText(null);
+			alert.setContentText("Please enter a valid fan serial number before starting the test.");
+			alert.showAndWait();
+			setControlsDisabled(false); // Re-enable buttons if previously disabled
+			return; // Exit early
+		}
 
-	    if (existingInProgressRun != null) {
-	    	// Use existing project run
-	    	currentProjectRun = existingInProgressRun;
-	    	appendLog("Project Run Exists: " + projectName, LogLevel.DEBUG);
-	    } else {
-	    	// Create new project run
-	    	String lastDeploymentIdStr = displayDataObj.getProjectRunService()
-	    			.findTopByProjectNameOrderByDeploymentIdDesc(projectName);
-	    	int nextDeploymentId = Integer.parseInt(lastDeploymentIdStr) + 1;
+		// Check if serial number already exists
+		// If exist prompt user and ask consent
+		List<Result> existingResults = DeviceDataManagerController.getResultService().findByFanSerialNumber(fanSerialNumber);
 
-	    	createProjectRun(String.valueOf(nextDeploymentId), projectName);
-	    	appendLog("Deployed new project run for model: " + projectName, LogLevel.DEBUG);
-	    }
+		if (existingResults != null && !existingResults.isEmpty()) {
+			Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+			alert.setTitle("Serial Number Exists");
+			alert.setHeaderText("The fan serial number '" + fanSerialNumber + "' already has test results.");
+			alert.setContentText("Do you want to continue with this serial number? This may overwrite or append to existing results.");
 
-	    String defaultStatus = ConstantStatus.IN_PROG;
+			Optional<ButtonType> result = alert.showAndWait();
+			if (result.isPresent() && result.get() == ButtonType.OK) {
+				appendLog("User consented to use existing serial number: " + fanSerialNumber, LogLevel.INFO);
+			} else {
+				appendLog("User cancelled due to existing serial number: " + fanSerialNumber, LogLevel.ERROR);
+				setControlsDisabled(false); // Re-enable buttons
+				return; // Exit early
+			}
+		}	    
 
-	    for (FanTestSetup tp : ref_tvTestSetup.getItems()) {
-	        String testPointName = tp.getTestPointName();
+		// Check for existing INPROGRESS project run
+		ProjectRun existingInProgressRun = displayDataObj.getProjectRunService()
+				.findTopByProjectNameAndExecutionStatusOrderByDeploymentIdDesc(projectName, "Not Started");
 
-	        // Check if result already exists with INPROGRESS
-			/*
-			 * Result existingResult = DeviceDataManagerController.getResultService()
-			 * .findByFanSerialNumberAndTestPointNameAndProjectRunAndTestStatus(
-			 * fanSerialNumber, testPointName, currentProjectRun, ConstantStatus.IN_PROG );
-			 */
-	        
+		if (existingInProgressRun != null) {
+			// Use existing project run
+			currentProjectRun = existingInProgressRun;
+			appendLog("Project Run Exists: " + projectName, LogLevel.DEBUG);
+		} else {
+			// Create new project run
+			String lastDeploymentIdStr = displayDataObj.getProjectRunService()
+					.findTopByProjectNameOrderByDeploymentIdDesc(projectName);
+			int nextDeploymentId = Integer.parseInt(lastDeploymentIdStr) + 1;
+
+			createProjectRun(String.valueOf(nextDeploymentId), projectName);
+			appendLog("Deployed new project run for model: " + projectName, LogLevel.DEBUG);
+		}
+
+		String defaultStatus = ConstantStatus.IN_PROG;
+
+		for (FanTestSetup tp : ref_tvTestSetup.getItems()) {
+			String testPointName = tp.getTestPointName();
+
+			// Check if result already exists with INPROGRESS
 			/*
 			 * Result existingResult = DeviceDataManagerController.getResultService()
 			 * .findByFanSerialNumberAndTestPointNameAndProjectRunAndTestStatus(
 			 * fanSerialNumber, testPointName, currentProjectRun, ConstantStatus.IN_PROG );
 			 */
 
-	        if (existingResults == null) {
-	            createResult(fanSerialNumber, testPointName, defaultStatus, currentProjectRun);
-	        } else {
-	            appendLog("Skipping creation for test point " + testPointName + " (already INPROGRESS)", LogLevel.DEBUG);
-	        }
-	    }
+			/*
+			 * Result existingResult = DeviceDataManagerController.getResultService()
+			 * .findByFanSerialNumberAndTestPointNameAndProjectRunAndTestStatus(
+			 * fanSerialNumber, testPointName, currentProjectRun, ConstantStatus.IN_PROG );
+			 */
+
+			if (existingResults == null) {
+				createResult(fanSerialNumber, testPointName, defaultStatus, currentProjectRun);
+			} else {
+				appendLog("Skipping creation for test point " + testPointName + " (already INPROGRESS)", LogLevel.DEBUG);
+			}
+		}
 
 
-	    // Proceed with test execution
-	    runTestPointsSequentially();
+		// Proceed with test execution
+		runTestPointsSequentially();
 	}
 
 	public void createProjectRun(String deploymentId,String projectName) {
-		
+
 		ProjectRun projectRun = new ProjectRun();
 		projectRun.setDeploymentId(deploymentId);
 		long epochStartTime = Instant.now().toEpochMilli()/1000;				
@@ -1620,12 +1638,12 @@ public class FanProjectExecuteController implements Initializable {
 		projectRun.setStartTime(startTime);
 		projectRun.setExecutionStatus(ConstantApp.EXECUTION_STATUS_NOT_STARTED);
 		projectRun.setProjectName(projectName);
-		
+
 		currentProjectRun = projectRun;
-		
+
 		displayDataObj.getProjectRunService().saveToDb(projectRun);
 	}
-	
+
 	/*public String getLastDeploymentId(String projectName) {
 	    // Fetch the ProjectRun with the highest deployment ID for the given project name
 	    // This could be a custom query like: 
@@ -1648,25 +1666,25 @@ public class FanProjectExecuteController implements Initializable {
 	 */
 	@FXML
 	private void btnTestPointStepRunOnClick() {
-	    appendLog("Step Run Execution", LogLevel.INFO);
-	    setControlsDisabled(true);
-	    isStepRun = true; // Indicate we're in Step Run mode
+		appendLog("Step Run Execution", LogLevel.INFO);
+		setControlsDisabled(true);
+		isStepRun = true; // Indicate we're in Step Run mode
 
-	    FanTestSetup selectedTestPoint = ref_tvTestSetup.getSelectionModel().getSelectedItem();
+		FanTestSetup selectedTestPoint = ref_tvTestSetup.getSelectionModel().getSelectedItem();
 
-	    if (selectedTestPoint != null) {
-	        Task<Void> task = new Task<Void>() {
-	            @Override
-	            protected Void call() {
-	                runSingleTestPoint(selectedTestPoint);
-	                return null;
-	            }
-	        };
-	        new Thread(task).start();
-	    } else {
-	        appendLog("No test point selected.", LogLevel.ERROR);
-	        setControlsDisabled(false);
-	    }
+		if (selectedTestPoint != null) {
+			Task<Void> task = new Task<Void>() {
+				@Override
+				protected Void call() {
+					runSingleTestPoint(selectedTestPoint);
+					return null;
+				}
+			};
+			new Thread(task).start();
+		} else {
+			appendLog("No test point selected.", LogLevel.ERROR);
+			setControlsDisabled(false);
+		}
 	}
 
 	/**
@@ -1677,17 +1695,17 @@ public class FanProjectExecuteController implements Initializable {
 	 */
 	@FXML
 	private void btnTestPointResumeOnClick() {
-	    appendLog("Resume Execution", LogLevel.INFO);
-	    setControlsDisabled(true);
+		appendLog("Resume Execution", LogLevel.INFO);
+		setControlsDisabled(true);
 
-	    int selectedIndex = ref_tvTestSetup.getSelectionModel().getSelectedIndex();
-	    if (selectedIndex >= 0 && selectedIndex < testPoints.size()) {
-	        currentIndex = selectedIndex;
-	    }
+		int selectedIndex = ref_tvTestSetup.getSelectionModel().getSelectedIndex();
+		if (selectedIndex >= 0 && selectedIndex < testPoints.size()) {
+			currentIndex = selectedIndex;
+		}
 
-	    isRunning = true;
-	    isStopped = false;
-	    runTestPointsSequentially();
+		isRunning = true;
+		isStopped = false;
+		runTestPointsSequentially();
 	}
 
 	/**
@@ -1699,21 +1717,21 @@ public class FanProjectExecuteController implements Initializable {
 	 */
 	@FXML
 	private void btnTestPointStopOnClick() {
-	    appendLog("Stop Execution", LogLevel.INFO);
+		appendLog("Stop Execution", LogLevel.INFO);
 
-	    isRunning = false;
-	    isStopped = true;
+		isRunning = false;
+		isStopped = true;
 
-	    // Reset voltage to 0 only if not in simulation mode
-	    if (!SIMULATION_MODE) {
-	        appendLog("Set Voltage : 0", LogLevel.INFO);
-	        TestPointUtils.setVoltage("0");
-	        ApplicationLauncher.logger.info("Execution stopped manually. Voltage set to 0.");
-	    } else {
-	        appendLog("SIMULATION: Voltage reset skipped.", LogLevel.INFO);
-	    }
+		// Reset voltage to 0 only if not in simulation mode
+		if (!SIMULATION_MODE) {
+			appendLog("Set Voltage : 0", LogLevel.INFO);
+			TestPointUtils.setVoltage("0");
+			ApplicationLauncher.logger.info("Execution stopped manually. Voltage set to 0.");
+		} else {
+			appendLog("SIMULATION: Voltage reset skipped.", LogLevel.INFO);
+		}
 
-	    setControlsDisabled(false); // Re-enable all buttons
+		setControlsDisabled(false); // Re-enable all buttons
 	}
 
 	/**
@@ -1724,84 +1742,84 @@ public class FanProjectExecuteController implements Initializable {
 	void btnTestPointCloseProjectOnClick(ActionEvent event) {
 		// To be implemented: logic to handle closing the project
 		appendLog("Start Execution", LogLevel.INFO);
-	    setControlsDisabled(true); // Disable all except stop
+		setControlsDisabled(true); // Disable all except stop
 
-	    isRunning = true;
-	    isStopped = false;
-	    currentIndex = 0;
+		isRunning = true;
+		isStopped = false;
+		currentIndex = 0;
 
-	    // To be implemented:
-	    // Create ProjectRun entry	  
-	    String projectName = cmbBxModelName.getSelectionModel().getSelectedItem();
+		// To be implemented:
+		// Create ProjectRun entry	  
+		String projectName = cmbBxModelName.getSelectionModel().getSelectedItem();
 
-	    // Check for existing INPROGRESS project run
-	    ProjectRun existingInProgressRun = displayDataObj.getProjectRunService()
-	    		.findTopByProjectNameAndExecutionStatusOrderByDeploymentIdDesc(projectName, "Not Started");
+		// Check for existing INPROGRESS project run
+		ProjectRun existingInProgressRun = displayDataObj.getProjectRunService()
+				.findTopByProjectNameAndExecutionStatusOrderByDeploymentIdDesc(projectName, "Not Started");
 
-	    if (existingInProgressRun != null) {
-	    	// Use existing project run
-	    	currentProjectRun = existingInProgressRun;
-	    	appendLog("Project Run Exists " + projectName, LogLevel.DEBUG);
-	    } else {
-	    	// Create new project run
-	    	String lastDeploymentIdStr = displayDataObj.getProjectRunService()
-	    			.findTopByProjectNameOrderByDeploymentIdDesc(projectName);
-	    	int nextDeploymentId = Integer.parseInt(lastDeploymentIdStr) + 1;
+		if (existingInProgressRun != null) {
+			// Use existing project run
+			currentProjectRun = existingInProgressRun;
+			appendLog("Project Run Exists " + projectName, LogLevel.DEBUG);
+		} else {
+			// Create new project run
+			String lastDeploymentIdStr = displayDataObj.getProjectRunService()
+					.findTopByProjectNameOrderByDeploymentIdDesc(projectName);
+			int nextDeploymentId = Integer.parseInt(lastDeploymentIdStr) + 1;
 
-	    	createProjectRun(String.valueOf(nextDeploymentId), projectName);
-	    	appendLog("Deployed new project run for model: " + projectName, LogLevel.DEBUG);
-	    }
+			createProjectRun(String.valueOf(nextDeploymentId), projectName);
+			appendLog("Deployed new project run for model: " + projectName, LogLevel.DEBUG);
+		}
 
-	    String fanSerialNumber = ref_txtNewFanSerialNo.getText();
+		String fanSerialNumber = ref_txtNewFanSerialNo.getText();
 
-	    // Check if serial number is empty
-	    if (fanSerialNumber.isEmpty()) {
-	    	Alert alert = new Alert(Alert.AlertType.ERROR);
-	    	alert.setTitle("Missing Serial Number");
-	    	alert.setHeaderText(null);
-	    	alert.setContentText("Please enter a valid fan serial number before starting the test.");
-	    	alert.showAndWait();
-	    	setControlsDisabled(false); // Re-enable buttons if previously disabled
-	    	return; // Exit early
-	    }
-	    
-	    String defaultStatus = ConstantStatus.IN_PROG;
+		// Check if serial number is empty
+		if (fanSerialNumber.isEmpty()) {
+			Alert alert = new Alert(Alert.AlertType.ERROR);
+			alert.setTitle("Missing Serial Number");
+			alert.setHeaderText(null);
+			alert.setContentText("Please enter a valid fan serial number before starting the test.");
+			alert.showAndWait();
+			setControlsDisabled(false); // Re-enable buttons if previously disabled
+			return; // Exit early
+		}
 
-	    for (FanTestSetup tp : ref_tvTestSetup.getItems()) {
-	        String testPointName = tp.getTestPointName();
+		String defaultStatus = ConstantStatus.IN_PROG;
 
-	        // Check if result already exists with INPROGRESS
-	        Result existingResult = DeviceDataManagerController.getResultService()
-	            .findByFanSerialNumberAndTestPointNameAndProjectRunAndTestStatus(
-	                fanSerialNumber, testPointName, currentProjectRun, ConstantStatus.IN_PROG
-	            );
+		for (FanTestSetup tp : ref_tvTestSetup.getItems()) {
+			String testPointName = tp.getTestPointName();
 
-	        if (existingResult == null) {
-	            createResult(fanSerialNumber, testPointName, defaultStatus, currentProjectRun);
-	        } else {
-	            appendLog("Skipping creation for test point " + testPointName + " (already INPROGRESS)", LogLevel.DEBUG);
-	        }
-	    }
-	    
-	    fanSerialNumber = ref_txtNewFanSerialNo.getText();
-	    
-	    FanTestSetup testPoint = testPoints.get(currentIndex);
+			// Check if result already exists with INPROGRESS
+			Result existingResult = DeviceDataManagerController.getResultService()
+					.findByFanSerialNumberAndTestPointNameAndProjectRunAndTestStatus(
+							fanSerialNumber, testPointName, currentProjectRun, ConstantStatus.IN_PROG
+							);
+
+			if (existingResult == null) {
+				createResult(fanSerialNumber, testPointName, defaultStatus, currentProjectRun);
+			} else {
+				appendLog("Skipping creation for test point " + testPointName + " (already INPROGRESS)", LogLevel.DEBUG);
+			}
+		}
+
+		fanSerialNumber = ref_txtNewFanSerialNo.getText();
+
+		FanTestSetup testPoint = testPoints.get(currentIndex);
 		// Update results to DB
-	    updateResultMeasurements(
-	    		//currentProjectRun, 
-	    		fanSerialNumber, 
-	    		testPoint.getTestPointName(), 
-	    		currentResult.getRpm(), 
-	    		currentResult.getWindSpeed(), 
-	    		currentResult.getWatts(), 
-	    		currentResult.getVa(), 
-	    		currentResult.getCurrent(), 
-	    		currentResult.getPowerFactor(), 
-	    		currentResult.getTestStatus()
-	    		);
-	    
-	    ApplicationLauncher.logger.debug("Test Point Name : " + testPoint.getTestPointName());
-	    appendLog("Result Updated : Test point : TestName1 ", LogLevel.INFO);
+		updateResultMeasurements(
+				//currentProjectRun, 
+				fanSerialNumber, 
+				testPoint.getTestPointName(), 
+				currentResult.getRpm(), 
+				currentResult.getWindSpeed(), 
+				currentResult.getWatts(), 
+				currentResult.getVa(), 
+				currentResult.getCurrent(), 
+				currentResult.getPowerFactor(), 
+				currentResult.getTestStatus()
+				);
+
+		ApplicationLauncher.logger.debug("Test Point Name : " + testPoint.getTestPointName());
+		appendLog("Result Updated : Test point : TestName1 ", LogLevel.INFO);
 	}	
 
 	/**
@@ -1813,16 +1831,16 @@ public class FanProjectExecuteController implements Initializable {
 	 * @param projectRun      The ProjectRun instance this result is associated with.
 	 */
 	public void createResult(String fanSerialNumber, String testPointName, String testStatus, ProjectRun projectRun) {
-	    Result result = new Result();
+		Result result = new Result();
 
-	    result.setFanSerialNumber(fanSerialNumber);
-	    result.setTestPointName(testPointName);
-	    result.setTestStatus(testStatus);
-	    result.setProjectRun(projectRun);
+		result.setFanSerialNumber(fanSerialNumber);
+		result.setTestPointName(testPointName);
+		result.setTestStatus(testStatus);
+		result.setProjectRun(projectRun);
 
-	    DeviceDataManagerController.getResultService().saveToDb(result);
+		DeviceDataManagerController.getResultService().saveToDb(result);
 	}
-	
+
 	/**
 	 * Updates measurement values for a specific Result entry.
 	 *
@@ -1838,37 +1856,37 @@ public class FanProjectExecuteController implements Initializable {
 	 * @param status          Final test status ("Completed", "Failed", etc.).
 	 */
 	public void updateResultMeasurements(ProjectRun projectRun, String fanSerialNumber, String testPointName,
-	                                     String rpm, String windspeed, String watts, String va, String current,
-	                                     String powerFactor, String status) {
+			String rpm, String windspeed, String watts, String va, String current,
+			String powerFactor, String status) {
 
-		
+
 		/*Result test1 = displayDataObj.getResultService()
 	            .findByProjectRunAndTestPointName(projectRun,testPointName);
-		
+
 		if (test1 != null) {
 			ApplicationLauncher.logger.debug("Test 1 Found : By Project Run and Test Point Name") ;
 		}*/
-		
-	    Result result = DeviceDataManagerController.getResultService()
-	            .findByProjectRunAndFanSerialNumberAndTestPointName(projectRun, fanSerialNumber, testPointName);
 
-	    if (result != null) {
-	        result.setRpm(rpm);
-	        result.setWindSpeed(windspeed);
-	        result.setWatts(watts);
-	        result.setVa(va);
-	        result.setCurrent(current);
-	        result.setPowerFactor(powerFactor);
-	        result.setTestStatus(status);
+		Result result = DeviceDataManagerController.getResultService()
+				.findByProjectRunAndFanSerialNumberAndTestPointName(projectRun, fanSerialNumber, testPointName);
 
-	        DeviceDataManagerController.getResultService().saveToDb(result);
-	    } else {
-	    	ApplicationLauncher.logger.debug("Project Run : " + projectRun);
-	    	ApplicationLauncher.logger.debug("Fan Serial Number : " + fanSerialNumber);
-	    	ApplicationLauncher.logger.debug("Test Point Name : " + testPointName);
-	        appendLog("Result not found for test point: " + testPointName, LogLevel.INFO);
-	        ApplicationLauncher.logger.debug("Result not found for test point: " + testPointName);
-	    }
+		if (result != null) {
+			result.setRpm(rpm);
+			result.setWindSpeed(windspeed);
+			result.setWatts(watts);
+			result.setVa(va);
+			result.setCurrent(current);
+			result.setPowerFactor(powerFactor);
+			result.setTestStatus(status);
+
+			DeviceDataManagerController.getResultService().saveToDb(result);
+		} else {
+			ApplicationLauncher.logger.debug("Project Run : " + projectRun);
+			ApplicationLauncher.logger.debug("Fan Serial Number : " + fanSerialNumber);
+			ApplicationLauncher.logger.debug("Test Point Name : " + testPointName);
+			appendLog("Result not found for test point: " + testPointName, LogLevel.INFO);
+			ApplicationLauncher.logger.debug("Result not found for test point: " + testPointName);
+		}
 	}
 
 	/**
@@ -1886,44 +1904,44 @@ public class FanProjectExecuteController implements Initializable {
 	 * @param status          Final test status ("Completed", "Failed", etc.).
 	 */
 	public void updateResultMeasurements(String fanSerialNumber, String testPointName,
-	                                     String rpm, String windspeed, String watts, String va, String current,
-	                                     String powerFactor, String status) {
+			String rpm, String windspeed, String watts, String va, String current,
+			String powerFactor, String status) {
 
-		
+
 		/*Result test1 = displayDataObj.getResultService()
 	            .findByProjectRunAndTestPointName(projectRun,testPointName);
-		
+
 		if (test1 != null) {
 			ApplicationLauncher.logger.debug("Test 1 Found : By Project Run and Test Point Name") ;
 		}*/
-		
-	    Result result = DeviceDataManagerController.getResultService()
-	            .findByFanSerialNumberAndTestPointName(fanSerialNumber, testPointName);
 
-	    if (result != null) {
-	        result.setRpm(rpm);
-	        result.setWindSpeed(windspeed);
-	        result.setWatts(watts);
-	        result.setVa(va);
-	        result.setCurrent(current);
-	        result.setPowerFactor(powerFactor);
-	        result.setTestStatus(status);
+		Result result = DeviceDataManagerController.getResultService()
+				.findByFanSerialNumberAndTestPointName(fanSerialNumber, testPointName);
 
-	        DeviceDataManagerController.getResultService().saveToDb(result);
-	    } else {
-	    	ApplicationLauncher.logger.debug("Fan Serial Number : " + fanSerialNumber);
-	    	ApplicationLauncher.logger.debug("Test Point Name : " + testPointName);
-	        appendLog("Result not found for test point: " + testPointName, LogLevel.INFO);
-	        ApplicationLauncher.logger.debug("Result not found for test point: " + testPointName);
-	    }
+		if (result != null) {
+			result.setRpm(rpm);
+			result.setWindSpeed(windspeed);
+			result.setWatts(watts);
+			result.setVa(va);
+			result.setCurrent(current);
+			result.setPowerFactor(powerFactor);
+			result.setTestStatus(status);
+
+			DeviceDataManagerController.getResultService().saveToDb(result);
+		} else {
+			ApplicationLauncher.logger.debug("Fan Serial Number : " + fanSerialNumber);
+			ApplicationLauncher.logger.debug("Test Point Name : " + testPointName);
+			appendLog("Result not found for test point: " + testPointName, LogLevel.INFO);
+			ApplicationLauncher.logger.debug("Result not found for test point: " + testPointName);
+		}
 	}
 
 	// Call this method to disable or enable test control buttons
 	private void setControlsDisabled(boolean disabled) {
-	    btnTestPointStart.setDisable(disabled);
-	    btnTestPointStepRun.setDisable(disabled);
-	    btnTestPointResume.setDisable(disabled);
-	    btnTestPointStop.setDisable(!disabled); // Enable stop only during execution
+		btnTestPointStart.setDisable(disabled);
+		btnTestPointStepRun.setDisable(disabled);
+		btnTestPointResume.setDisable(disabled);
+		btnTestPointStop.setDisable(!disabled); // Enable stop only during execution
 	}
 
 	// ===================================== RUNNING METHODS ====================================================
@@ -1934,56 +1952,56 @@ public class FanProjectExecuteController implements Initializable {
 	 * - Executes each point using runSingleTestPoint().
 	 */
 	private void runTestPointsSequentially() {		
-        new Thread(() -> {
-            for (; currentIndex < testPoints.size(); currentIndex++) {
-                if (!isRunning || isStopped) break;
+		new Thread(() -> {
+			for (; currentIndex < testPoints.size(); currentIndex++) {
+				if (!isRunning || isStopped) break;
 
-                FanTestSetup testPoint = testPoints.get(currentIndex);
-                Platform.runLater(() -> testPoint.setStatus(ConstantStatus.IN_PROG));
-                appendLog("Running : Testpoint : " + (currentIndex + 1), LogLevel.INFO);
-                runSingleTestPoint(testPoint);
-                
-                // After completing a test point, check if resume was requested
-                if (requestedResumeIndex != null) {
-                    if (requestedResumeIndex >= 0 && requestedResumeIndex < testPoints.size()) {
-                        currentIndex = requestedResumeIndex - 1; // -1 because loop will increment
-                        ApplicationLauncher.logger.info("Jumping to requested index: " + requestedResumeIndex);
-                        appendLog("Jumping to Index : " + requestedResumeIndex, LogLevel.INFO);
-                    }
-                    requestedResumeIndex = null; // Reset flag
-                }
+				FanTestSetup testPoint = testPoints.get(currentIndex);
+				Platform.runLater(() -> testPoint.setStatus(ConstantStatus.IN_PROG));
+				appendLog("Running : Testpoint : " + (currentIndex + 1), LogLevel.INFO);
+				runSingleTestPoint(testPoint);
 
-                try {
-                	Thread.sleep(500);  // small delay before next
-                } catch (InterruptedException e) {
-                	e.printStackTrace();
-                }
-            }
-            // After all test points are completed and not stopped
-            if (!isStopped && currentIndex == testPoints.size()) {
-                Platform.runLater(() -> {
-                    appendLog("All test points completed. Updating project status and serial number.", LogLevel.INFO);
-                    updateProjectRunStatus(ConstantStatus.COMPLETED); // Mark project run as completed
-                    updateNextSerialNumber(); // Increment serial number after completion
-                    setControlsDisabled(false); // Re-enable controls
-                });
-            }
-        }).start();
+				// After completing a test point, check if resume was requested
+				if (requestedResumeIndex != null) {
+					if (requestedResumeIndex >= 0 && requestedResumeIndex < testPoints.size()) {
+						currentIndex = requestedResumeIndex - 1; // -1 because loop will increment
+						ApplicationLauncher.logger.info("Jumping to requested index: " + requestedResumeIndex);
+						appendLog("Jumping to Index : " + requestedResumeIndex, LogLevel.INFO);
+					}
+					requestedResumeIndex = null; // Reset flag
+				}
+
+				try {
+					Thread.sleep(500);  // small delay before next
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			// After all test points are completed and not stopped
+			if (!isStopped && currentIndex == testPoints.size()) {
+				Platform.runLater(() -> {
+					appendLog("All test points completed. Updating project status and serial number.", LogLevel.INFO);
+					updateProjectRunStatus(ConstantStatus.COMPLETED); // Mark project run as completed
+					updateNextSerialNumber(); // Increment serial number after completion
+					setControlsDisabled(false); // Re-enable controls
+				});
+			}
+		}).start();
 	}
-	
+
 	// updateProjectRunStatus function
 	/**
 	 * Updates the status of the current ProjectRun.
 	 */
 	private void updateProjectRunStatus(String status) {
-	    if (currentProjectRun != null) {
-	        currentProjectRun.setExecutionStatus(status);
-	        currentProjectRun.setEndTime(String.valueOf(LocalDateTime.now())); // Set end time when status changes to completed/stopped/failed
-	        displayDataObj.getProjectRunService().saveToDb(currentProjectRun);
-	        appendLog("Project Run status updated to: " + status, LogLevel.INFO);
-	    } else {
-	        appendLog("No active Project Run to update status.", LogLevel.DEBUG);
-	    }
+		if (currentProjectRun != null) {
+			currentProjectRun.setExecutionStatus(status);
+			currentProjectRun.setEndTime(String.valueOf(LocalDateTime.now())); // Set end time when status changes to completed/stopped/failed
+			displayDataObj.getProjectRunService().saveToDb(currentProjectRun);
+			appendLog("Project Run status updated to: " + status, LogLevel.INFO);
+		} else {
+			appendLog("No active Project Run to update status.", LogLevel.DEBUG);
+		}
 	}
 
 	/**
@@ -1999,276 +2017,318 @@ public class FanProjectExecuteController implements Initializable {
 
 		Platform.runLater(() -> {
 			testPoint.setIsRunning(true);
-	        tvTestSetup.refresh();
-	    });
+			tvTestSetup.refresh();
+		});
 
-	    String targetVoltage = testPoint.getTargetVoltage();
-	    int setupTime = testPoint.getSetupTimeInSec();
+		// Step 0: Mains ON
+		appendLog("Turning Mains ON : ", LogLevel.INFO);
+		Platform.runLater(() -> testPoint.setProgress(0.1));
 
-	    // Step 1: Set Voltage
-	    appendLog("Setting Voltage : " + targetVoltage, LogLevel.INFO);
-	    Platform.runLater(() -> testPoint.setProgress(0.1));
+		boolean mainsOn;
+		if (SIMULATION_MODE) {
+			appendLog("SIMULATION: Mains ON (no actual hardware call): ", LogLevel.INFO);
+			mainsOn = true; // Simulate success
+		} else {
+			mainsOn = TestPointUtils.mainsOn();
+		}
 
-	    boolean voltageSet;
-	    if (SIMULATION_MODE) {
-	        appendLog("SIMULATION: Setting Voltage (no actual hardware call): " + targetVoltage, LogLevel.INFO);
-	        voltageSet = true; // Simulate success
-	    } else {
-	        voltageSet = TestPointUtils.setVoltage(targetVoltage);
-	    }
-	    
-	    if (!voltageSet || (!SIMULATION_MODE && (TestPointUtils.getLastErrorMessage().contains("COM") || TestPointUtils.getLastErrorMessage().contains("not found")))) {
-	        handleExecutionFailure(testPoint, "COM PORT NOT FOUND. Stopping execution." + (SIMULATION_MODE ? " (Simulated)" : ""));
-	        return;
-	    }
+		if (!mainsOn || (!SIMULATION_MODE && (TestPointUtils.getLastErrorMessage().contains("COM") || TestPointUtils.getLastErrorMessage().contains("not found")))) {
+			handleExecutionFailure(testPoint, "COM PORT NOT FOUND. Stopping execution." + (SIMULATION_MODE ? " (Simulated)" : ""));
+			return;
+		}
 
-	    // Step 2: Wait for voltage to stabilize
-	    appendLog("Waiting for Voltage Set", LogLevel.INFO);
-	    try {
-	        Thread.sleep(15000);
-	    } catch (InterruptedException ignored) {}
+		appendLog("MAINS ON", LogLevel.INFO);
 
-	    // Step 3: Verify Voltage
-	    final int MAX_ATTEMPTS = 10;
-	    boolean voltageVerified = false;
-	    String actualVoltage = "";
+		String targetVoltage = testPoint.getTargetVoltage();
+		int setupTime = testPoint.getSetupTimeInSec();
 
-	    for (int attempt = 1; attempt <= MAX_ATTEMPTS && !isStopped; attempt++) {
-	    	if (SIMULATION_MODE) {
-	            // Simulate voltage near target
-	            try {
-	                double target = Double.parseDouble(targetVoltage.trim());
-	                double simulatedVoltage = target + (random.nextDouble() * 10 - 5); // +/- 5V simulation
-	                actualVoltage = String.format("%.2f", simulatedVoltage);
-	            } catch (NumberFormatException e) {
-	                actualVoltage = "230.0"; // Default simulated voltage
-	            }
-	            appendLog("SIMULATION: Read Voltage: " + actualVoltage, LogLevel.INFO);
-	        } else {
-	    	    if (modelPhase.equals("1")) {
-	    		    appendLog("Reading R phase Voltage", LogLevel.INFO);
-	    		    actualVoltage = TestPointUtils.readRPhaseVoltage();
-			    } else if (modelPhase.equals("3")) {
-				    appendLog("Reading 3 phase Voltage", LogLevel.INFO);
-				    actualVoltage = TestPointUtils.readRYVoltage();
-			    }
-	        }
-	    	
-	        try {
-	            double actual = Double.parseDouble(actualVoltage.trim());
-	            double target = Double.parseDouble(targetVoltage.trim());
-	            if (Math.abs(actual - target) <= 5.0) {
-	            	appendLog("Voltage : " + actual, LogLevel.INFO);
-	                appendLog("Voltage Verified", LogLevel.INFO);
-	                Platform.runLater(() -> testPoint.setProgress(0.3));
-	                voltageVerified = true;
-	                break;
-	            } else {
-	                appendLog("Attempt " + attempt + ": Voltage mismatch. Got: " + actual, LogLevel.INFO);
-	                
-	            }
-	        } catch (NumberFormatException e) {
-	            appendLog("Attempt " + attempt + ": Invalid voltage format. Got: " + actualVoltage, LogLevel.INFO);
-	        }
-	        
-	        try {
-	            Thread.sleep(2000);
-	            appendLog("Sleep", LogLevel.INFO);
-	        } catch (InterruptedException e) {}
-	    }
+		// --- Conditional Execution for Voltage Set and Initial Wait ---
+		// These steps are executed ONLY for the first test point in a sequence.
+		if (isFirstTestPointInSequence) {
+			// Step 1: Set Voltage
+			appendLog("Setting Voltage : " + targetVoltage, LogLevel.INFO);
+			Platform.runLater(() -> testPoint.setProgress(0.1));
 
-	    if (!voltageVerified || isStopped) {
-	        handleExecutionFailure(testPoint, "Failed to verify voltage after " + MAX_ATTEMPTS + " attempts.");
-	        return;
-	    }
+			boolean voltageSet;
+			if (SIMULATION_MODE) {
+				appendLog("SIMULATION: Setting Voltage (no actual hardware call): " + targetVoltage, LogLevel.INFO);
+				voltageSet = true; // Simulate success
+			} else {
+				voltageSet = TestPointUtils.setVoltage(targetVoltage);
+			}
 
-	    // Step 4: Wait setup duration
-	    appendLog("Waiting for Setup Time : " + setupTime, LogLevel.INFO);
-	    for (int i = 0; i < setupTime && !isStopped; i++) {
-	        try {
-	            Thread.sleep(1000);
-	        } catch (InterruptedException e) {}
-	        final double progress = 0.3 + (i + 1) * (0.4 / setupTime);
-	        Platform.runLater(() -> testPoint.setProgress(progress));
-	    }
+			if (!voltageSet || (!SIMULATION_MODE && (TestPointUtils.getLastErrorMessage().contains("COM") || TestPointUtils.getLastErrorMessage().contains("not found")))) {
+				handleExecutionFailure(testPoint, "COM PORT NOT FOUND. Stopping execution." + (SIMULATION_MODE ? " (Simulated)" : ""));
+				return;
+			}
 
-	    // Step 5+: Loop measurement update until stop
-	    currentResult = new Result();
-	    currentResult.setFanSerialNumber(ref_txtNewFanSerialNo.getText());
-	    currentResult.setTestPointName(testPoint.getTestPointName());
-	    currentResult.setProjectRun(currentProjectRun); // Pass the current ProjectRun entity
-	    allValid = true; // Assume all passed initially
-	    // It works this way
-	    // Set false later if any one fails
-	    
-	    executeTestPoint(testPoint, isStepRun);
-	    
-	    fanSerialNumber = ref_txtNewFanSerialNo.getText();
-	    
-	    // Update results to DB
-	    updateResultMeasurements(
-	    		//currentProjectRun, 
-	    		fanSerialNumber, 
-	    		testPoint.getTestPointName(), 
-	    		currentResult.getRpm(), 
-	    		currentResult.getWindSpeed(), 
-	    		currentResult.getWatts(), 
-	    		currentResult.getVa(), 
-	    		currentResult.getCurrent(), 
-	    		currentResult.getPowerFactor(), 
-	    		currentResult.getTestStatus()
-	    		);
-	   
-	    appendLog("Result Updated : Test point : " + testPoint.getTestPointName(), LogLevel.INFO);
+			// Step 2: Wait for voltage to stabilize
+			appendLog("Waiting for Voltage Set", LogLevel.INFO);
+			try {
+				Thread.sleep(15000);
+			} catch (InterruptedException ignored) {
+				// Restore the interrupted status
+				Thread.currentThread().interrupt();
+				appendLog("Voltage stabilization wait interrupted.", LogLevel.DEBUG);
+				handleExecutionFailure(testPoint, "Voltage stabilization interrupted.");
+				return;
+			}
 
-	    // Final clean-up
-	    Platform.runLater(() -> {
-	        testPoint.setIsRunning(false);
-	        if (!isStopped) testPoint.setStatus(ConstantStatus.COMPLETED);
-	        else testPoint.setStatus(ConstantStatus.STOPPED);
-	        tvTestSetup.refresh();
-	    });
+			// After the first test point successfully completes these steps,
+			// set the flag to false so subsequent test points in this run skip them.
+			isFirstTestPointInSequence = false;
+			appendLog("Voltage set and initial wait complete. Subsequent test points will skip this step.", LogLevel.INFO);
+		} else {
+			appendLog("Skipping Voltage Set and initial wait for subsequent test points in this run.", LogLevel.INFO);
+		}
 
-	    // Reset voltage only if not step run (optional logic)
-	    // This part is moved to runTestPointsSequentially after all tests are done
-	    /* if (!isStepRun && currentIndex >= testPoints.size() - 1) {
+		// Step 3: Verify Voltage
+		final int MAX_ATTEMPTS = 10;
+		boolean voltageVerified = false;
+		String actualVoltage = "";
+
+		for (int attempt = 1; attempt <= MAX_ATTEMPTS && !isStopped; attempt++) {
+			if (SIMULATION_MODE) {
+				// Simulate voltage near target
+				try {
+					double target = Double.parseDouble(targetVoltage.trim());
+					double simulatedVoltage = target + (random.nextDouble() * 10 - 5); // +/- 5V simulation
+					actualVoltage = String.format("%.2f", simulatedVoltage);
+				} catch (NumberFormatException e) {
+					actualVoltage = "230.0"; // Default simulated voltage
+				}
+				appendLog("SIMULATION: Read Voltage: " + actualVoltage, LogLevel.INFO);
+			} else {
+				if (modelPhase.equals("1")) {
+					appendLog("Reading R phase Voltage", LogLevel.INFO);
+					actualVoltage = TestPointUtils.readRPhaseVoltage();
+				} else if (modelPhase.equals("3")) {
+					appendLog("Reading 3 phase Voltage", LogLevel.INFO);
+					actualVoltage = TestPointUtils.readRYVoltage();
+				}
+			}
+
+			try {
+				double actual = Double.parseDouble(actualVoltage.trim());
+				double target = Double.parseDouble(targetVoltage.trim());
+				if (Math.abs(actual - target) <= 5.0) {
+					appendLog("Voltage : " + actual, LogLevel.INFO);
+					appendLog("Voltage Verified", LogLevel.INFO);
+					Platform.runLater(() -> testPoint.setProgress(0.3));
+					voltageVerified = true;
+					break;
+				} else {
+					appendLog("Attempt " + attempt + ": Voltage mismatch. Got: " + actual, LogLevel.INFO);
+
+				}
+			} catch (NumberFormatException e) {
+				appendLog("Attempt " + attempt + ": Invalid voltage format. Got: " + actualVoltage, LogLevel.INFO);
+			}
+
+			try {
+				Thread.sleep(2000);
+				appendLog("Sleep", LogLevel.INFO);
+			} catch (InterruptedException e) {}
+		}
+
+		if (!voltageVerified || isStopped) {
+			handleExecutionFailure(testPoint, "Failed to verify voltage after " + MAX_ATTEMPTS + " attempts.");
+			return;
+		}
+
+		// Step 4: Wait setup duration
+		appendLog("Waiting for Setup Time : " + setupTime, LogLevel.INFO);
+		for (int i = 0; i < setupTime && !isStopped; i++) {
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {}
+			final double progress = 0.3 + (i + 1) * (0.4 / setupTime);
+			Platform.runLater(() -> testPoint.setProgress(progress));
+		}
+
+		// Step 5+: Loop measurement update until stop
+		currentResult = new Result();
+		currentResult.setFanSerialNumber(ref_txtNewFanSerialNo.getText());
+		currentResult.setTestPointName(testPoint.getTestPointName());
+		currentResult.setProjectRun(currentProjectRun); // Pass the current ProjectRun entity
+		allValid = true; // Assume all passed initially
+		// It works this way
+		// Set false later if any one fails
+
+		executeTestPoint(testPoint, isStepRun);
+
+		fanSerialNumber = ref_txtNewFanSerialNo.getText();
+
+		// Update results to DB
+		updateResultMeasurements(
+				//currentProjectRun, 
+				fanSerialNumber, 
+				testPoint.getTestPointName(), 
+				currentResult.getRpm(), 
+				currentResult.getWindSpeed(), 
+				currentResult.getWatts(), 
+				currentResult.getVa(), 
+				currentResult.getCurrent(), 
+				currentResult.getPowerFactor(), 
+				currentResult.getTestStatus()
+				);
+
+		appendLog("Result Updated : Test point : " + testPoint.getTestPointName(), LogLevel.INFO);
+
+		// Final clean-up
+		Platform.runLater(() -> {
+			testPoint.setIsRunning(false);
+			if (!isStopped) testPoint.setStatus(ConstantStatus.COMPLETED);
+			else testPoint.setStatus(ConstantStatus.STOPPED);
+			tvTestSetup.refresh();
+		});
+
+		// Reset voltage only if not step run (optional logic)
+		// This part is moved to runTestPointsSequentially after all tests are done
+		/* if (!isStepRun && currentIndex >= testPoints.size() - 1) {
 	        TestPointUtils.setVoltage("0");
 	        appendLog("All test points completed. Voltage set to 0.", LogLevel.INFO);
 	        setControlsDisabled(false);
 	    } */	        
+
+		if (!isStepRun && currentIndex >= testPoints.size() - 1) {
+			TestPointUtils.mainsOff();
+			appendLog("All test points completed. Voltage set to 0. Without setting dimmer to min.", LogLevel.INFO);
+			setControlsDisabled(false);
+		}
 	}
-	
+
 	/**
-     * Retrieves the wind-speed reading count (as integer) from the configuration
-     * stored against the currently selected model in the ComboBox.
-     *
-     * @return the number of wind-speed readings the user must enter
-     */
-    private int fetchWindSpeedConfigForCurrentModel() {
-        String modelName = cmbBxModelName.getSelectionModel().getSelectedItem();
-        DutMasterData model = DeviceDataManagerController.getDutMasterDataService().findByModelName(modelName);
-        // assume getWindSpeedConfig() returns a String like "3"
-        try {
-            return Integer.parseInt(model.getWindSpeedConfig());
-        } catch (NumberFormatException e) {
-            // fallback to a default of 1 reading
-            return 1;
-        }
-    }
-    
-    /**
-     * Opens a non-modal popup containing N labeled TextFields ("Reading 1", "Reading 2", …),
-     * a Save button and a Next/Confirm button. Once the user has entered all values and clicks Save,
-     * the average of those values is returned.
-     *
-     * @param count the number of individual wind-speed readings to collect
-     * @return the average of the entered wind-speed values
-     */
-    private double promptForWindSpeedReadings(int count) {
-        final FutureTask<Double> task = new FutureTask<>(() -> {
-            WindSpeedPopup popup = new WindSpeedPopup(count);
-            return popup.showAndWaitAndReturnAverage(); // Should be blocking on FX thread
-        });
+	 * Retrieves the wind-speed reading count (as integer) from the configuration
+	 * stored against the currently selected model in the ComboBox.
+	 *
+	 * @return the number of wind-speed readings the user must enter
+	 */
+	private int fetchWindSpeedConfigForCurrentModel() {
+		String modelName = cmbBxModelName.getSelectionModel().getSelectedItem();
+		DutMasterData model = DeviceDataManagerController.getDutMasterDataService().findByModelName(modelName);
+		// assume getWindSpeedConfig() returns a String like "3"
+		try {
+			return Integer.parseInt(model.getWindSpeedConfig());
+		} catch (NumberFormatException e) {
+			// fallback to a default of 1 reading
+			return 1;
+		}
+	}
 
-        Platform.runLater(task); // Run UI interaction on FX thread
+	/**
+	 * Opens a non-modal popup containing N labeled TextFields ("Reading 1", "Reading 2", …),
+	 * a Save button and a Next/Confirm button. Once the user has entered all values and clicks Save,
+	 * the average of those values is returned.
+	 *
+	 * @param count the number of individual wind-speed readings to collect
+	 * @return the average of the entered wind-speed values
+	 */
+	private double promptForWindSpeedReadings(int count) {
+		final FutureTask<Double> task = new FutureTask<>(() -> {
+			WindSpeedPopup popup = new WindSpeedPopup(count);
+			return popup.showAndWaitAndReturnAverage(); // Should be blocking on FX thread
+		});
 
-        try {
-            return task.get(); // Wait for result from FX thread
-        } catch (Exception e) {
-            e.printStackTrace();
-            return 0.0; // Or some other fallback/default
-        }
-    }
+		Platform.runLater(task); // Run UI interaction on FX thread
 
-    /**
-     * Executes a single test point by performing measurements such as RPM, Current, Watts,
-     * Active Power, Power Factor, and Wind Speed. The execution path is controlled by the
-     * `isStepRun` flag. If true, the function loops with a delay between each set of measurements
-     * until stopped. If false, it executes the measurements once. Each measurement is validated
-     * against configured limits using `readValidateAndUpdate`. Wind speed is handled as a special
-     * averaged input through a popup UI. At the end of execution, the test result is marked as
-     * PASSED or FAILED based on all validation flags.
-     *
-     * @param testPoint       the current test point containing expected limits and setters
-     * @param isStepRun       boolean flag to control step-run looping mode
-     * @throws InterruptedException if the loop is interrupted during sleep
-     */
-    private void executeTestPoint(FanTestSetup testPoint, boolean isStepRun) {
-        Runnable runAllValidations = () -> {
-            try {
-                // Determine the correct data source (simulation or actual hardware) based on SIMULATION_MODE
-                Supplier<String> rpmReadFunc = SIMULATION_MODE ? FanProjectExecuteController::generateRandomRpm : TestPointUtils::readRpm;
-                Supplier<String> currentReadFunc = SIMULATION_MODE ? FanProjectExecuteController::generateRandomCurrent : TestPointUtils::readCurrent;
-                Supplier<String> wattsReadFunc = SIMULATION_MODE ? FanProjectExecuteController::generateRandomWatts : TestPointUtils::readWatts;
-                Supplier<String> activePowerReadFunc = SIMULATION_MODE ? FanProjectExecuteController::generateRandomActivePower : TestPointUtils::readActivePower;
-                Supplier<String> powerFactorReadFunc = SIMULATION_MODE ? FanProjectExecuteController::generateRandomPowerFactor : TestPointUtils::readPowerFactor;
+		try {
+			return task.get(); // Wait for result from FX thread
+		} catch (Exception e) {
+			e.printStackTrace();
+			return 0.0; // Or some other fallback/default
+		}
+	}
 
-                readValidateAndUpdate(rpmReadFunc, FanTestSetup::getRpmLowerLimit, FanTestSetup::getRpmUpperLimit,
-                        FanTestSetup::setRpmActual, FanTestSetup::getRpmValid, testPoint, 0.7, "RPM");
+	/**
+	 * Executes a single test point by performing measurements such as RPM, Current, Watts,
+	 * Active Power, Power Factor, and Wind Speed. The execution path is controlled by the
+	 * `isStepRun` flag. If true, the function loops with a delay between each set of measurements
+	 * until stopped. If false, it executes the measurements once. Each measurement is validated
+	 * against configured limits using `readValidateAndUpdate`. Wind speed is handled as a special
+	 * averaged input through a popup UI. At the end of execution, the test result is marked as
+	 * PASSED or FAILED based on all validation flags.
+	 *
+	 * @param testPoint       the current test point containing expected limits and setters
+	 * @param isStepRun       boolean flag to control step-run looping mode
+	 * @throws InterruptedException if the loop is interrupted during sleep
+	 */
+	private void executeTestPoint(FanTestSetup testPoint, boolean isStepRun) {
+		Runnable runAllValidations = () -> {
+			try {
+				// Determine the correct data source (simulation or actual hardware) based on SIMULATION_MODE
+				Supplier<String> rpmReadFunc = SIMULATION_MODE ? FanProjectExecuteController::generateRandomRpm : TestPointUtils::readRpm;
+				Supplier<String> currentReadFunc = SIMULATION_MODE ? FanProjectExecuteController::generateRandomCurrent : TestPointUtils::readCurrent;
+				Supplier<String> wattsReadFunc = SIMULATION_MODE ? FanProjectExecuteController::generateRandomWatts : TestPointUtils::readWatts;
+				Supplier<String> activePowerReadFunc = SIMULATION_MODE ? FanProjectExecuteController::generateRandomActivePower : TestPointUtils::readActivePower;
+				Supplier<String> powerFactorReadFunc = SIMULATION_MODE ? FanProjectExecuteController::generateRandomPowerFactor : TestPointUtils::readPowerFactor;
 
-                readValidateAndUpdate(currentReadFunc, FanTestSetup::getCurrentLowerLimit, FanTestSetup::getCurrentUpperLimit,
-                        FanTestSetup::setCurrentActual, FanTestSetup::getCurrentValid, testPoint, 0.75, "Current");
+				readValidateAndUpdate(rpmReadFunc, FanTestSetup::getRpmLowerLimit, FanTestSetup::getRpmUpperLimit,
+						FanTestSetup::setRpmActual, FanTestSetup::getRpmValid, testPoint, 0.7, "RPM");
 
-                readValidateAndUpdate(wattsReadFunc, FanTestSetup::getWattsLowerLimit, FanTestSetup::getWattsUpperLimit,
-                        FanTestSetup::setWattsActual, FanTestSetup::getWattsValid, testPoint, 0.80, "Watts");
+				readValidateAndUpdate(currentReadFunc, FanTestSetup::getCurrentLowerLimit, FanTestSetup::getCurrentUpperLimit,
+						FanTestSetup::setCurrentActual, FanTestSetup::getCurrentValid, testPoint, 0.75, "Current");
 
-                readValidateAndUpdate(activePowerReadFunc, FanTestSetup::getActivePowerLowerLimit, FanTestSetup::getActivePowerUpperLimit,
-                        FanTestSetup::setActivePowerActual, FanTestSetup::getActivePowerValid, testPoint, 0.85, "ActivePower");
+				readValidateAndUpdate(wattsReadFunc, FanTestSetup::getWattsLowerLimit, FanTestSetup::getWattsUpperLimit,
+						FanTestSetup::setWattsActual, FanTestSetup::getWattsValid, testPoint, 0.80, "Watts");
 
-                readValidateAndUpdate(powerFactorReadFunc, FanTestSetup::getPowerFactorLowerLimit, FanTestSetup::getPowerFactorUpperLimit,
-                        FanTestSetup::setPowerFactorActual, FanTestSetup::getPowerFactorValid, testPoint, 0.90, "PowerFactor");
+				readValidateAndUpdate(activePowerReadFunc, FanTestSetup::getActivePowerLowerLimit, FanTestSetup::getActivePowerUpperLimit,
+						FanTestSetup::setActivePowerActual, FanTestSetup::getActivePowerValid, testPoint, 0.85, "ActivePower");
 
-                // Wind speed logic
-                int windSpeedCount = fetchWindSpeedConfigForCurrentModel();
-                double avgWindSpeed;
-                if (SIMULATION_MODE) {
-                    avgWindSpeed = Double.parseDouble(generateRandomWindSpeed());
-                    appendLog("SIMULATION: Windspeed: " + String.format("%.1f", avgWindSpeed), LogLevel.INFO);
-                } else {
-                    avgWindSpeed = promptForWindSpeedReadings(windSpeedCount);
-                }
-                Supplier<String> windSpeedSupplier = () -> String.valueOf(avgWindSpeed);
+				readValidateAndUpdate(powerFactorReadFunc, FanTestSetup::getPowerFactorLowerLimit, FanTestSetup::getPowerFactorUpperLimit,
+						FanTestSetup::setPowerFactorActual, FanTestSetup::getPowerFactorValid, testPoint, 0.90, "PowerFactor");
 
-                readValidateAndUpdate(
-                        windSpeedSupplier,
-                        FanTestSetup::getWindSpeedLowerLimit,
-                        FanTestSetup::getWindSpeedUpperLimit,
-                        FanTestSetup::setWindSpeedActual,
-                        FanTestSetup::getWindSpeedValid,
-                        testPoint,
-                        1.0,
-                        "WindSpeed"
-                );
+				// Wind speed logic
+				int windSpeedCount = fetchWindSpeedConfigForCurrentModel();
+				double avgWindSpeed;
+				if (SIMULATION_MODE) {
+					avgWindSpeed = Double.parseDouble(generateRandomWindSpeed());
+					appendLog("SIMULATION: Windspeed: " + String.format("%.1f", avgWindSpeed), LogLevel.INFO);
+				} else {
+					avgWindSpeed = promptForWindSpeedReadings(windSpeedCount);
+				}
+				Supplier<String> windSpeedSupplier = () -> String.valueOf(avgWindSpeed);
 
-            } catch (InterruptedException e) {
-                appendLog("Measurement loop interrupted.", LogLevel.INFO);
-                Thread.currentThread().interrupt();
-            }
-        };
+				readValidateAndUpdate(
+						windSpeedSupplier,
+						FanTestSetup::getWindSpeedLowerLimit,
+						FanTestSetup::getWindSpeedUpperLimit,
+						FanTestSetup::setWindSpeedActual,
+						FanTestSetup::getWindSpeedValid,
+						testPoint,
+						1.0,
+						"WindSpeed"
+						);
 
-        if (isStepRun) {
-            while (!isStopped) {
-                runAllValidations.run();
-                currentResult.setTestStatus(allValid ? ConstantStatus.PASSED : ConstantStatus.FAILED);
+			} catch (InterruptedException e) {
+				appendLog("Measurement loop interrupted.", LogLevel.INFO);
+				Thread.currentThread().interrupt();
+			}
+		};
 
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    break;
-                }
-            }
-        } else {
-            runAllValidations.run();
-            currentResult.setTestStatus(allValid ? ConstantStatus.PASSED : ConstantStatus.FAILED);
+		if (isStepRun) {
+			while (!isStopped) {
+				runAllValidations.run();
+				currentResult.setTestStatus(allValid ? ConstantStatus.PASSED : ConstantStatus.FAILED);
 
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        }
-    }
+				try {
+					Thread.sleep(2000);
+				} catch (InterruptedException e) {
+					Thread.currentThread().interrupt();
+					break;
+				}
+			}
+		} else {
+			runAllValidations.run();
+			currentResult.setTestStatus(allValid ? ConstantStatus.PASSED : ConstantStatus.FAILED);
+
+			try {
+				Thread.sleep(2000);
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+			}
+		}
+	}
 
 	/**
 	 * Handles failures during execution.
@@ -2277,24 +2337,24 @@ public class FanProjectExecuteController implements Initializable {
 	 * - Stops the execution safely.
 	 */
 	private void handleExecutionFailure(FanTestSetup testPoint, String errorMsg) {
-	    Platform.runLater(() -> {
-	        testPoint.setStatus("Failed");
-	        testPoint.setIsRunning(false);
-	        tvTestSetup.refresh();
+		Platform.runLater(() -> {
+			testPoint.setStatus("Failed");
+			testPoint.setIsRunning(false);
+			tvTestSetup.refresh();
 
-	        Alert alert = new Alert(AlertType.ERROR);
-	        alert.setTitle("Execution Error");
-	        alert.setHeaderText(null);
-	        alert.setContentText(errorMsg);
-	        alert.showAndWait();
-	    });
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("Execution Error");
+			alert.setHeaderText(null);
+			alert.setContentText(errorMsg);
+			alert.showAndWait();
+		});
 
-	    appendLog(errorMsg, LogLevel.INFO);
-	    ApplicationLauncher.logger.error(errorMsg);
-	    isRunning = false;
-	    isStopped = true;
+		appendLog(errorMsg, LogLevel.INFO);
+		ApplicationLauncher.logger.error(errorMsg);
+		isRunning = false;
+		isStopped = true;
 	}
-	
+
 	/**
 	 * Sends a voltage value using predefined DUT command logic.
 	 * - Retrieves the command from the project settings.
@@ -2317,48 +2377,48 @@ public class FanProjectExecuteController implements Initializable {
 		}
 
 	}
-	
+
 	/**
-     * Automatically updates the fan serial number in the text field to the next sequential number.
-     * Assumes serial numbers are in the format "SN" followed by a number (e.g., "SN100").
-     */
-    private void updateNextSerialNumber() {
-        String currentSerialNumber = ref_txtNewFanSerialNo.getText();
-        if (currentSerialNumber != null && currentSerialNumber.startsWith("SN") && currentSerialNumber.length() > 2) {
-            try {
-                // Extract the numeric part of the serial number
-                String numericPartStr = currentSerialNumber.substring(2);
-                int numericPart = Integer.parseInt(numericPartStr);
+	 * Automatically updates the fan serial number in the text field to the next sequential number.
+	 * Assumes serial numbers are in the format "SN" followed by a number (e.g., "SN100").
+	 */
+	private void updateNextSerialNumber() {
+		String currentSerialNumber = ref_txtNewFanSerialNo.getText();
+		if (currentSerialNumber != null && currentSerialNumber.startsWith("SN") && currentSerialNumber.length() > 2) {
+			try {
+				// Extract the numeric part of the serial number
+				String numericPartStr = currentSerialNumber.substring(2);
+				int numericPart = Integer.parseInt(numericPartStr);
 
-                // Increment the numeric part
-                int nextNumericPart = numericPart + 1;
+				// Increment the numeric part
+				int nextNumericPart = numericPart + 1;
 
-                // Format the new serial number back to "SN" + incremented number (with leading zeros if necessary)
-                // This assumes a fixed width for the numeric part, or you can adjust formatting as needed.
-                // For example, if "SN100" becomes "SN101", "SN001" becomes "SN002"
-                String formatString = "SN%0" + numericPartStr.length() + "d";
-                String newSerialNumber = String.format(formatString, nextNumericPart);
+				// Format the new serial number back to "SN" + incremented number (with leading zeros if necessary)
+				// This assumes a fixed width for the numeric part, or you can adjust formatting as needed.
+				// For example, if "SN100" becomes "SN101", "SN001" becomes "SN002"
+				String formatString = "SN%0" + numericPartStr.length() + "d";
+				String newSerialNumber = String.format(formatString, nextNumericPart);
 
-                // Set the new serial number to the text field on the JavaFX Application Thread
-                Platform.runLater(() -> {
-                    ref_txtNewFanSerialNo.setText(newSerialNumber);
-                    appendLog("Fan serial number updated to: " + newSerialNumber, LogLevel.INFO);
-                });
+				// Set the new serial number to the text field on the JavaFX Application Thread
+				Platform.runLater(() -> {
+					ref_txtNewFanSerialNo.setText(newSerialNumber);
+					appendLog("Fan serial number updated to: " + newSerialNumber, LogLevel.INFO);
+				});
 
-            } catch (NumberFormatException e) {
-                appendLog("Failed to parse serial number for increment: " + currentSerialNumber + ". Error: " + e.getMessage(), LogLevel.ERROR);
-            } catch (Exception e) {
-                appendLog("An unexpected error occurred while updating serial number: " + e.getMessage(), LogLevel.ERROR);
-            }
-        } else {
-            appendLog("Current serial number format is not 'SNXXX' or is empty. Cannot automatically increment: " + currentSerialNumber, LogLevel.DEBUG);
-        }
-    }
+			} catch (NumberFormatException e) {
+				appendLog("Failed to parse serial number for increment: " + currentSerialNumber + ". Error: " + e.getMessage(), LogLevel.ERROR);
+			} catch (Exception e) {
+				appendLog("An unexpected error occurred while updating serial number: " + e.getMessage(), LogLevel.ERROR);
+			}
+		} else {
+			appendLog("Current serial number format is not 'SNXXX' or is empty. Cannot automatically increment: " + currentSerialNumber, LogLevel.DEBUG);
+		}
+	}
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 	public void saveToDbTask() {
-		
+
 		ApplicationLauncher.logger.debug("saveToDbTask: Entry");
 		String selectedModel = ref_cmbBxModelName.getSelectionModel().getSelectedItem();
 
@@ -2399,26 +2459,26 @@ public class FanProjectExecuteController implements Initializable {
 	// =========================== Settings ====================================================
 	@FXML
 	private void openSettingsWindow() {
-	    try {
-	        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/project/SettingsPanel.fxml"));
-	        Parent root = loader.load();
+		try {
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/project/SettingsPanel.fxml"));
+			Parent root = loader.load();
 
-	        Stage settingsStage = new Stage();
-	        settingsStage.setTitle("Settings");
-	        settingsStage.setScene(new Scene(root));
-	        settingsStage.initOwner(btnSettings.getScene().getWindow()); // tie to main window
-	        settingsStage.initModality(Modality.NONE); // non-blocking
-	        settingsStage.setResizable(false);
-	        settingsStage.setAlwaysOnTop(true);
-	        settingsStage.show();
-	    } catch (IOException e) {
-	        e.printStackTrace();
-	    }
+			Stage settingsStage = new Stage();
+			settingsStage.setTitle("Settings");
+			settingsStage.setScene(new Scene(root));
+			settingsStage.initOwner(btnSettings.getScene().getWindow()); // tie to main window
+			settingsStage.initModality(Modality.NONE); // non-blocking
+			settingsStage.setResizable(false);
+			settingsStage.setAlwaysOnTop(true);
+			settingsStage.show();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
-	
+
 	// =========================== Start & Stop ================================================
-	
+
 	@FXML
 	void btnStartOnClick(ActionEvent event) {
 		ApplicationLauncher.logger.info("btnStartOnClick: Entry");
@@ -2426,15 +2486,17 @@ public class FanProjectExecuteController implements Initializable {
 		startTimer = new Timer();
 		startTimer.schedule(new startOnTaskClick(), 50);
 	}
-	
+
 	@FXML
 	void btnStopOnClick(ActionEvent event) {
 		ApplicationLauncher.logger.info("btnStopOnClick: Entry");
 
+		isFirstTestPointInSequence = true;
+		
 		stopTimer = new Timer();
 		stopTimer.schedule(new stopOnTaskClick(), 50);
 	}
-	
+
 	// =========================== Dimmer & Voltage Controls ====================================
 
 	@FXML 
@@ -2684,6 +2746,25 @@ public class FanProjectExecuteController implements Initializable {
 		fanWindspeedTimer.schedule(new FanWindspeedTask(), 50);
 	}
 
+
+	// ========================== Mains Controls ===============================================
+
+	@FXML
+	void btnVoltageMainsOnOnClick(ActionEvent event) {
+		ApplicationLauncher.logger.info("btnVoltageMainsOnOnClick: Entry");
+		clickedButtonRef = (Button) event.getSource(); // store the reference to clicked button
+		mainsOnTimer = new Timer();
+		mainsOnTimer.schedule(new MainsOnTask(), 50);
+	}
+
+	@FXML
+	void btnVoltageMainsOffOnClick(ActionEvent event) {
+		ApplicationLauncher.logger.info("btnVoltageMainsOffOnClick: Entry");
+		clickedButtonRef = (Button) event.getSource(); // store the reference to clicked button
+		mainsOffTimer = new Timer();
+		mainsOffTimer.schedule(new MainsOffTask(), 50);
+	}
+
 	// =========================== Utility Buttons ==============================================
 	//@FXML void btnSaveOnClick(ActionEvent event) { }
 
@@ -2696,14 +2777,14 @@ public class FanProjectExecuteController implements Initializable {
 			startTimer.cancel();
 		}
 	}
-	
+
 	class stopOnTaskClick extends TimerTask {
 		public void run() {
 			stopOnTask();
 			stopTimer.cancel();
 		}
 	}
-	
+
 	class DimmerForwardOnTaskClick extends TimerTask {
 		public void run() {
 			dimmerForwardOnTask();
@@ -2873,1155 +2954,1216 @@ public class FanProjectExecuteController implements Initializable {
 		}
 	}
 
+	class MainsOnTask extends TimerTask {
+		@Override public void run() {
+			ApplicationLauncher.logger.info("MainsOnTask: Entry");
+			mainsOnTask();
+			mainsOnTimer.cancel();
+		}
+	}
 
-
+	class MainsOffTask extends TimerTask {
+		@Override public void run() {
+			mainsOffTask();
+			mainsOffTimer.cancel();
+		}
+	}
 	// Task =======================================================================================================================================
 
-    public void startOnTask() {
-        Platform.runLater(() -> {
-            ref_btnStart.setDisable(true);
-            ref_btnStop.setDisable(false);
-        });
-
-        String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-        String testCaseName = ConstantArduinoCommands.START;
-        Optional<DutCommand> dutCommandDataOpt = DeviceDataManagerController.getDutCommandService()
-                .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
-
-        if (dutCommandDataOpt.isPresent()) {
-            DutCommand dutCommand = dutCommandDataOpt.get();
-            DeviceDataManagerController.setDutCommandData(dutCommand);
-
-            boolean isDataAppend = false;
-            // Only call hardware command if not in simulation mode
-            if (!SIMULATION_MODE) {
-                dutCommandExecuteStart("", isDataAppend);
-            } else {
-                appendLog("SIMULATION: Start command skipped.", LogLevel.INFO);
-            }
-        }
-    }
-
-    public void stopOnTask() {
-        Platform.runLater(() -> {
-            ref_btnStop.setDisable(true);
-            ref_btnStart.setDisable(false);
-        });
-
-        String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-        String testCaseName = ConstantArduinoCommands.STOP;
-        Optional<DutCommand> dutCommandDataOpt = DeviceDataManagerController.getDutCommandService()
-                .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
-
-        if (dutCommandDataOpt.isPresent()) {
-            DutCommand dutCommand = dutCommandDataOpt.get();
-            DeviceDataManagerController.setDutCommandData(dutCommand);
-
-            boolean isDataAppend = false;
-            // Only call hardware command if not in simulation mode
-            if (!SIMULATION_MODE) {
-                dutCommandExecuteStart("", isDataAppend);
-            } else {
-                appendLog("SIMULATION: Stop command skipped.", LogLevel.INFO);
-            }
-        }
-    }
-
-    public void dimmerForwardOnTask() {
-        Platform.runLater(() -> {
-        	clickedButtonRef.setDisable(true);
-        });
-
-        String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-        String testCaseName = ConstantArduinoCommands.DIMMER_FORWARD_VOLT;
-        Optional<DutCommand> dutCommandDataOpt = DeviceDataManagerController.getDutCommandService()
-                .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
-
-        if (dutCommandDataOpt.isPresent()) {
-            DutCommand dutCommand = dutCommandDataOpt.get();
-            DeviceDataManagerController.setDutCommandData(dutCommand);
-            String appendData = "";
-            
-            if (clickedButtonRef == ref_btnDimmerForward) {
-                appendData = ref_txtForwardInMsec.getText();
-            } else if (clickedButtonRef == ref_btnDimmerForwardExecute) {
-                appendData = ref_txtForwardInMsecExecute.getText();
-            }
-            
-            boolean isDataAppend = true;
-            // Only call hardware command if not in simulation mode
-            if (!SIMULATION_MODE) {
-                dutCommandExecuteStart(appendData, isDataAppend);
-            } else {
-                appendLog("SIMULATION: Dimmer Forward skipped (data: " + appendData + ").", LogLevel.INFO);
-            }
-        }
-
-        Platform.runLater(() -> {
-        	clickedButtonRef.setDisable(false);
-        });
-    }
-
-    public void dimmerReverseOnTask() {
-        Platform.runLater(() -> {
-        	clickedButtonRef.setDisable(true);
-        });
-
-        String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-        String testCaseName = ConstantArduinoCommands.DIMMER_REVERSE_VOLT;
-        Optional<DutCommand> dutCommandDataOpt = DeviceDataManagerController.getDutCommandService()
-                .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
-
-        if (dutCommandDataOpt.isPresent()) {
-            DutCommand dutCommand = dutCommandDataOpt.get();
-            DeviceDataManagerController.setDutCommandData(dutCommand);
-
-            String appendData = "";
-            
-            if (clickedButtonRef == ref_btnDimmerReverse) {
-                appendData = ref_txtReverseInMsec.getText();
-            } else if (clickedButtonRef == ref_btnDimmerReverseExecute) {
-                appendData = ref_txtReverseInMsecExecute.getText();
-            }
-            
-            boolean isDataAppend = true;
-            // Only call hardware command if not in simulation mode
-            if (!SIMULATION_MODE) {
-                dutCommandExecuteStart(appendData, isDataAppend);
-            } else {
-                appendLog("SIMULATION: Dimmer Reverse skipped (data: " + appendData + ").", LogLevel.INFO);
-            }
-        }
-
-        Platform.runLater(() -> {
-        	clickedButtonRef.setDisable(false);
-        });
-    }
-
-    public void dimmerIsMinOnTask() {
-        Platform.runLater(() -> clickedButtonRef.setDisable(true));
-
-        String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-        String testCaseName = ConstantArduinoCommands.DIMMER_IS_MIN;
-        Optional<DutCommand> dutCommandDataOpt = DeviceDataManagerController.getDutCommandService()
-                .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
-
-        if (dutCommandDataOpt.isPresent()) {
-            DutCommand dutCommand = dutCommandDataOpt.get();
-            DeviceDataManagerController.setDutCommandData(dutCommand);
-
-            boolean isDataAppend = false;
-            boolean result;
-            if (SIMULATION_MODE) {
-                result = random.nextBoolean(); // Simulate random true/false
-                appendLog("SIMULATION: Dimmer Is Min returned " + result, LogLevel.INFO);
-            } else {
-                result = dutCommandExecuteStart("", isDataAppend);
-            }
-
-            Platform.runLater(() -> {
-                if (clickedButtonRef == ref_btnDimmerIsMin) {
-                    ref_btnDimmerIsMin.setStyle(result 
-                        ? ConstantCSS.FX_BACKGROUND_COLOR + ConstantCSS.COLOR_GREEN_SEMI_COLON
-                        : ConstantCSS.FX_BACKGROUND_COLOR + ConstantCSS.COLOR_RED_SEMI_COLON);
-                } else if (clickedButtonRef == ref_btnDimmerIsMinExecute) {
-                    ref_btnDimmerIsMinExecute.setStyle(result 
-                        ? ConstantCSS.FX_BACKGROUND_COLOR + ConstantCSS.COLOR_GREEN_SEMI_COLON
-                        : ConstantCSS.FX_BACKGROUND_COLOR + ConstantCSS.COLOR_RED_SEMI_COLON);
-                }
-            });
-        }
-
-        Platform.runLater(() -> clickedButtonRef.setDisable(false));
-    }
-
-
-    public void dimmerSetMinOnTask() {
-        Platform.runLater(() -> clickedButtonRef.setDisable(true));
-
-        String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-        String testCaseName = ConstantArduinoCommands.DIMMER_SET_MIN;
-        Optional<DutCommand> dutCommandDataOpt = DeviceDataManagerController.getDutCommandService()
-                .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
-
-        if (dutCommandDataOpt.isPresent()) {
-            DutCommand dutCommand = dutCommandDataOpt.get();
-            DeviceDataManagerController.setDutCommandData(dutCommand);
-
-            boolean isDataAppend = false;
-            boolean result;
-            if (SIMULATION_MODE) {
-                result = true; // Simulate success
-                appendLog("SIMULATION: Dimmer Set Min successful.", LogLevel.INFO);
-            } else {
-                result = dutCommandExecuteStart("", isDataAppend);
-            }
-
-            Platform.runLater(() -> {
-                if (clickedButtonRef == ref_btnDimmerIsMin) { // Note: this might be a copy-paste error, should be SetMin related buttons
-                    ref_btnDimmerIsMin.setStyle(result 
-                        ? ConstantCSS.FX_BACKGROUND_COLOR + ConstantCSS.COLOR_GREEN_SEMI_COLON
-                        : ConstantCSS.FX_BACKGROUND_COLOR + ConstantCSS.COLOR_RED_SEMI_COLON);
-                } else if (clickedButtonRef == ref_btnDimmerIsMinExecute) { // Same here
-                    ref_btnDimmerIsMinExecute.setStyle(result 
-                        ? ConstantCSS.FX_BACKGROUND_COLOR + ConstantCSS.COLOR_GREEN_SEMI_COLON
-                        : ConstantCSS.FX_BACKGROUND_COLOR + ConstantCSS.COLOR_RED_SEMI_COLON);
-                }
-                // Potentially, add specific styles for btnDimmerSetMin and btnDimmerSetMinExecute if they exist
-            });
-        }
-
-        Platform.runLater(() -> clickedButtonRef.setDisable(false));
-    }
-
-
-    public void setVoltageTask() {
-        Platform.runLater(() -> clickedButtonRef.setDisable(true));
-
-        String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-        String testCaseName = ConstantArduinoCommands.SET_VOLTAGE;
-        Optional<DutCommand> dutCommandDataOpt = DeviceDataManagerController.getDutCommandService()
-                .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
-
-        if (dutCommandDataOpt.isPresent()) {
-            DutCommand dutCommand = dutCommandDataOpt.get();
-            DeviceDataManagerController.setDutCommandData(dutCommand);
-
-            String appendData = "";
-            
-            if (clickedButtonRef == ref_btnSetVoltage) {
-                appendData = ref_txtSetVoltage.getText();
-            } else if (clickedButtonRef == ref_btnSetVoltageExecute) {
-                appendData = ref_txtSetVoltageExecute.getText();
-            }
-            
-            boolean isDataAppend = true;
-            // Only call hardware command if not in simulation mode
-            if (!SIMULATION_MODE) {
-                dutCommandExecuteStart(appendData, isDataAppend);
-            } else {
-                appendLog("SIMULATION: Set Voltage skipped (data: " + appendData + ").", LogLevel.INFO);
-            }
-        }
-
-        Platform.runLater(() -> clickedButtonRef.setDisable(false));
-    }
-
-    public void testVoltageTask() {
-        Platform.runLater(() -> clickedButtonRef.setDisable(true));
-
-        String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-        String testCaseName = ConstantArduinoCommands.TEST_VOLTAGE;
-        Optional<DutCommand> dutCommandDataOpt = DeviceDataManagerController.getDutCommandService()
-                .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
-
-        if (dutCommandDataOpt.isPresent()) {
-            DutCommand dutCommand = dutCommandDataOpt.get();
-            DeviceDataManagerController.setDutCommandData(dutCommand);
-
-            String appendData = "";
-            
-            if (clickedButtonRef == ref_btnTestVoltage) {
-                appendData = ref_txtTestVoltage.getText();
-            } else if (clickedButtonRef == ref_btnTestVoltageExecute) {
-                appendData = ref_txtTestVoltageExecute.getText();
-            }
-            
-            boolean isDataAppend = true;
-            // Only call hardware command if not in simulation mode
-            if (!SIMULATION_MODE) {
-                dutCommandExecuteStart(appendData, isDataAppend);
-            } else {
-                appendLog("SIMULATION: Test Voltage skipped (data: " + appendData + ").", LogLevel.INFO);
-            }
-        }
-
-        Platform.runLater(() -> clickedButtonRef.setDisable(false));
-    }
-
-    public void maintainVoltageTask() {
-        Platform.runLater(() -> clickedButtonRef.setDisable(true));
-
-        String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-        String testCaseName = ConstantArduinoCommands.MAINTAIN_VOLTAGE;
-        Optional<DutCommand> dutCommandDataOpt = DeviceDataManagerController.getDutCommandService()
-                .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
-
-        if (dutCommandDataOpt.isPresent()) {
-            DutCommand dutCommand = dutCommandDataOpt.get();
-            DeviceDataManagerController.setDutCommandData(dutCommand);
-
-            boolean isDataAppend = false;
-            // Only call hardware command if not in simulation mode
-            if (!SIMULATION_MODE) {
-                dutCommandExecuteStart("", isDataAppend);
-            } else {
-                appendLog("SIMULATION: Maintain Voltage skipped.", LogLevel.INFO);
-            }
-        }
-
-        Platform.runLater(() -> clickedButtonRef.setDisable(false));
-    }
-
-    public void rPhaseVoltageTask() {
-        Platform.runLater(() -> ref_btnRPhaseVoltage.setDisable(true));
-
-        String value;
-        if (SIMULATION_MODE) {
-            value = generateRandomVoltage(); // Simulate a random voltage
-            appendLog("SIMULATION: R Phase Voltage: " + value, LogLevel.INFO);
-        } else {
-            String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-            String testCaseName = ConstantArduinoCommands.R_PHASE_VOLTAGE;
-            Optional<DutCommand> opt = DeviceDataManagerController
-                    .getDutCommandService()
-                    .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
-
-            if (opt.isPresent()) {
-                DeviceDataManagerController.setDutCommandData(opt.get());
-
-                Map<String, Object> resp = new DutSerialDataManager()
-                        .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
-
-                boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
-                value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
-            } else {
-                value = ConstantArduinoCommands.CMD_FAILED;
-            }
-        }
-
-        Platform.runLater(() -> ref_txtRPhaseVoltage.setText(value));
-        Platform.runLater(() -> ref_btnRPhaseVoltage.setDisable(false));
-    }
-
-    public void rPhaseCurrentTask() {
-        Platform.runLater(() -> ref_btnRPhaseCurrent.setDisable(true));
-
-        String value;
-        if (SIMULATION_MODE) {
-            value = generateRandomCurrent(); // Simulate random current
-            appendLog("SIMULATION: R Phase Current: " + value, LogLevel.INFO);
-        } else {
-            String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-            String testCaseName = ConstantArduinoCommands.R_PHASE_CURRENT;
-            Optional<DutCommand> opt = DeviceDataManagerController
-                    .getDutCommandService()
-                    .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
-
-            if (opt.isPresent()) {
-                DeviceDataManagerController.setDutCommandData(opt.get());
-
-                Map<String, Object> resp = new DutSerialDataManager()
-                        .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
-
-                boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
-                value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
-            } else {
-                value = ConstantArduinoCommands.CMD_FAILED;
-            }
-        }
-
-        Platform.runLater(() -> ref_txtRPhaseCurrent.setText(value));
-        Platform.runLater(() -> ref_btnRPhaseCurrent.setDisable(false));
-    }
-
-    public void rPhaseWattsTask() {
-        Platform.runLater(() -> ref_btnRPhaseWatts.setDisable(true));
-
-        String value;
-        if (SIMULATION_MODE) {
-            value = generateRandomWatts(); // Simulate random watts
-            appendLog("SIMULATION: R Phase Watts: " + value, LogLevel.INFO);
-        } else {
-            String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-            String testCaseName = ConstantArduinoCommands.R_PHASE_WATTS;
-            Optional<DutCommand> opt = DeviceDataManagerController
-                    .getDutCommandService()
-                    .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
-
-            if (opt.isPresent()) {
-                DeviceDataManagerController.setDutCommandData(opt.get());
-
-                Map<String, Object> resp = new DutSerialDataManager()
-                        .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
-
-                boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
-                value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
-            } else {
-                value = ConstantArduinoCommands.CMD_FAILED;
-            }
-        }
-
-        Platform.runLater(() -> ref_txtRPhaseWatts.setText(value));
-        Platform.runLater(() -> ref_btnRPhaseWatts.setDisable(false));
-    }
-
-    public void rPhaseVATask() {
-        Platform.runLater(() -> ref_btnRPhaseVA.setDisable(true));
-
-        String value;
-        if (SIMULATION_MODE) {
-            value = generateRandomActivePower(); // Simulate random VA
-            appendLog("SIMULATION: R Phase VA: " + value, LogLevel.INFO);
-        } else {
-            String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-            String testCaseName = ConstantArduinoCommands.R_PHASE_VA;
-            Optional<DutCommand> opt = DeviceDataManagerController
-                    .getDutCommandService()
-                    .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
-
-            if (opt.isPresent()) {
-                DeviceDataManagerController.setDutCommandData(opt.get());
-
-                Map<String, Object> resp = new DutSerialDataManager()
-                        .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
-
-                boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
-                value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
-            } else {
-                value = ConstantArduinoCommands.CMD_FAILED;
-            }
-        }
-
-        Platform.runLater(() -> ref_txtRPhaseVA.setText(value));
-        Platform.runLater(() -> ref_btnRPhaseVA.setDisable(false));
-    }
-
-    public void rPhasePFTask() {
-        Platform.runLater(() -> ref_btnRPhasePF.setDisable(true));
-
-        String value;
-        if (SIMULATION_MODE) {
-            value = generateRandomPowerFactor(); // Simulate random power factor
-            appendLog("SIMULATION: R Phase PF: " + value, LogLevel.INFO);
-        } else {
-            String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-            String testCaseName = ConstantArduinoCommands.R_PHASE_PF;
-            Optional<DutCommand> opt = DeviceDataManagerController
-                    .getDutCommandService()
-                    .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
-
-            if (opt.isPresent()) {
-                DeviceDataManagerController.setDutCommandData(opt.get());
-
-                Map<String, Object> resp = new DutSerialDataManager()
-                        .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
-
-                boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
-                value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
-            } else {
-                value = ConstantArduinoCommands.CMD_FAILED;
-            }
-        }
-
-        Platform.runLater(() -> ref_txtRPhasePF.setText(value));
-        Platform.runLater(() -> ref_btnRPhasePF.setDisable(false));
-    }
-
-    public void yPhaseVoltageTask() {
-        Platform.runLater(() -> ref_btnYPhaseVoltage.setDisable(true));
-
-        String value;
-        if (SIMULATION_MODE) {
-            value = generateRandomVoltage(); // Simulate random voltage
-            appendLog("SIMULATION: Y Phase Voltage: " + value, LogLevel.INFO);
-        } else {
-            String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-            String testCaseName = ConstantArduinoCommands.Y_PHASE_VOLTAGE;
-            Optional<DutCommand> opt = DeviceDataManagerController
-                    .getDutCommandService()
-                    .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
-
-            if (opt.isPresent()) {
-                DeviceDataManagerController.setDutCommandData(opt.get());
-
-                Map<String, Object> resp = new DutSerialDataManager()
-                        .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
-
-                boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
-                value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
-            } else {
-                value = ConstantArduinoCommands.CMD_FAILED;
-            }
-        }
-
-        Platform.runLater(() -> ref_txtYPhaseVoltage.setText(value));
-        Platform.runLater(() -> ref_btnYPhaseVoltage.setDisable(false));
-    }
-
-    public void yPhaseCurrentTask() {
-        Platform.runLater(() -> ref_btnYPhaseCurrent.setDisable(true));
-
-        String value;
-        if (SIMULATION_MODE) {
-            value = generateRandomCurrent(); // Simulate random current
-            appendLog("SIMULATION: Y Phase Current: " + value, LogLevel.INFO);
-        } else {
-            String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-            String testCaseName = ConstantArduinoCommands.Y_PHASE_CURRENT;
-            Optional<DutCommand> opt = DeviceDataManagerController
-                    .getDutCommandService()
-                    .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
-
-            if (opt.isPresent()) {
-                DeviceDataManagerController.setDutCommandData(opt.get());
-
-                Map<String, Object> resp = new DutSerialDataManager()
-                        .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
-
-                boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
-                value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
-            } else {
-                value = ConstantArduinoCommands.CMD_FAILED;
-            }
-        }
-
-        Platform.runLater(() -> ref_txtYPhaseCurrent.setText(value));
-        Platform.runLater(() -> ref_btnYPhaseCurrent.setDisable(false));
-    }
-
-    public void yPhaseWattsTask() {
-        Platform.runLater(() -> ref_btnYPhaseWatts.setDisable(true));
-
-        String value;
-        if (SIMULATION_MODE) {
-            value = generateRandomWatts(); // Simulate random watts
-            appendLog("SIMULATION: Y Phase Watts: " + value, LogLevel.INFO);
-        } else {
-            String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-            String testCaseName = ConstantArduinoCommands.Y_PHASE_WATTS;
-            Optional<DutCommand> opt = DeviceDataManagerController
-                    .getDutCommandService()
-                    .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
-
-            if (opt.isPresent()) {
-                DeviceDataManagerController.setDutCommandData(opt.get());
-
-                Map<String, Object> resp = new DutSerialDataManager()
-                        .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
-
-                boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
-                value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
-            } else {
-                value = ConstantArduinoCommands.CMD_FAILED;
-            }
-        }
-
-        Platform.runLater(() -> ref_txtYPhaseWatts.setText(value));
-        Platform.runLater(() -> ref_btnYPhaseWatts.setDisable(false));
-    }
-
-    public void yPhaseVATask() {
-        Platform.runLater(() -> ref_btnYPhaseVA.setDisable(true));
-
-        String value;
-        if (SIMULATION_MODE) {
-            value = generateRandomActivePower(); // Simulate random VA
-            appendLog("SIMULATION: Y Phase VA: " + value, LogLevel.INFO);
-        } else {
-            String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-            String testCaseName = ConstantArduinoCommands.Y_PHASE_VA;
-            Optional<DutCommand> opt = DeviceDataManagerController
-                    .getDutCommandService()
-                    .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
-
-            if (opt.isPresent()) {
-                DeviceDataManagerController.setDutCommandData(opt.get());
-
-                Map<String, Object> resp = new DutSerialDataManager()
-                        .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
-
-                boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
-                value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
-            } else {
-                value = ConstantArduinoCommands.CMD_FAILED;
-            }
-        }
-
-        Platform.runLater(() -> ref_txtYPhaseVA.setText(value));
-        Platform.runLater(() -> ref_btnYPhaseVA.setDisable(false));
-    }
-
-    public void yPhasePFTask() {
-        Platform.runLater(() -> ref_btnYPhasePF.setDisable(true));
-
-        String value;
-        if (SIMULATION_MODE) {
-            value = generateRandomPowerFactor(); // Simulate random power factor
-            appendLog("SIMULATION: Y Phase PF: " + value, LogLevel.INFO);
-        } else {
-            String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-            String testCaseName = ConstantArduinoCommands.Y_PHASE_PF;
-            Optional<DutCommand> opt = DeviceDataManagerController
-                    .getDutCommandService()
-                    .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
-
-            if (opt.isPresent()) {
-                DeviceDataManagerController.setDutCommandData(opt.get());
-
-                Map<String, Object> resp = new DutSerialDataManager()
-                        .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
-
-                boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
-                value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
-            } else {
-                value = ConstantArduinoCommands.CMD_FAILED;
-            }
-        }
-
-        Platform.runLater(() -> ref_txtYPhasePF.setText(value));
-        Platform.runLater(() -> ref_btnYPhasePF.setDisable(false));
-    }
-
-    public void bPhaseVoltageTask() {
-        Platform.runLater(() -> ref_btnBPhaseVoltage.setDisable(true));
-
-        String value;
-        if (SIMULATION_MODE) {
-            value = generateRandomVoltage(); // Simulate random voltage
-            appendLog("SIMULATION: B Phase Voltage: " + value, LogLevel.INFO);
-        } else {
-            String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-            String testCaseName = ConstantArduinoCommands.B_PHASE_VOLTAGE;
-            Optional<DutCommand> opt = DeviceDataManagerController
-                    .getDutCommandService()
-                    .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
-
-            if (opt.isPresent()) {
-                DeviceDataManagerController.setDutCommandData(opt.get());
-
-                Map<String, Object> resp = new DutSerialDataManager()
-                        .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
-
-                boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
-                value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
-            } else {
-                value = ConstantArduinoCommands.CMD_FAILED;
-            }
-        }
-
-        Platform.runLater(() -> ref_txtBPhaseVoltage.setText(value));
-        Platform.runLater(() -> ref_btnBPhaseVoltage.setDisable(false));
-    }
-
-    public void bPhaseCurrentTask() {
-        Platform.runLater(() -> ref_btnBPhaseCurrent.setDisable(true));
-
-        String value;
-        if (SIMULATION_MODE) {
-            value = generateRandomCurrent(); // Simulate random current
-            appendLog("SIMULATION: B Phase Current: " + value, LogLevel.INFO);
-        } else {
-            String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-            String testCaseName = ConstantArduinoCommands.B_PHASE_CURRENT;
-            Optional<DutCommand> opt = DeviceDataManagerController
-                    .getDutCommandService()
-                    .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
-
-            if (opt.isPresent()) {
-                DeviceDataManagerController.setDutCommandData(opt.get());
-
-                Map<String, Object> resp = new DutSerialDataManager()
-                        .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
-
-                boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
-                value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
-            } else {
-                value = ConstantArduinoCommands.CMD_FAILED;
-            }
-        }
-
-        Platform.runLater(() -> ref_txtBPhaseCurrent.setText(value));
-        Platform.runLater(() -> ref_btnBPhaseCurrent.setDisable(false));
-    }
-
-    public void bPhaseWattsTask() {
-        Platform.runLater(() -> ref_btnBPhaseWatts.setDisable(true));
-
-        String value;
-        if (SIMULATION_MODE) {
-            value = generateRandomWatts(); // Simulate random watts
-            appendLog("SIMULATION: B Phase Watts: " + value, LogLevel.INFO);
-        } else {
-            String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-            String testCaseName = ConstantArduinoCommands.B_PHASE_WATTS;
-            Optional<DutCommand> opt = DeviceDataManagerController
-                    .getDutCommandService()
-                    .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
-
-            if (opt.isPresent()) {
-                DeviceDataManagerController.setDutCommandData(opt.get());
-
-                Map<String, Object> resp = new DutSerialDataManager()
-                        .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
-
-                boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
-                value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
-            } else {
-                value = ConstantArduinoCommands.CMD_FAILED;
-            }
-        }
-
-        Platform.runLater(() -> ref_txtBPhaseWatts.setText(value));
-        Platform.runLater(() -> ref_btnBPhaseWatts.setDisable(false));
-    }
-
-    public void bPhaseVATask() {
-        Platform.runLater(() -> ref_btnBPhaseVA.setDisable(true));
-
-        String value;
-        if (SIMULATION_MODE) {
-            value = generateRandomActivePower(); // Simulate random VA
-            appendLog("SIMULATION: B Phase VA: " + value, LogLevel.INFO);
-        } else {
-            String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-            String testCaseName = ConstantArduinoCommands.B_PHASE_VA;
-            Optional<DutCommand> opt = DeviceDataManagerController
-                    .getDutCommandService()
-                    .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
-
-            if (opt.isPresent()) {
-                DeviceDataManagerController.setDutCommandData(opt.get());
-
-                Map<String, Object> resp = new DutSerialDataManager()
-                        .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
-
-                boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
-                value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
-            } else {
-                value = ConstantArduinoCommands.CMD_FAILED;
-            }
-        }
-
-        Platform.runLater(() -> ref_txtBPhaseVA.setText(value));
-        Platform.runLater(() -> ref_btnBPhaseVA.setDisable(false));
-    }
-
-    public void bPhasePFTask() {
-        Platform.runLater(() -> ref_btnBPhasePF.setDisable(true));
-
-        String value;
-        if (SIMULATION_MODE) {
-            value = generateRandomPowerFactor(); // Simulate random power factor
-            appendLog("SIMULATION: B Phase PF: " + value, LogLevel.INFO);
-        } else {
-            String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-            String testCaseName = ConstantArduinoCommands.B_PHASE_PF;
-            Optional<DutCommand> opt = DeviceDataManagerController
-                    .getDutCommandService()
-                    .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
-
-            if (opt.isPresent()) {
-                DeviceDataManagerController.setDutCommandData(opt.get());
-
-                Map<String, Object> resp = new DutSerialDataManager()
-                        .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
-
-                boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
-                value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
-            } else {
-                value = ConstantArduinoCommands.CMD_FAILED;
-            }
-        }
-
-        Platform.runLater(() -> ref_txtBPhasePF.setText(value));
-        Platform.runLater(() -> ref_btnBPhasePF.setDisable(false));
-    }
-
-    public void phase3CurrentAvgTask() {
-        Platform.runLater(() -> ref_btn3PhaseCurrentAvg.setDisable(true));
-
-        String value;
-        if (SIMULATION_MODE) {
-            value = generateRandomCurrent(); // Simulate random current
-            appendLog("SIMULATION: 3 Phase Current Avg: " + value, LogLevel.INFO);
-        } else {
-            String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-            String testCaseName = ConstantArduinoCommands.PHASE_3_CURRENT_AVG;
-            Optional<DutCommand> opt = DeviceDataManagerController
-                    .getDutCommandService()
-                    .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
-
-            if (opt.isPresent()) {
-                DeviceDataManagerController.setDutCommandData(opt.get());
-
-                Map<String, Object> resp = new DutSerialDataManager()
-                        .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
-
-                boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
-                value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
-            } else {
-                value = ConstantArduinoCommands.CMD_FAILED;
-            }
-        }
-
-        Platform.runLater(() -> ref_txt3PhaseCurrentAvg.setText(value));
-        Platform.runLater(() -> ref_btn3PhaseCurrentAvg.setDisable(false));
-    }
-
-    public void phase3PFAvgTask() {
-        Platform.runLater(() -> ref_btn3PhasePFAvg.setDisable(true));
-
-        String value;
-        if (SIMULATION_MODE) {
-            value = generateRandomPowerFactor(); // Simulate random power factor
-            appendLog("SIMULATION: 3 Phase PF Avg: " + value, LogLevel.INFO);
-        } else {
-            String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-            String testCaseName = ConstantArduinoCommands.PHASE_3_PF_AVG;
-            Optional<DutCommand> opt = DeviceDataManagerController
-                    .getDutCommandService()
-                    .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
-
-            if (opt.isPresent()) {
-                DeviceDataManagerController.setDutCommandData(opt.get());
-
-                Map<String, Object> resp = new DutSerialDataManager()
-                        .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
-
-                boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
-                value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
-            } else {
-                value = ConstantArduinoCommands.CMD_FAILED;
-            }
-        }
-
-        Platform.runLater(() -> ref_txt3PhasePFAvg.setText(value));
-        Platform.runLater(() -> ref_btn3PhasePFAvg.setDisable(false));
-    }
-
-    public void phase3VATotalTask() {
-        Platform.runLater(() -> ref_btn3PhaseVATotal.setDisable(true));
-
-        String value;
-        if (SIMULATION_MODE) {
-            value = generateRandomActivePower(); // Simulate random VA
-            appendLog("SIMULATION: 3 Phase VA Total: " + value, LogLevel.INFO);
-        } else {
-            String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-            String testCaseName = ConstantArduinoCommands.PHASE_3_VA_TOTAL;
-            Optional<DutCommand> opt = DeviceDataManagerController
-                    .getDutCommandService()
-                    .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
-
-            if (opt.isPresent()) {
-                DeviceDataManagerController.setDutCommandData(opt.get());
-
-                Map<String, Object> resp = new DutSerialDataManager()
-                        .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
-
-                boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
-                value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
-            } else {
-                value = ConstantArduinoCommands.CMD_FAILED;
-            }
-        }
-
-        Platform.runLater(() -> ref_txt3PhaseVATotal.setText(value));
-        Platform.runLater(() -> ref_btn3PhaseVATotal.setDisable(false));
-    }
-
-    public void phase3VBRTask() {
-        Platform.runLater(() -> ref_btn3PhaseVBR.setDisable(true));
-
-        String value;
-        if (SIMULATION_MODE) {
-            value = generateRandomVoltage(); // Simulate random voltage
-            appendLog("SIMULATION: 3 Phase VBR: " + value, LogLevel.INFO);
-        } else {
-            String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-            String testCaseName = ConstantArduinoCommands.PHASE_3_VBR;
-            Optional<DutCommand> opt = DeviceDataManagerController
-                    .getDutCommandService()
-                    .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
-
-            if (opt.isPresent()) {
-                DeviceDataManagerController.setDutCommandData(opt.get());
-
-                Map<String, Object> resp = new DutSerialDataManager()
-                        .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
-
-                boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
-                value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
-            } else {
-                value = ConstantArduinoCommands.CMD_FAILED;
-            }
-        }
-
-        Platform.runLater(() -> ref_txt3PhaseVBR.setText(value));
-        Platform.runLater(() -> ref_btn3PhaseVBR.setDisable(false));
-    }
-
-    public void phase3VLLTask() {
-        Platform.runLater(() -> ref_btn3PhaseVLL.setDisable(true));
-
-        String value;
-        if (SIMULATION_MODE) {
-            value = generateRandomVoltage(); // Simulate random voltage
-            appendLog("SIMULATION: 3 Phase VLL: " + value, LogLevel.INFO);
-        } else {
-            String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-            String testCaseName = ConstantArduinoCommands.PHASE_3_VLL;
-            Optional<DutCommand> opt = DeviceDataManagerController
-                    .getDutCommandService()
-                    .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
-
-            if (opt.isPresent()) {
-                DeviceDataManagerController.setDutCommandData(opt.get());
-
-                Map<String, Object> resp = new DutSerialDataManager()
-                        .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
-
-                boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
-                value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
-            } else {
-                value = ConstantArduinoCommands.CMD_FAILED;
-            }
-        }
-
-        Platform.runLater(() -> ref_txt3PhaseVLL.setText(value));
-        Platform.runLater(() -> ref_btn3PhaseVLL.setDisable(false));
-    }
-
-    public void phase3VLNTask() {
-        Platform.runLater(() -> ref_btn3PhaseVLN.setDisable(true));
-
-        String value;
-        if (SIMULATION_MODE) {
-            value = generateRandomVoltage(); // Simulate random voltage
-            appendLog("SIMULATION: 3 Phase VLN: " + value, LogLevel.INFO);
-        } else {
-            String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-            String testCaseName = ConstantArduinoCommands.PHASE_3_VLN;
-            Optional<DutCommand> opt = DeviceDataManagerController
-                    .getDutCommandService()
-                    .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
-
-            if (opt.isPresent()) {
-                DeviceDataManagerController.setDutCommandData(opt.get());
-
-                Map<String, Object> resp = new DutSerialDataManager()
-                        .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
-
-                boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
-                value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
-            } else {
-                value = ConstantArduinoCommands.CMD_FAILED;
-            }
-        }
-
-        Platform.runLater(() -> ref_txt3PhaseVLN.setText(value));
-        Platform.runLater(() -> ref_btn3PhaseVLN.setDisable(false));
-    }
-
-    public void phase3VRYTask() {
-        Platform.runLater(() -> ref_btn3PhaseVRY.setDisable(true));
-
-        String value;
-        if (SIMULATION_MODE) {
-            value = generateRandomVoltage(); // Simulate random voltage
-            appendLog("SIMULATION: 3 Phase VRY: " + value, LogLevel.INFO);
-        } else {
-            String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-            String testCaseName = ConstantArduinoCommands.PHASE_3_VRY;
-            Optional<DutCommand> opt = DeviceDataManagerController
-                    .getDutCommandService()
-                    .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
-
-            if (opt.isPresent()) {
-                DeviceDataManagerController.setDutCommandData(opt.get());
-
-                Map<String, Object> resp = new DutSerialDataManager()
-                        .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
-
-                boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
-                value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
-            } else {
-                value = ConstantArduinoCommands.CMD_FAILED;
-            }
-        }
-
-        Platform.runLater(() -> ref_txt3PhaseVRY.setText(value));
-        Platform.runLater(() -> ref_btn3PhaseVRY.setDisable(false));
-    }
-
-    public void phase3VYBTask() {
-        Platform.runLater(() -> ref_btn3PhaseVYB.setDisable(true));
-
-        String value;
-        if (SIMULATION_MODE) {
-            value = generateRandomVoltage(); // Simulate random voltage
-            appendLog("SIMULATION: 3 Phase VYB: " + value, LogLevel.INFO);
-        } else {
-            String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-            String testCaseName = ConstantArduinoCommands.PHASE_3_VYB;
-            Optional<DutCommand> opt = DeviceDataManagerController
-                    .getDutCommandService()
-                    .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
-
-            if (opt.isPresent()) {
-                DeviceDataManagerController.setDutCommandData(opt.get());
-
-                Map<String, Object> resp = new DutSerialDataManager()
-                        .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
-
-                boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
-                value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
-            } else {
-                value = ConstantArduinoCommands.CMD_FAILED;
-            }
-        }
-
-        Platform.runLater(() -> ref_txt3PhaseVYB.setText(value));
-        Platform.runLater(() -> ref_btn3PhaseVYB.setDisable(false));
-    }
-
-    public void phase3WattsTotalTask() {
-        Platform.runLater(() -> ref_btn3PhaseWattsTotal.setDisable(true));
-
-        String value;
-        if (SIMULATION_MODE) {
-            value = generateRandomWatts(); // Simulate random watts
-            appendLog("SIMULATION: 3 Phase Watts Total: " + value, LogLevel.INFO);
-        } else {
-            String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-            String testCaseName = ConstantArduinoCommands.PHASE_3_WATTS_TOTAL;
-            Optional<DutCommand> opt = DeviceDataManagerController
-                    .getDutCommandService()
-                    .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
-
-            if (opt.isPresent()) {
-                DeviceDataManagerController.setDutCommandData(opt.get());
-
-                Map<String, Object> resp = new DutSerialDataManager()
-                        .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
-
-                boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
-                value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
-            } else {
-                value = ConstantArduinoCommands.CMD_FAILED;
-            }
-        }
-
-        Platform.runLater(() -> ref_txt3PhaseWattsTotal.setText(value));
-        Platform.runLater(() -> ref_btn3PhaseWattsTotal.setDisable(false));
-    }
-
-    public void fanRpmTask() {
-        Platform.runLater(() -> clickedButtonRef.setDisable(true));
-
-        String value;
-        if (SIMULATION_MODE) {
-            value = generateRandomRpm(); // Simulate random RPM
-            appendLog("SIMULATION: Fan RPM: " + value, LogLevel.INFO);
-        } else {
-            String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-            String testCaseName = ConstantArduinoCommands.FAN_RPM;
-            Optional<DutCommand> opt = DeviceDataManagerController
-                    .getDutCommandService()
-                    .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
-
-            if (opt.isPresent()) {
-                DeviceDataManagerController.setDutCommandData(opt.get());
-
-                Map<String, Object> resp = new DutSerialDataManager()
-                        .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
-
-                boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
-                value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
-            } else {
-                value = ConstantArduinoCommands.CMD_FAILED;
-            }
-        }
-
-        Platform.runLater(() -> {
-            if (clickedButtonRef == ref_btnFanRpm) {
-                ref_txtFanRpm.setText(value);
-            } else if (clickedButtonRef == ref_btnFanRpmExecute) {
-                ref_txtFanRpmExecute.setText(value);
-            }
-        });
-
-        Platform.runLater(() -> clickedButtonRef.setDisable(false));
-    }
-
-    public void fanWindspeedTask() {
-        Platform.runLater(() -> clickedButtonRef.setDisable(true));
-
-        String value;
-        if (SIMULATION_MODE) {
-            value = generateRandomWindSpeed(); // Simulate random windspeed
-            appendLog("SIMULATION: Fan Windspeed: " + value, LogLevel.INFO);
-        } else {
-            String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
-            String testCaseName = ConstantArduinoCommands.FAN_WINDSPEED;
-            Optional<DutCommand> opt = DeviceDataManagerController
-                    .getDutCommandService()
-                    .findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
-
-            if (opt.isPresent()) {
-                DeviceDataManagerController.setDutCommandData(opt.get());
-
-                Map<String, Object> resp = new DutSerialDataManager()
-                        .dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
-
-                boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
-                value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
-            } else {
-                value = ConstantArduinoCommands.CMD_FAILED;
-            }
-        }
-
-        Platform.runLater(() -> {
-            if (clickedButtonRef == ref_btnFanWindspeed) {
-                ref_txtFanWindSpeed.setText(value);
-            } else if (clickedButtonRef == ref_btnFanWindspeedExecute) {
-                ref_txtFanWindSpeedExecute.setText(value);
-            }
-        });
-
-        Platform.runLater(() -> clickedButtonRef.setDisable(false));
-    }
-
-   
-	
+	public void startOnTask() {
+		Platform.runLater(() -> {
+			ref_btnStart.setDisable(true);
+			ref_btnStop.setDisable(false);
+		});
+
+		String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+		String testCaseName = ConstantArduinoCommands.START;
+		Optional<DutCommand> dutCommandDataOpt = DeviceDataManagerController.getDutCommandService()
+				.findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+
+		if (dutCommandDataOpt.isPresent()) {
+			DutCommand dutCommand = dutCommandDataOpt.get();
+			DeviceDataManagerController.setDutCommandData(dutCommand);
+
+			boolean isDataAppend = false;
+			// Only call hardware command if not in simulation mode
+			if (!SIMULATION_MODE) {
+				dutCommandExecuteStart("", isDataAppend);
+			} else {
+				appendLog("SIMULATION: Start command skipped.", LogLevel.INFO);
+			}
+		}
+	}
+
+	public void stopOnTask() {
+		Platform.runLater(() -> {
+			ref_btnStop.setDisable(true);
+			ref_btnStart.setDisable(false);
+		});
+
+		String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+		String testCaseName = ConstantArduinoCommands.STOP;
+		Optional<DutCommand> dutCommandDataOpt = DeviceDataManagerController.getDutCommandService()
+				.findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+
+		if (dutCommandDataOpt.isPresent()) {
+			DutCommand dutCommand = dutCommandDataOpt.get();
+			DeviceDataManagerController.setDutCommandData(dutCommand);
+
+			boolean isDataAppend = false;
+			// Only call hardware command if not in simulation mode
+			if (!SIMULATION_MODE) {
+				dutCommandExecuteStart("", isDataAppend);
+			} else {
+				appendLog("SIMULATION: Stop command skipped.", LogLevel.INFO);
+			}
+		}
+	}
+
+	public void dimmerForwardOnTask() {
+		Platform.runLater(() -> {
+			clickedButtonRef.setDisable(true);
+		});
+
+		String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+		String testCaseName = ConstantArduinoCommands.DIMMER_FORWARD_VOLT;
+		Optional<DutCommand> dutCommandDataOpt = DeviceDataManagerController.getDutCommandService()
+				.findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+
+		if (dutCommandDataOpt.isPresent()) {
+			DutCommand dutCommand = dutCommandDataOpt.get();
+			DeviceDataManagerController.setDutCommandData(dutCommand);
+			String appendData = "";
+
+			if (clickedButtonRef == ref_btnDimmerForward) {
+				appendData = ref_txtForwardInMsec.getText();
+			} else if (clickedButtonRef == ref_btnDimmerForwardExecute) {
+				appendData = ref_txtForwardInMsecExecute.getText();
+			}
+
+			boolean isDataAppend = true;
+			// Only call hardware command if not in simulation mode
+			if (!SIMULATION_MODE) {
+				dutCommandExecuteStart(appendData, isDataAppend);
+			} else {
+				appendLog("SIMULATION: Dimmer Forward skipped (data: " + appendData + ").", LogLevel.INFO);
+			}
+		}
+
+		Platform.runLater(() -> {
+			clickedButtonRef.setDisable(false);
+		});
+	}
+
+	public void dimmerReverseOnTask() {
+		Platform.runLater(() -> {
+			clickedButtonRef.setDisable(true);
+		});
+
+		String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+		String testCaseName = ConstantArduinoCommands.DIMMER_REVERSE_VOLT;
+		Optional<DutCommand> dutCommandDataOpt = DeviceDataManagerController.getDutCommandService()
+				.findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+
+		if (dutCommandDataOpt.isPresent()) {
+			DutCommand dutCommand = dutCommandDataOpt.get();
+			DeviceDataManagerController.setDutCommandData(dutCommand);
+
+			String appendData = "";
+
+			if (clickedButtonRef == ref_btnDimmerReverse) {
+				appendData = ref_txtReverseInMsec.getText();
+			} else if (clickedButtonRef == ref_btnDimmerReverseExecute) {
+				appendData = ref_txtReverseInMsecExecute.getText();
+			}
+
+			boolean isDataAppend = true;
+			// Only call hardware command if not in simulation mode
+			if (!SIMULATION_MODE) {
+				dutCommandExecuteStart(appendData, isDataAppend);
+			} else {
+				appendLog("SIMULATION: Dimmer Reverse skipped (data: " + appendData + ").", LogLevel.INFO);
+			}
+		}
+
+		Platform.runLater(() -> {
+			clickedButtonRef.setDisable(false);
+		});
+	}
+
+	public void dimmerIsMinOnTask() {
+		Platform.runLater(() -> clickedButtonRef.setDisable(true));
+
+		String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+		String testCaseName = ConstantArduinoCommands.DIMMER_IS_MIN;
+		Optional<DutCommand> dutCommandDataOpt = DeviceDataManagerController.getDutCommandService()
+				.findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+
+		if (dutCommandDataOpt.isPresent()) {
+			DutCommand dutCommand = dutCommandDataOpt.get();
+			DeviceDataManagerController.setDutCommandData(dutCommand);
+
+			boolean isDataAppend = false;
+			boolean result;
+			if (SIMULATION_MODE) {
+				result = random.nextBoolean(); // Simulate random true/false
+				appendLog("SIMULATION: Dimmer Is Min returned " + result, LogLevel.INFO);
+			} else {
+				result = dutCommandExecuteStart("", isDataAppend);
+			}
+
+			Platform.runLater(() -> {
+				if (clickedButtonRef == ref_btnDimmerIsMin) {
+					ref_btnDimmerIsMin.setStyle(result 
+							? ConstantCSS.FX_BACKGROUND_COLOR + ConstantCSS.COLOR_GREEN_SEMI_COLON
+									: ConstantCSS.FX_BACKGROUND_COLOR + ConstantCSS.COLOR_RED_SEMI_COLON);
+				} else if (clickedButtonRef == ref_btnDimmerIsMinExecute) {
+					ref_btnDimmerIsMinExecute.setStyle(result 
+							? ConstantCSS.FX_BACKGROUND_COLOR + ConstantCSS.COLOR_GREEN_SEMI_COLON
+									: ConstantCSS.FX_BACKGROUND_COLOR + ConstantCSS.COLOR_RED_SEMI_COLON);
+				}
+			});
+		}
+
+		Platform.runLater(() -> clickedButtonRef.setDisable(false));
+	}
+
+
+	public void dimmerSetMinOnTask() {
+		Platform.runLater(() -> clickedButtonRef.setDisable(true));
+
+		String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+		String testCaseName = ConstantArduinoCommands.DIMMER_SET_MIN;
+		Optional<DutCommand> dutCommandDataOpt = DeviceDataManagerController.getDutCommandService()
+				.findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+
+		if (dutCommandDataOpt.isPresent()) {
+			DutCommand dutCommand = dutCommandDataOpt.get();
+			DeviceDataManagerController.setDutCommandData(dutCommand);
+
+			boolean isDataAppend = false;
+			boolean result;
+			if (SIMULATION_MODE) {
+				result = true; // Simulate success
+				appendLog("SIMULATION: Dimmer Set Min successful.", LogLevel.INFO);
+			} else {
+				result = dutCommandExecuteStart("", isDataAppend);
+			}
+
+			Platform.runLater(() -> {
+				if (clickedButtonRef == ref_btnDimmerIsMin) { // Note: this might be a copy-paste error, should be SetMin related buttons
+					ref_btnDimmerIsMin.setStyle(result 
+							? ConstantCSS.FX_BACKGROUND_COLOR + ConstantCSS.COLOR_GREEN_SEMI_COLON
+									: ConstantCSS.FX_BACKGROUND_COLOR + ConstantCSS.COLOR_RED_SEMI_COLON);
+				} else if (clickedButtonRef == ref_btnDimmerIsMinExecute) { // Same here
+					ref_btnDimmerIsMinExecute.setStyle(result 
+							? ConstantCSS.FX_BACKGROUND_COLOR + ConstantCSS.COLOR_GREEN_SEMI_COLON
+									: ConstantCSS.FX_BACKGROUND_COLOR + ConstantCSS.COLOR_RED_SEMI_COLON);
+				}
+				// Potentially, add specific styles for btnDimmerSetMin and btnDimmerSetMinExecute if they exist
+			});
+		}
+
+		Platform.runLater(() -> clickedButtonRef.setDisable(false));
+	}
+
+
+	public void setVoltageTask() {
+		Platform.runLater(() -> clickedButtonRef.setDisable(true));
+
+		String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+		String testCaseName = ConstantArduinoCommands.SET_VOLTAGE;
+		Optional<DutCommand> dutCommandDataOpt = DeviceDataManagerController.getDutCommandService()
+				.findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+
+		if (dutCommandDataOpt.isPresent()) {
+			DutCommand dutCommand = dutCommandDataOpt.get();
+			DeviceDataManagerController.setDutCommandData(dutCommand);
+
+			String appendData = "";
+
+			if (clickedButtonRef == ref_btnSetVoltage) {
+				appendData = ref_txtSetVoltage.getText();
+			} else if (clickedButtonRef == ref_btnSetVoltageExecute) {
+				appendData = ref_txtSetVoltageExecute.getText();
+			}
+
+			boolean isDataAppend = true;
+			// Only call hardware command if not in simulation mode
+			if (!SIMULATION_MODE) {
+				dutCommandExecuteStart(appendData, isDataAppend);
+			} else {
+				appendLog("SIMULATION: Set Voltage skipped (data: " + appendData + ").", LogLevel.INFO);
+			}
+		}
+
+		Platform.runLater(() -> clickedButtonRef.setDisable(false));
+	}
+
+	public void testVoltageTask() {
+		Platform.runLater(() -> clickedButtonRef.setDisable(true));
+
+		String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+		String testCaseName = ConstantArduinoCommands.TEST_VOLTAGE;
+		Optional<DutCommand> dutCommandDataOpt = DeviceDataManagerController.getDutCommandService()
+				.findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+
+		if (dutCommandDataOpt.isPresent()) {
+			DutCommand dutCommand = dutCommandDataOpt.get();
+			DeviceDataManagerController.setDutCommandData(dutCommand);
+
+			String appendData = "";
+
+			if (clickedButtonRef == ref_btnTestVoltage) {
+				appendData = ref_txtTestVoltage.getText();
+			} else if (clickedButtonRef == ref_btnTestVoltageExecute) {
+				appendData = ref_txtTestVoltageExecute.getText();
+			}
+
+			boolean isDataAppend = true;
+			// Only call hardware command if not in simulation mode
+			if (!SIMULATION_MODE) {
+				dutCommandExecuteStart(appendData, isDataAppend);
+			} else {
+				appendLog("SIMULATION: Test Voltage skipped (data: " + appendData + ").", LogLevel.INFO);
+			}
+		}
+
+		Platform.runLater(() -> clickedButtonRef.setDisable(false));
+	}
+
+	public void maintainVoltageTask() {
+		Platform.runLater(() -> clickedButtonRef.setDisable(true));
+
+		String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+		String testCaseName = ConstantArduinoCommands.MAINTAIN_VOLTAGE;
+		Optional<DutCommand> dutCommandDataOpt = DeviceDataManagerController.getDutCommandService()
+				.findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+
+		if (dutCommandDataOpt.isPresent()) {
+			DutCommand dutCommand = dutCommandDataOpt.get();
+			DeviceDataManagerController.setDutCommandData(dutCommand);
+
+			boolean isDataAppend = false;
+			// Only call hardware command if not in simulation mode
+			if (!SIMULATION_MODE) {
+				dutCommandExecuteStart("", isDataAppend);
+			} else {
+				appendLog("SIMULATION: Maintain Voltage skipped.", LogLevel.INFO);
+			}
+		}
+
+		Platform.runLater(() -> clickedButtonRef.setDisable(false));
+	}
+
+	public void rPhaseVoltageTask() {
+		Platform.runLater(() -> ref_btnRPhaseVoltage.setDisable(true));
+
+		String value;
+		if (SIMULATION_MODE) {
+			value = generateRandomVoltage(); // Simulate a random voltage
+			appendLog("SIMULATION: R Phase Voltage: " + value, LogLevel.INFO);
+		} else {
+			String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+			String testCaseName = ConstantArduinoCommands.R_PHASE_VOLTAGE;
+			Optional<DutCommand> opt = DeviceDataManagerController
+					.getDutCommandService()
+					.findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+
+			if (opt.isPresent()) {
+				DeviceDataManagerController.setDutCommandData(opt.get());
+
+				Map<String, Object> resp = new DutSerialDataManager()
+						.dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
+
+				boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
+				value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
+			} else {
+				value = ConstantArduinoCommands.CMD_FAILED;
+			}
+		}
+
+		Platform.runLater(() -> ref_txtRPhaseVoltage.setText(value));
+		Platform.runLater(() -> ref_btnRPhaseVoltage.setDisable(false));
+	}
+
+	public void rPhaseCurrentTask() {
+		Platform.runLater(() -> ref_btnRPhaseCurrent.setDisable(true));
+
+		String value;
+		if (SIMULATION_MODE) {
+			value = generateRandomCurrent(); // Simulate random current
+			appendLog("SIMULATION: R Phase Current: " + value, LogLevel.INFO);
+		} else {
+			String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+			String testCaseName = ConstantArduinoCommands.R_PHASE_CURRENT;
+			Optional<DutCommand> opt = DeviceDataManagerController
+					.getDutCommandService()
+					.findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+
+			if (opt.isPresent()) {
+				DeviceDataManagerController.setDutCommandData(opt.get());
+
+				Map<String, Object> resp = new DutSerialDataManager()
+						.dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
+
+				boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
+				value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
+			} else {
+				value = ConstantArduinoCommands.CMD_FAILED;
+			}
+		}
+
+		Platform.runLater(() -> ref_txtRPhaseCurrent.setText(value));
+		Platform.runLater(() -> ref_btnRPhaseCurrent.setDisable(false));
+	}
+
+	public void rPhaseWattsTask() {
+		Platform.runLater(() -> ref_btnRPhaseWatts.setDisable(true));
+
+		String value;
+		if (SIMULATION_MODE) {
+			value = generateRandomWatts(); // Simulate random watts
+			appendLog("SIMULATION: R Phase Watts: " + value, LogLevel.INFO);
+		} else {
+			String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+			String testCaseName = ConstantArduinoCommands.R_PHASE_WATTS;
+			Optional<DutCommand> opt = DeviceDataManagerController
+					.getDutCommandService()
+					.findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+
+			if (opt.isPresent()) {
+				DeviceDataManagerController.setDutCommandData(opt.get());
+
+				Map<String, Object> resp = new DutSerialDataManager()
+						.dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
+
+				boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
+				value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
+			} else {
+				value = ConstantArduinoCommands.CMD_FAILED;
+			}
+		}
+
+		Platform.runLater(() -> ref_txtRPhaseWatts.setText(value));
+		Platform.runLater(() -> ref_btnRPhaseWatts.setDisable(false));
+	}
+
+	public void rPhaseVATask() {
+		Platform.runLater(() -> ref_btnRPhaseVA.setDisable(true));
+
+		String value;
+		if (SIMULATION_MODE) {
+			value = generateRandomActivePower(); // Simulate random VA
+			appendLog("SIMULATION: R Phase VA: " + value, LogLevel.INFO);
+		} else {
+			String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+			String testCaseName = ConstantArduinoCommands.R_PHASE_VA;
+			Optional<DutCommand> opt = DeviceDataManagerController
+					.getDutCommandService()
+					.findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+
+			if (opt.isPresent()) {
+				DeviceDataManagerController.setDutCommandData(opt.get());
+
+				Map<String, Object> resp = new DutSerialDataManager()
+						.dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
+
+				boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
+				value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
+			} else {
+				value = ConstantArduinoCommands.CMD_FAILED;
+			}
+		}
+
+		Platform.runLater(() -> ref_txtRPhaseVA.setText(value));
+		Platform.runLater(() -> ref_btnRPhaseVA.setDisable(false));
+	}
+
+	public void rPhasePFTask() {
+		Platform.runLater(() -> ref_btnRPhasePF.setDisable(true));
+
+		String value;
+		if (SIMULATION_MODE) {
+			value = generateRandomPowerFactor(); // Simulate random power factor
+			appendLog("SIMULATION: R Phase PF: " + value, LogLevel.INFO);
+		} else {
+			String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+			String testCaseName = ConstantArduinoCommands.R_PHASE_PF;
+			Optional<DutCommand> opt = DeviceDataManagerController
+					.getDutCommandService()
+					.findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+
+			if (opt.isPresent()) {
+				DeviceDataManagerController.setDutCommandData(opt.get());
+
+				Map<String, Object> resp = new DutSerialDataManager()
+						.dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
+
+				boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
+				value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
+			} else {
+				value = ConstantArduinoCommands.CMD_FAILED;
+			}
+		}
+
+		Platform.runLater(() -> ref_txtRPhasePF.setText(value));
+		Platform.runLater(() -> ref_btnRPhasePF.setDisable(false));
+	}
+
+	public void yPhaseVoltageTask() {
+		Platform.runLater(() -> ref_btnYPhaseVoltage.setDisable(true));
+
+		String value;
+		if (SIMULATION_MODE) {
+			value = generateRandomVoltage(); // Simulate random voltage
+			appendLog("SIMULATION: Y Phase Voltage: " + value, LogLevel.INFO);
+		} else {
+			String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+			String testCaseName = ConstantArduinoCommands.Y_PHASE_VOLTAGE;
+			Optional<DutCommand> opt = DeviceDataManagerController
+					.getDutCommandService()
+					.findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+
+			if (opt.isPresent()) {
+				DeviceDataManagerController.setDutCommandData(opt.get());
+
+				Map<String, Object> resp = new DutSerialDataManager()
+						.dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
+
+				boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
+				value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
+			} else {
+				value = ConstantArduinoCommands.CMD_FAILED;
+			}
+		}
+
+		Platform.runLater(() -> ref_txtYPhaseVoltage.setText(value));
+		Platform.runLater(() -> ref_btnYPhaseVoltage.setDisable(false));
+	}
+
+	public void yPhaseCurrentTask() {
+		Platform.runLater(() -> ref_btnYPhaseCurrent.setDisable(true));
+
+		String value;
+		if (SIMULATION_MODE) {
+			value = generateRandomCurrent(); // Simulate random current
+			appendLog("SIMULATION: Y Phase Current: " + value, LogLevel.INFO);
+		} else {
+			String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+			String testCaseName = ConstantArduinoCommands.Y_PHASE_CURRENT;
+			Optional<DutCommand> opt = DeviceDataManagerController
+					.getDutCommandService()
+					.findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+
+			if (opt.isPresent()) {
+				DeviceDataManagerController.setDutCommandData(opt.get());
+
+				Map<String, Object> resp = new DutSerialDataManager()
+						.dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
+
+				boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
+				value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
+			} else {
+				value = ConstantArduinoCommands.CMD_FAILED;
+			}
+		}
+
+		Platform.runLater(() -> ref_txtYPhaseCurrent.setText(value));
+		Platform.runLater(() -> ref_btnYPhaseCurrent.setDisable(false));
+	}
+
+	public void yPhaseWattsTask() {
+		Platform.runLater(() -> ref_btnYPhaseWatts.setDisable(true));
+
+		String value;
+		if (SIMULATION_MODE) {
+			value = generateRandomWatts(); // Simulate random watts
+			appendLog("SIMULATION: Y Phase Watts: " + value, LogLevel.INFO);
+		} else {
+			String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+			String testCaseName = ConstantArduinoCommands.Y_PHASE_WATTS;
+			Optional<DutCommand> opt = DeviceDataManagerController
+					.getDutCommandService()
+					.findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+
+			if (opt.isPresent()) {
+				DeviceDataManagerController.setDutCommandData(opt.get());
+
+				Map<String, Object> resp = new DutSerialDataManager()
+						.dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
+
+				boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
+				value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
+			} else {
+				value = ConstantArduinoCommands.CMD_FAILED;
+			}
+		}
+
+		Platform.runLater(() -> ref_txtYPhaseWatts.setText(value));
+		Platform.runLater(() -> ref_btnYPhaseWatts.setDisable(false));
+	}
+
+	public void yPhaseVATask() {
+		Platform.runLater(() -> ref_btnYPhaseVA.setDisable(true));
+
+		String value;
+		if (SIMULATION_MODE) {
+			value = generateRandomActivePower(); // Simulate random VA
+			appendLog("SIMULATION: Y Phase VA: " + value, LogLevel.INFO);
+		} else {
+			String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+			String testCaseName = ConstantArduinoCommands.Y_PHASE_VA;
+			Optional<DutCommand> opt = DeviceDataManagerController
+					.getDutCommandService()
+					.findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+
+			if (opt.isPresent()) {
+				DeviceDataManagerController.setDutCommandData(opt.get());
+
+				Map<String, Object> resp = new DutSerialDataManager()
+						.dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
+
+				boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
+				value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
+			} else {
+				value = ConstantArduinoCommands.CMD_FAILED;
+			}
+		}
+
+		Platform.runLater(() -> ref_txtYPhaseVA.setText(value));
+		Platform.runLater(() -> ref_btnYPhaseVA.setDisable(false));
+	}
+
+	public void yPhasePFTask() {
+		Platform.runLater(() -> ref_btnYPhasePF.setDisable(true));
+
+		String value;
+		if (SIMULATION_MODE) {
+			value = generateRandomPowerFactor(); // Simulate random power factor
+			appendLog("SIMULATION: Y Phase PF: " + value, LogLevel.INFO);
+		} else {
+			String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+			String testCaseName = ConstantArduinoCommands.Y_PHASE_PF;
+			Optional<DutCommand> opt = DeviceDataManagerController
+					.getDutCommandService()
+					.findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+
+			if (opt.isPresent()) {
+				DeviceDataManagerController.setDutCommandData(opt.get());
+
+				Map<String, Object> resp = new DutSerialDataManager()
+						.dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
+
+				boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
+				value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
+			} else {
+				value = ConstantArduinoCommands.CMD_FAILED;
+			}
+		}
+
+		Platform.runLater(() -> ref_txtYPhasePF.setText(value));
+		Platform.runLater(() -> ref_btnYPhasePF.setDisable(false));
+	}
+
+	public void bPhaseVoltageTask() {
+		Platform.runLater(() -> ref_btnBPhaseVoltage.setDisable(true));
+
+		String value;
+		if (SIMULATION_MODE) {
+			value = generateRandomVoltage(); // Simulate random voltage
+			appendLog("SIMULATION: B Phase Voltage: " + value, LogLevel.INFO);
+		} else {
+			String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+			String testCaseName = ConstantArduinoCommands.B_PHASE_VOLTAGE;
+			Optional<DutCommand> opt = DeviceDataManagerController
+					.getDutCommandService()
+					.findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+
+			if (opt.isPresent()) {
+				DeviceDataManagerController.setDutCommandData(opt.get());
+
+				Map<String, Object> resp = new DutSerialDataManager()
+						.dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
+
+				boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
+				value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
+			} else {
+				value = ConstantArduinoCommands.CMD_FAILED;
+			}
+		}
+
+		Platform.runLater(() -> ref_txtBPhaseVoltage.setText(value));
+		Platform.runLater(() -> ref_btnBPhaseVoltage.setDisable(false));
+	}
+
+	public void bPhaseCurrentTask() {
+		Platform.runLater(() -> ref_btnBPhaseCurrent.setDisable(true));
+
+		String value;
+		if (SIMULATION_MODE) {
+			value = generateRandomCurrent(); // Simulate random current
+			appendLog("SIMULATION: B Phase Current: " + value, LogLevel.INFO);
+		} else {
+			String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+			String testCaseName = ConstantArduinoCommands.B_PHASE_CURRENT;
+			Optional<DutCommand> opt = DeviceDataManagerController
+					.getDutCommandService()
+					.findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+
+			if (opt.isPresent()) {
+				DeviceDataManagerController.setDutCommandData(opt.get());
+
+				Map<String, Object> resp = new DutSerialDataManager()
+						.dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
+
+				boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
+				value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
+			} else {
+				value = ConstantArduinoCommands.CMD_FAILED;
+			}
+		}
+
+		Platform.runLater(() -> ref_txtBPhaseCurrent.setText(value));
+		Platform.runLater(() -> ref_btnBPhaseCurrent.setDisable(false));
+	}
+
+	public void bPhaseWattsTask() {
+		Platform.runLater(() -> ref_btnBPhaseWatts.setDisable(true));
+
+		String value;
+		if (SIMULATION_MODE) {
+			value = generateRandomWatts(); // Simulate random watts
+			appendLog("SIMULATION: B Phase Watts: " + value, LogLevel.INFO);
+		} else {
+			String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+			String testCaseName = ConstantArduinoCommands.B_PHASE_WATTS;
+			Optional<DutCommand> opt = DeviceDataManagerController
+					.getDutCommandService()
+					.findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+
+			if (opt.isPresent()) {
+				DeviceDataManagerController.setDutCommandData(opt.get());
+
+				Map<String, Object> resp = new DutSerialDataManager()
+						.dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
+
+				boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
+				value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
+			} else {
+				value = ConstantArduinoCommands.CMD_FAILED;
+			}
+		}
+
+		Platform.runLater(() -> ref_txtBPhaseWatts.setText(value));
+		Platform.runLater(() -> ref_btnBPhaseWatts.setDisable(false));
+	}
+
+	public void bPhaseVATask() {
+		Platform.runLater(() -> ref_btnBPhaseVA.setDisable(true));
+
+		String value;
+		if (SIMULATION_MODE) {
+			value = generateRandomActivePower(); // Simulate random VA
+			appendLog("SIMULATION: B Phase VA: " + value, LogLevel.INFO);
+		} else {
+			String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+			String testCaseName = ConstantArduinoCommands.B_PHASE_VA;
+			Optional<DutCommand> opt = DeviceDataManagerController
+					.getDutCommandService()
+					.findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+
+			if (opt.isPresent()) {
+				DeviceDataManagerController.setDutCommandData(opt.get());
+
+				Map<String, Object> resp = new DutSerialDataManager()
+						.dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
+
+				boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
+				value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
+			} else {
+				value = ConstantArduinoCommands.CMD_FAILED;
+			}
+		}
+
+		Platform.runLater(() -> ref_txtBPhaseVA.setText(value));
+		Platform.runLater(() -> ref_btnBPhaseVA.setDisable(false));
+	}
+
+	public void bPhasePFTask() {
+		Platform.runLater(() -> ref_btnBPhasePF.setDisable(true));
+
+		String value;
+		if (SIMULATION_MODE) {
+			value = generateRandomPowerFactor(); // Simulate random power factor
+			appendLog("SIMULATION: B Phase PF: " + value, LogLevel.INFO);
+		} else {
+			String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+			String testCaseName = ConstantArduinoCommands.B_PHASE_PF;
+			Optional<DutCommand> opt = DeviceDataManagerController
+					.getDutCommandService()
+					.findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+
+			if (opt.isPresent()) {
+				DeviceDataManagerController.setDutCommandData(opt.get());
+
+				Map<String, Object> resp = new DutSerialDataManager()
+						.dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
+
+				boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
+				value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
+			} else {
+				value = ConstantArduinoCommands.CMD_FAILED;
+			}
+		}
+
+		Platform.runLater(() -> ref_txtBPhasePF.setText(value));
+		Platform.runLater(() -> ref_btnBPhasePF.setDisable(false));
+	}
+
+	public void phase3CurrentAvgTask() {
+		Platform.runLater(() -> ref_btn3PhaseCurrentAvg.setDisable(true));
+
+		String value;
+		if (SIMULATION_MODE) {
+			value = generateRandomCurrent(); // Simulate random current
+			appendLog("SIMULATION: 3 Phase Current Avg: " + value, LogLevel.INFO);
+		} else {
+			String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+			String testCaseName = ConstantArduinoCommands.PHASE_3_CURRENT_AVG;
+			Optional<DutCommand> opt = DeviceDataManagerController
+					.getDutCommandService()
+					.findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+
+			if (opt.isPresent()) {
+				DeviceDataManagerController.setDutCommandData(opt.get());
+
+				Map<String, Object> resp = new DutSerialDataManager()
+						.dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
+
+				boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
+				value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
+			} else {
+				value = ConstantArduinoCommands.CMD_FAILED;
+			}
+		}
+
+		Platform.runLater(() -> ref_txt3PhaseCurrentAvg.setText(value));
+		Platform.runLater(() -> ref_btn3PhaseCurrentAvg.setDisable(false));
+	}
+
+	public void phase3PFAvgTask() {
+		Platform.runLater(() -> ref_btn3PhasePFAvg.setDisable(true));
+
+		String value;
+		if (SIMULATION_MODE) {
+			value = generateRandomPowerFactor(); // Simulate random power factor
+			appendLog("SIMULATION: 3 Phase PF Avg: " + value, LogLevel.INFO);
+		} else {
+			String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+			String testCaseName = ConstantArduinoCommands.PHASE_3_PF_AVG;
+			Optional<DutCommand> opt = DeviceDataManagerController
+					.getDutCommandService()
+					.findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+
+			if (opt.isPresent()) {
+				DeviceDataManagerController.setDutCommandData(opt.get());
+
+				Map<String, Object> resp = new DutSerialDataManager()
+						.dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
+
+				boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
+				value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
+			} else {
+				value = ConstantArduinoCommands.CMD_FAILED;
+			}
+		}
+
+		Platform.runLater(() -> ref_txt3PhasePFAvg.setText(value));
+		Platform.runLater(() -> ref_btn3PhasePFAvg.setDisable(false));
+	}
+
+	public void phase3VATotalTask() {
+		Platform.runLater(() -> ref_btn3PhaseVATotal.setDisable(true));
+
+		String value;
+		if (SIMULATION_MODE) {
+			value = generateRandomActivePower(); // Simulate random VA
+			appendLog("SIMULATION: 3 Phase VA Total: " + value, LogLevel.INFO);
+		} else {
+			String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+			String testCaseName = ConstantArduinoCommands.PHASE_3_VA_TOTAL;
+			Optional<DutCommand> opt = DeviceDataManagerController
+					.getDutCommandService()
+					.findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+
+			if (opt.isPresent()) {
+				DeviceDataManagerController.setDutCommandData(opt.get());
+
+				Map<String, Object> resp = new DutSerialDataManager()
+						.dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
+
+				boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
+				value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
+			} else {
+				value = ConstantArduinoCommands.CMD_FAILED;
+			}
+		}
+
+		Platform.runLater(() -> ref_txt3PhaseVATotal.setText(value));
+		Platform.runLater(() -> ref_btn3PhaseVATotal.setDisable(false));
+	}
+
+	public void phase3VBRTask() {
+		Platform.runLater(() -> ref_btn3PhaseVBR.setDisable(true));
+
+		String value;
+		if (SIMULATION_MODE) {
+			value = generateRandomVoltage(); // Simulate random voltage
+			appendLog("SIMULATION: 3 Phase VBR: " + value, LogLevel.INFO);
+		} else {
+			String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+			String testCaseName = ConstantArduinoCommands.PHASE_3_VBR;
+			Optional<DutCommand> opt = DeviceDataManagerController
+					.getDutCommandService()
+					.findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+
+			if (opt.isPresent()) {
+				DeviceDataManagerController.setDutCommandData(opt.get());
+
+				Map<String, Object> resp = new DutSerialDataManager()
+						.dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
+
+				boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
+				value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
+			} else {
+				value = ConstantArduinoCommands.CMD_FAILED;
+			}
+		}
+
+		Platform.runLater(() -> ref_txt3PhaseVBR.setText(value));
+		Platform.runLater(() -> ref_btn3PhaseVBR.setDisable(false));
+	}
+
+	public void phase3VLLTask() {
+		Platform.runLater(() -> ref_btn3PhaseVLL.setDisable(true));
+
+		String value;
+		if (SIMULATION_MODE) {
+			value = generateRandomVoltage(); // Simulate random voltage
+			appendLog("SIMULATION: 3 Phase VLL: " + value, LogLevel.INFO);
+		} else {
+			String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+			String testCaseName = ConstantArduinoCommands.PHASE_3_VLL;
+			Optional<DutCommand> opt = DeviceDataManagerController
+					.getDutCommandService()
+					.findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+
+			if (opt.isPresent()) {
+				DeviceDataManagerController.setDutCommandData(opt.get());
+
+				Map<String, Object> resp = new DutSerialDataManager()
+						.dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
+
+				boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
+				value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
+			} else {
+				value = ConstantArduinoCommands.CMD_FAILED;
+			}
+		}
+
+		Platform.runLater(() -> ref_txt3PhaseVLL.setText(value));
+		Platform.runLater(() -> ref_btn3PhaseVLL.setDisable(false));
+	}
+
+	public void phase3VLNTask() {
+		Platform.runLater(() -> ref_btn3PhaseVLN.setDisable(true));
+
+		String value;
+		if (SIMULATION_MODE) {
+			value = generateRandomVoltage(); // Simulate random voltage
+			appendLog("SIMULATION: 3 Phase VLN: " + value, LogLevel.INFO);
+		} else {
+			String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+			String testCaseName = ConstantArduinoCommands.PHASE_3_VLN;
+			Optional<DutCommand> opt = DeviceDataManagerController
+					.getDutCommandService()
+					.findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+
+			if (opt.isPresent()) {
+				DeviceDataManagerController.setDutCommandData(opt.get());
+
+				Map<String, Object> resp = new DutSerialDataManager()
+						.dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
+
+				boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
+				value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
+			} else {
+				value = ConstantArduinoCommands.CMD_FAILED;
+			}
+		}
+
+		Platform.runLater(() -> ref_txt3PhaseVLN.setText(value));
+		Platform.runLater(() -> ref_btn3PhaseVLN.setDisable(false));
+	}
+
+	public void phase3VRYTask() {
+		Platform.runLater(() -> ref_btn3PhaseVRY.setDisable(true));
+
+		String value;
+		if (SIMULATION_MODE) {
+			value = generateRandomVoltage(); // Simulate random voltage
+			appendLog("SIMULATION: 3 Phase VRY: " + value, LogLevel.INFO);
+		} else {
+			String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+			String testCaseName = ConstantArduinoCommands.PHASE_3_VRY;
+			Optional<DutCommand> opt = DeviceDataManagerController
+					.getDutCommandService()
+					.findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+
+			if (opt.isPresent()) {
+				DeviceDataManagerController.setDutCommandData(opt.get());
+
+				Map<String, Object> resp = new DutSerialDataManager()
+						.dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
+
+				boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
+				value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
+			} else {
+				value = ConstantArduinoCommands.CMD_FAILED;
+			}
+		}
+
+		Platform.runLater(() -> ref_txt3PhaseVRY.setText(value));
+		Platform.runLater(() -> ref_btn3PhaseVRY.setDisable(false));
+	}
+
+	public void phase3VYBTask() {
+		Platform.runLater(() -> ref_btn3PhaseVYB.setDisable(true));
+
+		String value;
+		if (SIMULATION_MODE) {
+			value = generateRandomVoltage(); // Simulate random voltage
+			appendLog("SIMULATION: 3 Phase VYB: " + value, LogLevel.INFO);
+		} else {
+			String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+			String testCaseName = ConstantArduinoCommands.PHASE_3_VYB;
+			Optional<DutCommand> opt = DeviceDataManagerController
+					.getDutCommandService()
+					.findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+
+			if (opt.isPresent()) {
+				DeviceDataManagerController.setDutCommandData(opt.get());
+
+				Map<String, Object> resp = new DutSerialDataManager()
+						.dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
+
+				boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
+				value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
+			} else {
+				value = ConstantArduinoCommands.CMD_FAILED;
+			}
+		}
+
+		Platform.runLater(() -> ref_txt3PhaseVYB.setText(value));
+		Platform.runLater(() -> ref_btn3PhaseVYB.setDisable(false));
+	}
+
+	public void phase3WattsTotalTask() {
+		Platform.runLater(() -> ref_btn3PhaseWattsTotal.setDisable(true));
+
+		String value;
+		if (SIMULATION_MODE) {
+			value = generateRandomWatts(); // Simulate random watts
+			appendLog("SIMULATION: 3 Phase Watts Total: " + value, LogLevel.INFO);
+		} else {
+			String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+			String testCaseName = ConstantArduinoCommands.PHASE_3_WATTS_TOTAL;
+			Optional<DutCommand> opt = DeviceDataManagerController
+					.getDutCommandService()
+					.findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+
+			if (opt.isPresent()) {
+				DeviceDataManagerController.setDutCommandData(opt.get());
+
+				Map<String, Object> resp = new DutSerialDataManager()
+						.dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
+
+				boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
+				value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
+			} else {
+				value = ConstantArduinoCommands.CMD_FAILED;
+			}
+		}
+
+		Platform.runLater(() -> ref_txt3PhaseWattsTotal.setText(value));
+		Platform.runLater(() -> ref_btn3PhaseWattsTotal.setDisable(false));
+	}
+
+	public void fanRpmTask() {
+		Platform.runLater(() -> clickedButtonRef.setDisable(true));
+
+		String value;
+		if (SIMULATION_MODE) {
+			value = generateRandomRpm(); // Simulate random RPM
+			appendLog("SIMULATION: Fan RPM: " + value, LogLevel.INFO);
+		} else {
+			String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+			String testCaseName = ConstantArduinoCommands.FAN_RPM;
+			Optional<DutCommand> opt = DeviceDataManagerController
+					.getDutCommandService()
+					.findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+
+			if (opt.isPresent()) {
+				DeviceDataManagerController.setDutCommandData(opt.get());
+
+				Map<String, Object> resp = new DutSerialDataManager()
+						.dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
+
+				boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
+				value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
+			} else {
+				value = ConstantArduinoCommands.CMD_FAILED;
+			}
+		}
+
+		Platform.runLater(() -> {
+			if (clickedButtonRef == ref_btnFanRpm) {
+				ref_txtFanRpm.setText(value);
+			} else if (clickedButtonRef == ref_btnFanRpmExecute) {
+				ref_txtFanRpmExecute.setText(value);
+			}
+		});
+
+		Platform.runLater(() -> clickedButtonRef.setDisable(false));
+	}
+
+	public void fanWindspeedTask() {
+		Platform.runLater(() -> clickedButtonRef.setDisable(true));
+
+		String value;
+		if (SIMULATION_MODE) {
+			value = generateRandomWindSpeed(); // Simulate random windspeed
+			appendLog("SIMULATION: Fan Windspeed: " + value, LogLevel.INFO);
+		} else {
+			String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+			String testCaseName = ConstantArduinoCommands.FAN_WINDSPEED;
+			Optional<DutCommand> opt = DeviceDataManagerController
+					.getDutCommandService()
+					.findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+
+			if (opt.isPresent()) {
+				DeviceDataManagerController.setDutCommandData(opt.get());
+
+				Map<String, Object> resp = new DutSerialDataManager()
+						.dutExecuteCommand(ConstantAppConfig.DUT_COMMAND_INTERFACE_ID, "", false);
+
+				boolean status = resp.get("status") instanceof Boolean && (Boolean) resp.get("status");
+				value = status ? (String) resp.get("result") : ConstantArduinoCommands.CMD_FAILED;
+			} else {
+				value = ConstantArduinoCommands.CMD_FAILED;
+			}
+		}
+
+		Platform.runLater(() -> {
+			if (clickedButtonRef == ref_btnFanWindspeed) {
+				ref_txtFanWindSpeed.setText(value);
+			} else if (clickedButtonRef == ref_btnFanWindspeedExecute) {
+				ref_txtFanWindSpeedExecute.setText(value);
+			}
+		});
+
+		Platform.runLater(() -> clickedButtonRef.setDisable(false));
+	}
+
+	public void mainsOnTask() {
+		Platform.runLater(() -> clickedButtonRef.setDisable(true));
+
+		ApplicationLauncher.logger.info("MainsOnTask: Entry");
+
+		String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+		String testCaseName = ConstantArduinoCommands.MAINS_ON;
+		Optional<DutCommand> dutCommandDataOpt = DeviceDataManagerController.getDutCommandService()
+				.findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+
+		if (dutCommandDataOpt.isPresent()) {
+			DutCommand dutCommand = dutCommandDataOpt.get();
+			DeviceDataManagerController.setDutCommandData(dutCommand);
+
+			boolean isDataAppend = false;
+			// Only call hardware command if not in simulation mode
+			if (!SIMULATION_MODE) {
+				dutCommandExecuteStart("", isDataAppend);
+			} else {
+				appendLog("SIMULATION: Mains On skipped.", LogLevel.INFO);
+			}
+		}
+
+		Platform.runLater(() -> clickedButtonRef.setDisable(false));
+	}
+
+	public void mainsOffTask() {
+		Platform.runLater(() -> clickedButtonRef.setDisable(true));
+
+		String projectName = ConstantAppConfig.DUT_COMMAND_PROJECT_NAME;
+		String testCaseName = ConstantArduinoCommands.MAINS_OFF;
+		Optional<DutCommand> dutCommandDataOpt = DeviceDataManagerController.getDutCommandService()
+				.findFirstByProjectNameAndTestCaseNameStartingWith(projectName, testCaseName);
+
+		if (dutCommandDataOpt.isPresent()) {
+			DutCommand dutCommand = dutCommandDataOpt.get();
+			DeviceDataManagerController.setDutCommandData(dutCommand);
+
+			boolean isDataAppend = false;
+			// Only call hardware command if not in simulation mode
+			if (!SIMULATION_MODE) {
+				dutCommandExecuteStart("", isDataAppend);
+			} else {
+				appendLog("SIMULATION: Mains On skipped.", LogLevel.INFO);
+			}
+		}
+
+		Platform.runLater(() -> clickedButtonRef.setDisable(false));
+	}
+
+
 	// Auto Updates ===============================================================================
-    
-    /**
-     * Auto-update control methods:
-     *
-     * These methods manage periodic data fetching for the various measurement
-     * phases (R, Y, B), the combined 3-phase metrics, and the fan metrics.
-     * * In normal operation these would run in parallel (each sub-task scheduled
-     * independently on a pool of threads), but for testing they have been
-     * shifted into a single serial sequence.
-     *
-     * startAutoXUpdate():
-     * 1. Makes the corresponding progress indicator visible.
-     * 2. Creates a ScheduledExecutorService (single-threaded for series testing,
-     * or a pool for true parallel runs).
-     * 3. Schedules its metric-specific tasks (voltage, current, watts, VA, PF,
-     * etc.) at a fixed rate (every 3 seconds). In series mode, all subtasks
-     * are invoked one after another inside one Runnable; in parallel mode,
-     * each Runnable is scheduled separately.
-     *
-     * stopAutoXUpdate():
-     * 1. Hides the corresponding progress indicator.
-     * 2. Uses Platform.runLater() to re-enable each metric button on the
-     * JavaFX Application Thread.
-     * 3. Calls stopAutoUpdateGracefully() to shut down the executor:
-     * • Attempts a graceful shutdown (awaits termination up to 3 seconds).
-     * • If still running, forces shutdownNow().
-     * • Logs the outcome under the given phase/fan tag.
-     *
-     * stopAutoUpdateGracefully(executor, tag):
-     * - Initiates executor.shutdown().
-     * - Spawns a background thread to await termination.
-     * - If not terminated within 3 seconds, calls executor.shutdownNow().
-     * - Catches InterruptedException to force shutdown and resets thread interrupt.
-     */
-    
-  /*private void startAutoRPhaseUpdate() {
+
+	/**
+	 * Auto-update control methods:
+	 *
+	 * These methods manage periodic data fetching for the various measurement
+	 * phases (R, Y, B), the combined 3-phase metrics, and the fan metrics.
+	 * * In normal operation these would run in parallel (each sub-task scheduled
+	 * independently on a pool of threads), but for testing they have been
+	 * shifted into a single serial sequence.
+	 *
+	 * startAutoXUpdate():
+	 * 1. Makes the corresponding progress indicator visible.
+	 * 2. Creates a ScheduledExecutorService (single-threaded for series testing,
+	 * or a pool for true parallel runs).
+	 * 3. Schedules its metric-specific tasks (voltage, current, watts, VA, PF,
+	 * etc.) at a fixed rate (every 3 seconds). In series mode, all subtasks
+	 * are invoked one after another inside one Runnable; in parallel mode,
+	 * each Runnable is scheduled separately.
+	 *
+	 * stopAutoXUpdate():
+	 * 1. Hides the corresponding progress indicator.
+	 * 2. Uses Platform.runLater() to re-enable each metric button on the
+	 * JavaFX Application Thread.
+	 * 3. Calls stopAutoUpdateGracefully() to shut down the executor:
+	 * • Attempts a graceful shutdown (awaits termination up to 3 seconds).
+	 * • If still running, forces shutdownNow().
+	 * • Logs the outcome under the given phase/fan tag.
+	 *
+	 * stopAutoUpdateGracefully(executor, tag):
+	 * - Initiates executor.shutdown().
+	 * - Spawns a background thread to await termination.
+	 * - If not terminated within 3 seconds, calls executor.shutdownNow().
+	 * - Catches InterruptedException to force shutdown and resets thread interrupt.
+	 */
+
+	/*private void startAutoRPhaseUpdate() {
         pi_AutoRPhase.setVisible(true);
         autoRPhaseExecutor = Executors.newScheduledThreadPool(5);
 
@@ -4031,249 +4173,249 @@ public class FanProjectExecuteController implements Initializable {
         autoRPhaseExecutor.scheduleAtFixedRate(this::rPhaseVATask, 0, 3, TimeUnit.SECONDS);
         autoRPhaseExecutor.scheduleAtFixedRate(this::rPhasePFTask, 0, 3, TimeUnit.SECONDS);
     }*/
-    
-    private void startAutoRPhaseUpdate() {
-        pi_AutoRPhase.setVisible(true);
-        // Single-threaded so tasks execute one by one
-        autoRPhaseExecutor = Executors.newSingleThreadScheduledExecutor();
 
-        autoRPhaseExecutor.scheduleAtFixedRate(() -> {
-            // each of these runs serially on the same thread
-            rPhaseVoltageTask();
-            rPhaseCurrentTask();
-            rPhaseWattsTask();
-            rPhaseVATask();
-            rPhasePFTask();
-        }, 0, 3, TimeUnit.SECONDS);
-    }
+	private void startAutoRPhaseUpdate() {
+		pi_AutoRPhase.setVisible(true);
+		// Single-threaded so tasks execute one by one
+		autoRPhaseExecutor = Executors.newSingleThreadScheduledExecutor();
 
-    private void stopAutoRPhaseUpdate() {
-    	pi_AutoRPhase.setVisible(false);
-        if (autoRPhaseExecutor != null && !autoRPhaseExecutor.isShutdown()) {
-        	
-        	// re-enable buttons on JavaFX application thread
-            Platform.runLater(() -> {
-                ref_btnRPhaseVoltage.setDisable(false);
-                ref_btnRPhaseCurrent.setDisable(false);
-                ref_btnRPhaseWatts.setDisable(false);
-                ref_btnRPhaseVA.setDisable(false);
-                ref_btnRPhasePF.setDisable(false);
-            });
-        	
-        	stopAutoUpdateGracefully(autoRPhaseExecutor, "R Phase");
-        }
-    }
-    
-    private void startAutoYPhaseUpdate() {
-        pi_AutoYPhase.setVisible(true);
-        autoYPhaseExecutor = Executors.newScheduledThreadPool(5);
+		autoRPhaseExecutor.scheduleAtFixedRate(() -> {
+			// each of these runs serially on the same thread
+			rPhaseVoltageTask();
+			rPhaseCurrentTask();
+			rPhaseWattsTask();
+			rPhaseVATask();
+			rPhasePFTask();
+		}, 0, 3, TimeUnit.SECONDS);
+	}
 
-        autoYPhaseExecutor.scheduleAtFixedRate(this::yPhaseVoltageTask, 0, 3, TimeUnit.SECONDS);
-        autoYPhaseExecutor.scheduleAtFixedRate(this::yPhaseCurrentTask, 0, 3, TimeUnit.SECONDS);
-        autoYPhaseExecutor.scheduleAtFixedRate(this::yPhaseWattsTask, 0, 3, TimeUnit.SECONDS);
-        autoYPhaseExecutor.scheduleAtFixedRate(this::yPhaseVATask, 0, 3, TimeUnit.SECONDS);
-        autoYPhaseExecutor.scheduleAtFixedRate(this::yPhasePFTask, 0, 3, TimeUnit.SECONDS);
-    }
+	private void stopAutoRPhaseUpdate() {
+		pi_AutoRPhase.setVisible(false);
+		if (autoRPhaseExecutor != null && !autoRPhaseExecutor.isShutdown()) {
 
-    private void stopAutoYPhaseUpdate() {
-    	pi_AutoYPhase.setVisible(false);
-        if (autoYPhaseExecutor != null && !autoYPhaseExecutor.isShutdown()) {
-        	
-        	Platform.runLater(() -> ref_btnYPhaseVoltage.setDisable(false));
-        	Platform.runLater(() -> ref_btnYPhaseCurrent.setDisable(false));
-        	Platform.runLater(() -> ref_btnYPhaseWatts.setDisable(false));
-        	Platform.runLater(() -> ref_btnYPhaseVA.setDisable(false));
-        	Platform.runLater(() -> ref_btnYPhasePF.setDisable(false));
-        	
-        	stopAutoUpdateGracefully(autoYPhaseExecutor, "Y Phase");
-        }
-    }
-    
-    private void startAutoBPhaseUpdate() {
-        pi_AutoBPhase.setVisible(true);
-        autoBPhaseExecutor = Executors.newScheduledThreadPool(5);
+			// re-enable buttons on JavaFX application thread
+			Platform.runLater(() -> {
+				ref_btnRPhaseVoltage.setDisable(false);
+				ref_btnRPhaseCurrent.setDisable(false);
+				ref_btnRPhaseWatts.setDisable(false);
+				ref_btnRPhaseVA.setDisable(false);
+				ref_btnRPhasePF.setDisable(false);
+			});
 
-        autoBPhaseExecutor.scheduleAtFixedRate(this::bPhaseVoltageTask, 0, 3, TimeUnit.SECONDS);
-        autoBPhaseExecutor.scheduleAtFixedRate(this::bPhaseCurrentTask, 0, 3, TimeUnit.SECONDS);
-        autoBPhaseExecutor.scheduleAtFixedRate(this::bPhaseWattsTask, 0, 3, TimeUnit.SECONDS);
-        autoBPhaseExecutor.scheduleAtFixedRate(this::bPhaseVATask, 0, 3, TimeUnit.SECONDS);
-        autoBPhaseExecutor.scheduleAtFixedRate(this::bPhasePFTask, 0, 3, TimeUnit.SECONDS);
-    }
+			stopAutoUpdateGracefully(autoRPhaseExecutor, "R Phase");
+		}
+	}
 
-    private void stopAutoBPhaseUpdate() {
-    	pi_AutoBPhase.setVisible(false);
-        if (autoBPhaseExecutor != null && !autoBPhaseExecutor.isShutdown()) {
-        	
-        	Platform.runLater(() -> ref_btnBPhaseVoltage.setDisable(false));
-        	Platform.runLater(() -> ref_btnBPhaseCurrent.setDisable(false));
-        	Platform.runLater(() -> ref_btnBPhaseWatts.setDisable(false));
-        	Platform.runLater(() -> ref_btnBPhaseVA.setDisable(false));
-        	Platform.runLater(() -> ref_btnBPhasePF.setDisable(false));
-        	
-        	stopAutoUpdateGracefully(autoBPhaseExecutor, "B Phase");
-        }
-    }
+	private void startAutoYPhaseUpdate() {
+		pi_AutoYPhase.setVisible(true);
+		autoYPhaseExecutor = Executors.newScheduledThreadPool(5);
 
-    private void startAuto3PhaseUpdate() {
-        pi_Auto3Phase.setVisible(true);
-        auto3PhaseExecutor = Executors.newScheduledThreadPool(5);
+		autoYPhaseExecutor.scheduleAtFixedRate(this::yPhaseVoltageTask, 0, 3, TimeUnit.SECONDS);
+		autoYPhaseExecutor.scheduleAtFixedRate(this::yPhaseCurrentTask, 0, 3, TimeUnit.SECONDS);
+		autoYPhaseExecutor.scheduleAtFixedRate(this::yPhaseWattsTask, 0, 3, TimeUnit.SECONDS);
+		autoYPhaseExecutor.scheduleAtFixedRate(this::yPhaseVATask, 0, 3, TimeUnit.SECONDS);
+		autoYPhaseExecutor.scheduleAtFixedRate(this::yPhasePFTask, 0, 3, TimeUnit.SECONDS);
+	}
 
-        auto3PhaseExecutor.scheduleAtFixedRate(this::phase3WattsTotalTask, 0, 3, TimeUnit.SECONDS);
-        auto3PhaseExecutor.scheduleAtFixedRate(this::phase3VATotalTask, 0, 3, TimeUnit.SECONDS);
-        auto3PhaseExecutor.scheduleAtFixedRate(this::phase3PFAvgTask, 0, 3, TimeUnit.SECONDS);
-        auto3PhaseExecutor.scheduleAtFixedRate(this::phase3CurrentAvgTask, 0, 3, TimeUnit.SECONDS);
-        
-        auto3PhaseExecutor.scheduleAtFixedRate(this::phase3VLLTask, 0, 3, TimeUnit.SECONDS);
-        auto3PhaseExecutor.scheduleAtFixedRate(this::phase3VLNTask, 0, 3, TimeUnit.SECONDS);
-        auto3PhaseExecutor.scheduleAtFixedRate(this::phase3VRYTask, 0, 3, TimeUnit.SECONDS);
-        auto3PhaseExecutor.scheduleAtFixedRate(this::phase3VYBTask, 0, 3, TimeUnit.SECONDS);
-        auto3PhaseExecutor.scheduleAtFixedRate(this::phase3VBRTask, 0, 3, TimeUnit.SECONDS);
+	private void stopAutoYPhaseUpdate() {
+		pi_AutoYPhase.setVisible(false);
+		if (autoYPhaseExecutor != null && !autoYPhaseExecutor.isShutdown()) {
 
-    }
+			Platform.runLater(() -> ref_btnYPhaseVoltage.setDisable(false));
+			Platform.runLater(() -> ref_btnYPhaseCurrent.setDisable(false));
+			Platform.runLater(() -> ref_btnYPhaseWatts.setDisable(false));
+			Platform.runLater(() -> ref_btnYPhaseVA.setDisable(false));
+			Platform.runLater(() -> ref_btnYPhasePF.setDisable(false));
 
-    private void stopAuto3PhaseUpdate() {
-    	pi_Auto3Phase.setVisible(false);
-        if (auto3PhaseExecutor != null && !auto3PhaseExecutor.isShutdown()) {
-        	
-        	Platform.runLater(() -> ref_btn3PhaseWattsTotal.setDisable(false));
-        	Platform.runLater(() -> ref_btn3PhaseVATotal.setDisable(false));
-        	Platform.runLater(() -> ref_btn3PhasePFAvg.setDisable(false));
-        	Platform.runLater(() -> ref_btn3PhaseCurrentAvg.setDisable(false));
-        	
-        	Platform.runLater(() -> ref_btn3PhaseVLL.setDisable(false));
-        	Platform.runLater(() -> ref_btn3PhaseVLN.setDisable(false));
-        	Platform.runLater(() -> ref_btn3PhaseVRY.setDisable(false));
-        	Platform.runLater(() -> ref_btn3PhaseVYB.setDisable(false));
-        	Platform.runLater(() -> ref_btn3PhaseVBR.setDisable(false));
+			stopAutoUpdateGracefully(autoYPhaseExecutor, "Y Phase");
+		}
+	}
 
-            stopAutoUpdateGracefully(auto3PhaseExecutor, "3 Phase");
-        }
-    }
+	private void startAutoBPhaseUpdate() {
+		pi_AutoBPhase.setVisible(true);
+		autoBPhaseExecutor = Executors.newScheduledThreadPool(5);
 
-    private void startAutoFanUpdate() {
-    	pi_AutoFan.setVisible(true);
-    	autoBPhaseExecutor = Executors.newScheduledThreadPool(5);
+		autoBPhaseExecutor.scheduleAtFixedRate(this::bPhaseVoltageTask, 0, 3, TimeUnit.SECONDS);
+		autoBPhaseExecutor.scheduleAtFixedRate(this::bPhaseCurrentTask, 0, 3, TimeUnit.SECONDS);
+		autoBPhaseExecutor.scheduleAtFixedRate(this::bPhaseWattsTask, 0, 3, TimeUnit.SECONDS);
+		autoBPhaseExecutor.scheduleAtFixedRate(this::bPhaseVATask, 0, 3, TimeUnit.SECONDS);
+		autoBPhaseExecutor.scheduleAtFixedRate(this::bPhasePFTask, 0, 3, TimeUnit.SECONDS);
+	}
 
-    	autoFanExecutor.scheduleAtFixedRate(this::fanRpmTask, 0, 3, TimeUnit.SECONDS);
-    	autoFanExecutor.scheduleAtFixedRate(this::fanWindspeedTask, 0, 3, TimeUnit.SECONDS);
+	private void stopAutoBPhaseUpdate() {
+		pi_AutoBPhase.setVisible(false);
+		if (autoBPhaseExecutor != null && !autoBPhaseExecutor.isShutdown()) {
 
-    }
+			Platform.runLater(() -> ref_btnBPhaseVoltage.setDisable(false));
+			Platform.runLater(() -> ref_btnBPhaseCurrent.setDisable(false));
+			Platform.runLater(() -> ref_btnBPhaseWatts.setDisable(false));
+			Platform.runLater(() -> ref_btnBPhaseVA.setDisable(false));
+			Platform.runLater(() -> ref_btnBPhasePF.setDisable(false));
 
-    private void stopAutoFanUpdate() {
-    	pi_AutoFan.setVisible(false);
-    	if (autoFanExecutor != null && !autoFanExecutor.isShutdown()) {
+			stopAutoUpdateGracefully(autoBPhaseExecutor, "B Phase");
+		}
+	}
 
-    		Platform.runLater(() -> ref_btnFanRpm.setDisable(false));
-    		Platform.runLater(() -> ref_btnFanWindspeed.setDisable(false));
+	private void startAuto3PhaseUpdate() {
+		pi_Auto3Phase.setVisible(true);
+		auto3PhaseExecutor = Executors.newScheduledThreadPool(5);
 
-    		stopAutoUpdateGracefully(autoFanExecutor, "Fan");
-    	}
-    }
-    
-    private void stopAutoUpdateGracefully(ExecutorService executor, String tag) {
-        if (executor != null && !executor.isShutdown()) {
-            executor.shutdown(); // Graceful stop
-            new Thread(() -> {
-                try {
-                    if (!executor.awaitTermination(3, TimeUnit.SECONDS)) {
-                        ApplicationLauncher.logger.debug(tag + " executor not terminated in time, forcing shutdown...");
-                        executor.shutdownNow(); // Force if not done
-                    } else {
-                        ApplicationLauncher.logger.debug(tag + " executor terminated gracefully.");
-                    }
-                } catch (InterruptedException e) {
-                    executor.shutdownNow();
-                    Thread.currentThread().interrupt();
-                    ApplicationLauncher.logger.debug(tag + " executor interrupted during shutdown.");
-                }
-            }).start(); // Run in background thread
-        }
-    }
+		auto3PhaseExecutor.scheduleAtFixedRate(this::phase3WattsTotalTask, 0, 3, TimeUnit.SECONDS);
+		auto3PhaseExecutor.scheduleAtFixedRate(this::phase3VATotalTask, 0, 3, TimeUnit.SECONDS);
+		auto3PhaseExecutor.scheduleAtFixedRate(this::phase3PFAvgTask, 0, 3, TimeUnit.SECONDS);
+		auto3PhaseExecutor.scheduleAtFixedRate(this::phase3CurrentAvgTask, 0, 3, TimeUnit.SECONDS);
 
-    
-    // ==============================================================================================================================================
-    
-    /**
-     * Reads a parameter value using the provided function, validates it against limits,
-     * updates the actual value and validity in the test point, updates UI progress,
-     * and stores the result. Used for test point measurements like RPM, current, etc.
-     *
-     * @param readFunc            Function to read the parameter value (from hardware or simulation)
-     * @param lowerLimitGetter    Function to get the lower limit for the parameter
-     * @param upperLimitGetter    Function to get the upper limit for the parameter
-     * @param actualSetter        Consumer to update the actual value in the test point
-     * @param validPropertyGetter Function to get the validity flag for the parameter
-     * @param testPoint           The test point being evaluated
-     * @param progress            Progress value (0.0 to 1.0) to update UI
-     * @param label               Label of the parameter (for logging and result mapping)
-     * @throws InterruptedException if the thread is interrupted during sleep
-     */
-    private void readValidateAndUpdate(
-    	    Supplier<String> readFunc,
-    	    Function<FanTestSetup, String> lowerLimitGetter,
-    	    Function<FanTestSetup, String> upperLimitGetter,
-    	    BiConsumer<FanTestSetup, String> actualSetter,
-    	    Function<FanTestSetup, BooleanProperty> validPropertyGetter,
-    	    FanTestSetup testPoint,
-    	    double progress,
-    	    String label
-    	) throws InterruptedException {
-    	 // Step 1: Read the parameter value
-    	    String value = readFunc.get();
-    	    String finalValue = value;
-    	    appendLog("Read and Update : " + label + " : " + finalValue, LogLevel.INFO);
-    	    ApplicationLauncher.logger.debug("runSingleTestPoint : Read and Update : " + label + " : " + finalValue);
+		auto3PhaseExecutor.scheduleAtFixedRate(this::phase3VLLTask, 0, 3, TimeUnit.SECONDS);
+		auto3PhaseExecutor.scheduleAtFixedRate(this::phase3VLNTask, 0, 3, TimeUnit.SECONDS);
+		auto3PhaseExecutor.scheduleAtFixedRate(this::phase3VRYTask, 0, 3, TimeUnit.SECONDS);
+		auto3PhaseExecutor.scheduleAtFixedRate(this::phase3VYBTask, 0, 3, TimeUnit.SECONDS);
+		auto3PhaseExecutor.scheduleAtFixedRate(this::phase3VBRTask, 0, 3, TimeUnit.SECONDS);
 
-    	 // Step 2: Fetch limit values for validation
-    	    String lowerLimit = lowerLimitGetter.apply(testPoint);
-    	    String upperLimit = upperLimitGetter.apply(testPoint);
-    	    boolean isValid = false;
-    	    
-    	 // Step 3: Validate the value within lower and upper bounds
-    	    try {
-    	        if (finalValue != null && !finalValue.trim().isEmpty() &&
-    	            lowerLimit != null && !lowerLimit.trim().isEmpty() &&
-    	            upperLimit != null && !upperLimit.trim().isEmpty()) {
+	}
 
-    	            double val = Double.parseDouble(finalValue.trim());
-    	            double lower = Double.parseDouble(lowerLimit.trim());
-    	            double upper = Double.parseDouble(upperLimit.trim());
+	private void stopAuto3PhaseUpdate() {
+		pi_Auto3Phase.setVisible(false);
+		if (auto3PhaseExecutor != null && !auto3PhaseExecutor.isShutdown()) {
 
-    	            isValid = val >= lower && val <= upper;
-    	        }
-    	    } catch (NumberFormatException e) {
-    	        isValid = true; // fallback if parsing fails
-    	    }
+			Platform.runLater(() -> ref_btn3PhaseWattsTotal.setDisable(false));
+			Platform.runLater(() -> ref_btn3PhaseVATotal.setDisable(false));
+			Platform.runLater(() -> ref_btn3PhasePFAvg.setDisable(false));
+			Platform.runLater(() -> ref_btn3PhaseCurrentAvg.setDisable(false));
 
-    	 // Step 4: Update validity status
-    	    validPropertyGetter.apply(testPoint).set(isValid);
-    	    if (!isValid) {
-    	        allValid = false; // Mark test point result as failed if any parameter is invalid
-    	    }
-    	    
-    	    
+			Platform.runLater(() -> ref_btn3PhaseVLL.setDisable(false));
+			Platform.runLater(() -> ref_btn3PhaseVLN.setDisable(false));
+			Platform.runLater(() -> ref_btn3PhaseVRY.setDisable(false));
+			Platform.runLater(() -> ref_btn3PhaseVYB.setDisable(false));
+			Platform.runLater(() -> ref_btn3PhaseVBR.setDisable(false));
 
-    	 // Step 5: Update the actual value and progress in the UI
-    	    Platform.runLater(() -> actualSetter.accept(testPoint, finalValue));
-    	    Platform.runLater(() -> testPoint.setProgress(progress));
+			stopAutoUpdateGracefully(auto3PhaseExecutor, "3 Phase");
+		}
+	}
 
-    	 // Step 6: Update result object based on label
-    	    switch (label) {
-    	        case "RPM" 			: currentResult.setRpm(finalValue); break;
-    	        case "WindSpeed" 	: currentResult.setWindSpeed(finalValue); break;
-    	        case "Current" 		: currentResult.setCurrent(finalValue); break;
-    	        case "Watts" 		: currentResult.setWatts(finalValue); break;
-    	        case "ActivePower"  : currentResult.setVa(finalValue); break;
-    	        case "PowerFactor"  : currentResult.setPowerFactor(finalValue); break;
-    	    }
+	private void startAutoFanUpdate() {
+		pi_AutoFan.setVisible(true);
+		autoBPhaseExecutor = Executors.newScheduledThreadPool(5);
 
-    	 // Step 7: Small delay between updates
-    	    Thread.sleep(500);
-    	}
+		autoFanExecutor.scheduleAtFixedRate(this::fanRpmTask, 0, 3, TimeUnit.SECONDS);
+		autoFanExecutor.scheduleAtFixedRate(this::fanWindspeedTask, 0, 3, TimeUnit.SECONDS);
+
+	}
+
+	private void stopAutoFanUpdate() {
+		pi_AutoFan.setVisible(false);
+		if (autoFanExecutor != null && !autoFanExecutor.isShutdown()) {
+
+			Platform.runLater(() -> ref_btnFanRpm.setDisable(false));
+			Platform.runLater(() -> ref_btnFanWindspeed.setDisable(false));
+
+			stopAutoUpdateGracefully(autoFanExecutor, "Fan");
+		}
+	}
+
+	private void stopAutoUpdateGracefully(ExecutorService executor, String tag) {
+		if (executor != null && !executor.isShutdown()) {
+			executor.shutdown(); // Graceful stop
+			new Thread(() -> {
+				try {
+					if (!executor.awaitTermination(3, TimeUnit.SECONDS)) {
+						ApplicationLauncher.logger.debug(tag + " executor not terminated in time, forcing shutdown...");
+						executor.shutdownNow(); // Force if not done
+					} else {
+						ApplicationLauncher.logger.debug(tag + " executor terminated gracefully.");
+					}
+				} catch (InterruptedException e) {
+					executor.shutdownNow();
+					Thread.currentThread().interrupt();
+					ApplicationLauncher.logger.debug(tag + " executor interrupted during shutdown.");
+				}
+			}).start(); // Run in background thread
+		}
+	}
+
+
+	// ==============================================================================================================================================
+
+	/**
+	 * Reads a parameter value using the provided function, validates it against limits,
+	 * updates the actual value and validity in the test point, updates UI progress,
+	 * and stores the result. Used for test point measurements like RPM, current, etc.
+	 *
+	 * @param readFunc            Function to read the parameter value (from hardware or simulation)
+	 * @param lowerLimitGetter    Function to get the lower limit for the parameter
+	 * @param upperLimitGetter    Function to get the upper limit for the parameter
+	 * @param actualSetter        Consumer to update the actual value in the test point
+	 * @param validPropertyGetter Function to get the validity flag for the parameter
+	 * @param testPoint           The test point being evaluated
+	 * @param progress            Progress value (0.0 to 1.0) to update UI
+	 * @param label               Label of the parameter (for logging and result mapping)
+	 * @throws InterruptedException if the thread is interrupted during sleep
+	 */
+	private void readValidateAndUpdate(
+			Supplier<String> readFunc,
+			Function<FanTestSetup, String> lowerLimitGetter,
+			Function<FanTestSetup, String> upperLimitGetter,
+			BiConsumer<FanTestSetup, String> actualSetter,
+			Function<FanTestSetup, BooleanProperty> validPropertyGetter,
+			FanTestSetup testPoint,
+			double progress,
+			String label
+			) throws InterruptedException {
+		// Step 1: Read the parameter value
+		String value = readFunc.get();
+		String finalValue = value;
+		appendLog("Read and Update : " + label + " : " + finalValue, LogLevel.INFO);
+		ApplicationLauncher.logger.debug("runSingleTestPoint : Read and Update : " + label + " : " + finalValue);
+
+		// Step 2: Fetch limit values for validation
+		String lowerLimit = lowerLimitGetter.apply(testPoint);
+		String upperLimit = upperLimitGetter.apply(testPoint);
+		boolean isValid = false;
+
+		// Step 3: Validate the value within lower and upper bounds
+		try {
+			if (finalValue != null && !finalValue.trim().isEmpty() &&
+					lowerLimit != null && !lowerLimit.trim().isEmpty() &&
+					upperLimit != null && !upperLimit.trim().isEmpty()) {
+
+				double val = Double.parseDouble(finalValue.trim());
+				double lower = Double.parseDouble(lowerLimit.trim());
+				double upper = Double.parseDouble(upperLimit.trim());
+
+				isValid = val >= lower && val <= upper;
+			}
+		} catch (NumberFormatException e) {
+			isValid = true; // fallback if parsing fails
+		}
+
+		// Step 4: Update validity status
+		validPropertyGetter.apply(testPoint).set(isValid);
+		if (!isValid) {
+			allValid = false; // Mark test point result as failed if any parameter is invalid
+		}
+
+
+
+		// Step 5: Update the actual value and progress in the UI
+		Platform.runLater(() -> actualSetter.accept(testPoint, finalValue));
+		Platform.runLater(() -> testPoint.setProgress(progress));
+
+		// Step 6: Update result object based on label
+		switch (label) {
+		case "RPM" 			: currentResult.setRpm(finalValue); break;
+		case "WindSpeed" 	: currentResult.setWindSpeed(finalValue); break;
+		case "Current" 		: currentResult.setCurrent(finalValue); break;
+		case "Watts" 		: currentResult.setWatts(finalValue); break;
+		case "ActivePower"  : currentResult.setVa(finalValue); break;
+		case "PowerFactor"  : currentResult.setPowerFactor(finalValue); break;
+		}
+
+		// Step 7: Small delay between updates
+		Thread.sleep(500);
+	}
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-    /**
+	/**
 	 * appendLog:
 	 * Safely appends a log message to the JavaFX TextArea on the UI thread.
 	 *
@@ -4292,24 +4434,24 @@ public class FanProjectExecuteController implements Initializable {
 	        }
 	    });
 	}*/
-    
-    /**
-     * appendLog:
-     * Adds a timestamped log message to the top of a ListView.
-     * Maintains fast updates and avoids UI thread bloat.
-     */
-    public void appendLog(String message, LogLevel level) {
-        LogEntry entry = new LogEntry(message, level);
 
-        Platform.runLater(() -> {
-            if (listViewLogs != null) {
-                logItems.add(0, entry);  // Prepend
-            }
-        });
-    }
+	/**
+	 * appendLog:
+	 * Adds a timestamped log message to the top of a ListView.
+	 * Maintains fast updates and avoids UI thread bloat.
+	 */
+	public void appendLog(String message, LogLevel level) {
+		LogEntry entry = new LogEntry(message, level);
+
+		Platform.runLater(() -> {
+			if (listViewLogs != null) {
+				logItems.add(0, entry);  // Prepend
+			}
+		});
+	}
 
 
-	
+
 	/**
 	 * Adds numeric input validation to a TextField that only allows values between 1 and 240.
 	 * If the field is empty, not numeric, or out of range, a pop-up error message is shown.
@@ -4318,54 +4460,54 @@ public class FanProjectExecuteController implements Initializable {
 	 * @param label The label used in the validation message for user clarity.
 	 */
 	public void addNumericRangeValidation(TextField field, String label) {
-	 // Create a pop-up to show validation error
-	    Popup validationPopup = new Popup();
-	    Text validationText = new Text();
+		// Create a pop-up to show validation error
+		Popup validationPopup = new Popup();
+		Text validationText = new Text();
 
-	 // Style and configure the pop-up content
-	    StackPane popupContent = new StackPane(validationText);
-	    popupContent.setBackground(new Background(new BackgroundFill(Color.web("#ffefef"), new CornerRadii(8), Insets.EMPTY)));
-	    popupContent.setPadding(new Insets(6));
-	    popupContent.setStyle("-fx-border-color: red; -fx-border-width: 1px;");
-	    validationText.setFill(Color.RED);
-	    validationText.setFont(Font.font("Arial", 12));
-	    validationPopup.getContent().add(popupContent);
-	    validationPopup.setAutoHide(true);
+		// Style and configure the pop-up content
+		StackPane popupContent = new StackPane(validationText);
+		popupContent.setBackground(new Background(new BackgroundFill(Color.web("#ffefef"), new CornerRadii(8), Insets.EMPTY)));
+		popupContent.setPadding(new Insets(6));
+		popupContent.setStyle("-fx-border-color: red; -fx-border-width: 1px;");
+		validationText.setFill(Color.RED);
+		validationText.setFont(Font.font("Arial", 12));
+		validationPopup.getContent().add(popupContent);
+		validationPopup.setAutoHide(true);
 
-	 // Listener for text changes in the field
-	    field.textProperty().addListener((obs, oldVal, newVal) -> {
-	        String message = null;
+		// Listener for text changes in the field
+		field.textProperty().addListener((obs, oldVal, newVal) -> {
+			String message = null;
 
-	     // Validation rules
-	        if (newVal.isEmpty()) {
-	            message = label + " cannot be empty.";
-	        } else if (!newVal.matches("\\d+")) {
-	            message = label + " must be a number.";
-	        } else {
-	            int value = Integer.parseInt(newVal);
-	            if (value < 1 || value > 240) {
-	                message = label + " must be between 1 and 240.";
-	            }
-	        }
+			// Validation rules
+			if (newVal.isEmpty()) {
+				message = label + " cannot be empty.";
+			} else if (!newVal.matches("\\d+")) {
+				message = label + " must be a number.";
+			} else {
+				int value = Integer.parseInt(newVal);
+				if (value < 1 || value > 240) {
+					message = label + " must be between 1 and 240.";
+				}
+			}
 
-	        if (message != null) {
-	         // Set red border and show pop-up
-	            field.setStyle("-fx-border-color: red; -fx-border-width: 2px;");
-	            validationText.setText(message);
+			if (message != null) {
+				// Set red border and show pop-up
+				field.setStyle("-fx-border-color: red; -fx-border-width: 2px;");
+				validationText.setText(message);
 
-	            if (!validationPopup.isShowing()) {
-	                double x = field.localToScreen(field.getBoundsInLocal()).getMinX();
-	                double y = field.localToScreen(field.getBoundsInLocal()).getMinY() - 35;
-	                validationPopup.show(field, x, y);
-	            }
-	        } else {
-	         // Clear styles and hide pop-up on valid input
-	            field.setStyle("");
-	            validationPopup.hide();
-	        }
-	    });
+				if (!validationPopup.isShowing()) {
+					double x = field.localToScreen(field.getBoundsInLocal()).getMinX();
+					double y = field.localToScreen(field.getBoundsInLocal()).getMinY() - 35;
+					validationPopup.show(field, x, y);
+				}
+			} else {
+				// Clear styles and hide pop-up on valid input
+				field.setStyle("");
+				validationPopup.hide();
+			}
+		});
 	}
-	
+
 	/**
 	 * Adds numeric input validation to a TextField that allows values from 0 to 240.
 	 * Similar to the above method, but includes 0 as a valid entry.
@@ -4374,48 +4516,48 @@ public class FanProjectExecuteController implements Initializable {
 	 * @param label The label used in the validation message for user clarity.
 	 */
 	public void addNumericRangeValidationAllowZero(TextField field, String label) {
-	    Popup validationPopup = new Popup();
-	    Text validationText = new Text();
+		Popup validationPopup = new Popup();
+		Text validationText = new Text();
 
-	    StackPane popupContent = new StackPane(validationText);
-	    popupContent.setBackground(new Background(new BackgroundFill(Color.web("#ffefef"), new CornerRadii(8), Insets.EMPTY)));
-	    popupContent.setPadding(new Insets(6));
-	    popupContent.setStyle("-fx-border-color: red; -fx-border-width: 1px;");
-	    validationText.setFill(Color.RED);
-	    validationText.setFont(Font.font("Arial", 12));
-	    validationPopup.getContent().add(popupContent);
-	    validationPopup.setAutoHide(true);
+		StackPane popupContent = new StackPane(validationText);
+		popupContent.setBackground(new Background(new BackgroundFill(Color.web("#ffefef"), new CornerRadii(8), Insets.EMPTY)));
+		popupContent.setPadding(new Insets(6));
+		popupContent.setStyle("-fx-border-color: red; -fx-border-width: 1px;");
+		validationText.setFill(Color.RED);
+		validationText.setFont(Font.font("Arial", 12));
+		validationPopup.getContent().add(popupContent);
+		validationPopup.setAutoHide(true);
 
-	    field.textProperty().addListener((obs, oldVal, newVal) -> {
-	        String message = null;
+		field.textProperty().addListener((obs, oldVal, newVal) -> {
+			String message = null;
 
-	        if (newVal.isEmpty()) {
-	            message = label + " cannot be empty.";
-	        } else if (!newVal.matches("\\d+")) {
-	            message = label + " must be a number.";
-	        } else {
-	            int value = Integer.parseInt(newVal);
-	            if (value < 0 || value > 415) {
-	                message = label + " must be between 0 and 415.";
-	            }
-	        }
+			if (newVal.isEmpty()) {
+				message = label + " cannot be empty.";
+			} else if (!newVal.matches("\\d+")) {
+				message = label + " must be a number.";
+			} else {
+				int value = Integer.parseInt(newVal);
+				if (value < 0 || value > 415) {
+					message = label + " must be between 0 and 415.";
+				}
+			}
 
-	        if (message != null) {
-	            field.setStyle("-fx-border-color: red; -fx-border-width: 2px;");
-	            validationText.setText(message);
+			if (message != null) {
+				field.setStyle("-fx-border-color: red; -fx-border-width: 2px;");
+				validationText.setText(message);
 
-	            if (!validationPopup.isShowing()) {
-	                double x = field.localToScreen(field.getBoundsInLocal()).getMinX();
-	                double y = field.localToScreen(field.getBoundsInLocal()).getMinY() - 35;
-	                validationPopup.show(field, x, y);
-	            }
-	        } else {
-	            field.setStyle("");
-	            validationPopup.hide();
-	        }
-	    });
+				if (!validationPopup.isShowing()) {
+					double x = field.localToScreen(field.getBoundsInLocal()).getMinX();
+					double y = field.localToScreen(field.getBoundsInLocal()).getMinY() - 35;
+					validationPopup.show(field, x, y);
+				}
+			} else {
+				field.setStyle("");
+				validationPopup.hide();
+			}
+		});
 	}
-	
+
 	/**
 	 * Adds validation to ensure a TextField contains a valid identifier-like name.
 	 * Rules: must start with a letter or underscore, followed by letters, digits, or underscores.
@@ -4425,32 +4567,32 @@ public class FanProjectExecuteController implements Initializable {
 	 * @param label The label used in error messages.
 	 */
 	public void addTextValidation(TextField field, String label) {
-	    Tooltip tooltip = new Tooltip();
-	    tooltip.setStyle("-fx-background-color: #ffdddd; -fx-text-fill: red; -fx-font-size: 12;");
-	    tooltip.setAutoHide(true);
+		Tooltip tooltip = new Tooltip();
+		tooltip.setStyle("-fx-background-color: #ffdddd; -fx-text-fill: red; -fx-font-size: 12;");
+		tooltip.setAutoHide(true);
 
-	    field.textProperty().addListener((obs, oldText, newText) -> {
-	        // Validation: Only letters, digits, and underscore; no spaces; no number at the start
-	        boolean isValid = newText.matches("^[A-Za-z_][A-Za-z0-9_]*$");
+		field.textProperty().addListener((obs, oldText, newText) -> {
+			// Validation: Only letters, digits, and underscore; no spaces; no number at the start
+			boolean isValid = newText.matches("^[A-Za-z_][A-Za-z0-9_]*$");
 
-	        if (newText.isEmpty()) {
-	        	// Reset style if empty
-	            field.setStyle(""); // Clear styles if empty
-	            tooltip.hide();
-	        } else if (!isValid) {
-	        	// Invalid input styling and tooltip message
-	            field.setStyle("-fx-border-color: red; -fx-border-width: 2px;");
-	            tooltip.setText(label + " must start with a letter or underscore and contain only letters, numbers, or underscores.");
-	            if (!tooltip.isShowing()) {
-	                Bounds bounds = field.localToScreen(field.getBoundsInLocal());
-	                tooltip.show(field, bounds.getMinX(), bounds.getMinY() - 30);
-	            }
-	        } else {
-	        	// Valid input
-	            field.setStyle(""); // Valid input: clear error styles
-	            tooltip.hide();
-	        }
-	    });
+			if (newText.isEmpty()) {
+				// Reset style if empty
+				field.setStyle(""); // Clear styles if empty
+				tooltip.hide();
+			} else if (!isValid) {
+				// Invalid input styling and tooltip message
+				field.setStyle("-fx-border-color: red; -fx-border-width: 2px;");
+				tooltip.setText(label + " must start with a letter or underscore and contain only letters, numbers, or underscores.");
+				if (!tooltip.isShowing()) {
+					Bounds bounds = field.localToScreen(field.getBoundsInLocal());
+					tooltip.show(field, bounds.getMinX(), bounds.getMinY() - 30);
+				}
+			} else {
+				// Valid input
+				field.setStyle(""); // Valid input: clear error styles
+				tooltip.hide();
+			}
+		});
 	}
 
 
@@ -4476,25 +4618,27 @@ public class FanProjectExecuteController implements Initializable {
 
 	// dutCommandExecuteStart function (Fixed for Java 1.8)
 	public boolean dutCommandExecuteStart(String appendData, boolean isDataAppend) {
-	    DeviceDataManagerController.getDutCommandData().getTotalDutExecutionTimeInSec();
-	    DutSerialDataManager dutSerialDataManager = new DutSerialDataManager();
+		ApplicationLauncher.logger.info("dutCommandExecuteStart : ENTRY");
 
-	    int dutInterfaceId = ConstantAppConfig.DUT_COMMAND_INTERFACE_ID;
-	    Map<String, Object> resultMap;
+		DeviceDataManagerController.getDutCommandData().getTotalDutExecutionTimeInSec();
+		DutSerialDataManager dutSerialDataManager = new DutSerialDataManager();
 
-	    if (SIMULATION_MODE) {
-	        appendLog("SIMULATION: dutCommandExecuteStart skipped (data: " + appendData + ").", LogLevel.INFO);
-	        // Fix for Java 1.8: Use HashMap instead of Map.of()
-	        Map<String, Object> simulatedResponse = new HashMap<>();
-	        simulatedResponse.put("status", true);
-	        simulatedResponse.put("result", "SIM_OK");
-	        resultMap = simulatedResponse;
-	    } else {
-	        resultMap = dutSerialDataManager.dutExecuteCommand(dutInterfaceId, appendData, isDataAppend);
-	    }
+		int dutInterfaceId = ConstantAppConfig.DUT_COMMAND_INTERFACE_ID;
+		Map<String, Object> resultMap;
 
-	    Object status = resultMap.get("status");
-	    return status instanceof Boolean && (Boolean) status;
+		if (SIMULATION_MODE) {
+			appendLog("SIMULATION: dutCommandExecuteStart skipped (data: " + appendData + ").", LogLevel.INFO);
+			// Fix for Java 1.8: Use HashMap instead of Map.of()
+			Map<String, Object> simulatedResponse = new HashMap<>();
+			simulatedResponse.put("status", true);
+			simulatedResponse.put("result", "SIM_OK");
+			resultMap = simulatedResponse;
+		} else {
+			resultMap = dutSerialDataManager.dutExecuteCommand(dutInterfaceId, appendData, isDataAppend);
+		}
+
+		Object status = resultMap.get("status");
+		return status instanceof Boolean && (Boolean) status;
 	}
 
 
@@ -4508,83 +4652,93 @@ public class FanProjectExecuteController implements Initializable {
 
 		return test_parameter;
 	}
-	
+
 	// RANDOM GENERATOR
 	private static final Random random = new Random();
 	// Method to generate random RPM value (e.g., in the range of 0 to 1150)
-    public static String generateRandomRpm() {
-        int rpm = random.nextInt(1151); // Random number between 0 and 1150
-        return String.valueOf(rpm);
-    }
+	public static String generateRandomRpm() {
+		int rpm = random.nextInt(1151); // Random number between 0 and 1150
+		return String.valueOf(rpm);
+	}
 
-    // Method to generate random wind speed value (e.g., in the range of 0 to 20)
-    public static String generateRandomWindSpeed() {
-        double windSpeed = 1 + (random.nextDouble() * 19); // Random value between 1 and 20
-        return String.format("%.1f", windSpeed);  // Format to one decimal place
-    }
-    
-    // Method to generate random voltage value (e.g., in the range of 0 to 415)
-    public static String generateRandomVoltage() {
-        int voltage = random.nextInt(416); // Random number between 0 and 415
-        return String.valueOf(voltage);
-    }
+	// Method to generate random wind speed value (e.g., in the range of 0 to 20)
+	public static String generateRandomWindSpeed() {
+		double windSpeed = 1 + (random.nextDouble() * 19); // Random value between 1 and 20
+		return String.format("%.1f", windSpeed);  // Format to one decimal place
+	}
 
-    // Method to generate random current value (e.g., in the range of 0 to 5 amps)
-    public static String generateRandomCurrent() {
-        double current = 0.1 + (random.nextDouble() * 4.9); // Random value between 0.1 and 5
-        return String.format("%.1f", current);
-    }
+	// Method to generate random voltage value (e.g., in the range of 0 to 415)
+	public static String generateRandomVoltage() {
+		int voltage = random.nextInt(416); // Random number between 0 and 415
+		return String.valueOf(voltage);
+	}
 
-    // Method to generate random watts value (e.g., in the range of 0 to 2000 watts)
-    public static String generateRandomWatts() {
-        int watts = random.nextInt(2001); // Random value between 0 and 2000
-        return String.valueOf(watts);
-    }
+	// Method to generate random current value (e.g., in the range of 0 to 5 amps)
+	public static String generateRandomCurrent() {
+		double current = 0.1 + (random.nextDouble() * 4.9); // Random value between 0.1 and 5
+		return String.format("%.1f", current);
+	}
 
-    // Method to generate random active power value (e.g., in the range of 0 to 2000 VA)
-    public static String generateRandomActivePower() {
-        int activePower = random.nextInt(2001); // Random value between 0 and 2000
-        return String.valueOf(activePower);
-    }
+	// Method to generate random watts value (e.g., in the range of 0 to 2000 watts)
+	public static String generateRandomWatts() {
+		int watts = random.nextInt(2001); // Random value between 0 and 2000
+		return String.valueOf(watts);
+	}
 
-    // Method to generate random power factor value (e.g., between 0.1 and 1.0)
-    public static String generateRandomPowerFactor() {
-        double powerFactor = 0.1 + (random.nextDouble() * 0.9); // Random value between 0.1 and 1.0
-        return String.format("%.2f", powerFactor);  // Format to two decimal places
-    }
-    
-    // DYNAMIC CONTROLS PANEL
-    /**
-     * Loads an FXML into the dynamic content area based on the model phase.
-     * @param modelPhase the current model phase determining which screen to show
-     */
-    public void loadPhaseContent(String modelPhase) {
-        String fxmlPath;
+	// Method to generate random active power value (e.g., in the range of 0 to 2000 VA)
+	public static String generateRandomActivePower() {
+		int activePower = random.nextInt(2001); // Random value between 0 and 2000
+		return String.valueOf(activePower);
+	}
 
-        switch (modelPhase) {
-            case "1":
-                fxmlPath = "/fxml/project/SinglePhase" + ConstantApp.THEME_FXML	;
-                break;
-            case "3":
-            	fxmlPath = "/fxml/project/ThreePhase" + ConstantApp.THEME_FXML	;
-                break;
-            default:
-                return;
-        }
+	// Method to generate random power factor value (e.g., between 0.1 and 1.0)
+	public static String generateRandomPowerFactor() {
+		double powerFactor = 0.1 + (random.nextDouble() * 0.9); // Random value between 0.1 and 1.0
+		return String.format("%.2f", powerFactor);  // Format to two decimal places
+	}
 
-        try {
-            Parent content = FXMLLoader.load(getClass().getResource(fxmlPath));
-            dynamicContentPane.getChildren().setAll(content);
-            // Optional: anchor content to all sides
-            AnchorPane.setTopAnchor(content, 0.0);
-            AnchorPane.setBottomAnchor(content, 0.0);
-            AnchorPane.setLeftAnchor(content, 0.0);
-            AnchorPane.setRightAnchor(content, 0.0);
-        } catch (IOException e) {
-            e.printStackTrace();
-            //log or display a UI alert here
-        }
-    }
+
+
+	// DYNAMIC CONTROLS PANEL
+	/**
+	 * Loads an FXML into the dynamic content area based on the model phase.
+	 * @param modelPhase the current model phase determining which screen to show
+	 */
+	public void loadPhaseContent(String modelPhase) {
+		String fxmlPath;
+
+		switch (modelPhase) {
+		case "1":
+			fxmlPath = "/fxml/project/SinglePhase" + ConstantApp.THEME_FXML	;
+			break;
+		case "3":
+			fxmlPath = "/fxml/project/ThreePhase" + ConstantApp.THEME_FXML	;
+			break;
+		default:
+			return;
+		}
+
+		try {
+			Parent content = FXMLLoader.load(getClass().getResource(fxmlPath));
+			dynamicContentPane.getChildren().setAll(content);
+			// Optional: anchor content to all sides
+			AnchorPane.setTopAnchor(content, 0.0);
+			AnchorPane.setBottomAnchor(content, 0.0);
+			AnchorPane.setLeftAnchor(content, 0.0);
+			AnchorPane.setRightAnchor(content, 0.0);
+		} catch (IOException e) {
+			e.printStackTrace();
+			//log or display a UI alert here
+		}
+	}
+
+	public boolean isFirstTestPointInSequence() {
+		return isFirstTestPointInSequence;
+	}
+
+	public void setFirstTestPointInSequence(boolean isFirstTestPointInSequence) {
+		this.isFirstTestPointInSequence = isFirstTestPointInSequence;
+	}
 
 
 }
