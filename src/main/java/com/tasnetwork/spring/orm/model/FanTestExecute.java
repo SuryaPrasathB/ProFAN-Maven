@@ -34,7 +34,6 @@ public class FanTestExecute {
 	    @GeneratedValue(strategy = GenerationType.IDENTITY )
 	    private Long id;
 	   
-	   
 		@Column( updatable = false)
 		@Temporal(TemporalType.TIMESTAMP)
 		@CreatedDate
@@ -85,6 +84,11 @@ public class FanTestExecute {
 		private String windSpeedActual = "";
 	    @Transient
 		private SimpleStringProperty windSpeedActualProperty = new SimpleStringProperty();
+	    
+	    @Column(columnDefinition = "VARCHAR(45)", nullable = false) 
+		private String vibrationActual = "";
+	    @Transient
+		private SimpleStringProperty vibrationActualProperty = new SimpleStringProperty();
 	    
 	    @Column(columnDefinition = "VARCHAR(45)", nullable = false) 
 		private String currentActual = "";
@@ -219,6 +223,18 @@ public class FanTestExecute {
 		}
 		public void setWindSpeedActualProperty(SimpleStringProperty windSpeedActualProperty) {
 			this.windSpeedActualProperty = windSpeedActualProperty;
+		}
+		public String getVibrationActual() {
+			return vibrationActual;
+		}
+		public SimpleStringProperty getVibrationActualProperty() {
+			return vibrationActualProperty;
+		}
+		public void setVibrationActual(String vibrationActual) {
+			this.vibrationActual = vibrationActual;
+		}
+		public void setVibrationActualProperty(SimpleStringProperty vibrationActualProperty) {
+			this.vibrationActualProperty = vibrationActualProperty;
 		}
 		public String getCurrentActual() {
 			return currentActual;

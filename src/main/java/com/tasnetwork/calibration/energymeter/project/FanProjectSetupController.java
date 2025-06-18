@@ -161,7 +161,12 @@ public class FanProjectSetupController implements Initializable {//extends Ancho
     @FXML
     private TableColumn<FanTestSetup, String> colTestSetupWindSpeedUpperLimit;
 
+    @FXML
+    private TableColumn<FanTestSetup, String> colTestSetupVibLowerLimit;
 
+    @FXML
+    private TableColumn<FanTestSetup, String> colTestSetupVibUpperLimit;
+    
     @FXML
     private TableView<FanTestSetup> tvTestSetup;
     static private TableView<FanTestSetup> ref_tvTestSetup;
@@ -484,6 +489,35 @@ public class FanProjectSetupController implements Initializable {//extends Ancho
 				if(t.getNewValue() != null){
 					
 					rowData.setWindSpeedUpperLimit(t.getNewValue());
+					ref_tvTestSetup.refresh();
+
+				}
+			}
+		});
+		
+		colTestSetupVibLowerLimit.setCellValueFactory(data -> data.getValue().getVibrationLowerLimitProperty());
+		colTestSetupVibLowerLimit.setCellFactory(TextFieldTableCell.forTableColumn());
+		colTestSetupVibLowerLimit.setOnEditCommit(new EventHandler<CellEditEvent<FanTestSetup, String>>() {
+			public void handle(CellEditEvent<FanTestSetup, String> t) {
+				FanTestSetup rowData = ((FanTestSetup) t.getTableView().getItems().get(t.getTablePosition().getRow()));
+				if(t.getNewValue() != null){
+					
+					rowData.setVibrationLowerLimit(t.getNewValue());
+					ref_tvTestSetup.refresh();
+
+				}
+			}
+		});
+		
+		
+		colTestSetupVibUpperLimit.setCellValueFactory(data -> data.getValue().getVibrationUpperLimitProperty());
+		colTestSetupVibUpperLimit.setCellFactory(TextFieldTableCell.forTableColumn());
+		colTestSetupVibUpperLimit.setOnEditCommit(new EventHandler<CellEditEvent<FanTestSetup, String>>() {
+			public void handle(CellEditEvent<FanTestSetup, String> t) {
+				FanTestSetup rowData = ((FanTestSetup) t.getTableView().getItems().get(t.getTablePosition().getRow()));
+				if(t.getNewValue() != null){
+					
+					rowData.setVibrationUpperLimit(t.getNewValue());
 					ref_tvTestSetup.refresh();
 
 				}
@@ -833,18 +867,22 @@ public class FanProjectSetupController implements Initializable {//extends Ancho
 		fanTestSetup.setRpmUpperLimit("RpmHigh");
 		
 		fanTestSetup.setSetupTimeInSec(20);
-		fanTestSetup.setTargetVoltage("240.5");
+		fanTestSetup.setTargetVoltage("240");
 		fanTestSetup.setWindSpeedLowerLimit("WsLower");
+		fanTestSetup.setVibrationLowerLimit("V-Lower");
 		fanTestSetup.setWattsLowerLimit("WattLower");
 		fanTestSetup.setPowerFactorLowerLimit("PfLower");
 		fanTestSetup.setActivePowerLowerLimit("ApLower");
 		fanTestSetup.setCurrentLowerLimit("I-Lower");
 		
+		
 		fanTestSetup.setWindSpeedUpperLimit("WsUpper");
+		fanTestSetup.setVibrationUpperLimit("V-Upper");
 		fanTestSetup.setWattsUpperLimit("WattsUpper");
 		fanTestSetup.setPowerFactorUpperLimit("PfUpper");
 		fanTestSetup.setActivePowerUpperLimit("ApUpper");
 		fanTestSetup.setCurrentUpperLimit("I-Upper");
+			
 		
 		ref_tvTestSetup.getItems().add(fanTestSetup);
 	}
@@ -935,12 +973,14 @@ public class FanProjectSetupController implements Initializable {//extends Ancho
 	        fanTestSetup.setPowerFactorLowerLimit(previous.getPowerFactorLowerLimit());
 	        fanTestSetup.setActivePowerLowerLimit(previous.getActivePowerLowerLimit());
 	        fanTestSetup.setCurrentLowerLimit(previous.getCurrentLowerLimit());
+	        fanTestSetup.setVibrationLowerLimit(previous.getVibrationLowerLimit());
 
 	        fanTestSetup.setWindSpeedUpperLimit(previous.getWindSpeedUpperLimit());
 	        fanTestSetup.setWattsUpperLimit(previous.getWattsUpperLimit());
 	        fanTestSetup.setPowerFactorUpperLimit(previous.getPowerFactorUpperLimit());
 	        fanTestSetup.setActivePowerUpperLimit(previous.getActivePowerUpperLimit());
 	        fanTestSetup.setCurrentUpperLimit(previous.getCurrentUpperLimit());
+	        fanTestSetup.setVibrationUpperLimit(previous.getVibrationUpperLimit());
 	    }
 
 	    ref_tvTestSetup.getItems().add(index + 1, fanTestSetup);
@@ -958,12 +998,14 @@ public class FanProjectSetupController implements Initializable {//extends Ancho
 	    point.setPowerFactorLowerLimit("");
 	    point.setActivePowerLowerLimit("");
 	    point.setCurrentLowerLimit("");
+	    point.setVibrationLowerLimit("");
 
 	    point.setWindSpeedUpperLimit("");
 	    point.setWattsUpperLimit("");
 	    point.setPowerFactorUpperLimit("");
 	    point.setActivePowerUpperLimit("");
 	    point.setCurrentUpperLimit("");
+	    point.setVibrationUpperLimit("");
 	    
 	    ref_tvTestSetup.refresh();
 	}
@@ -979,6 +1021,7 @@ public class FanProjectSetupController implements Initializable {//extends Ancho
 	            point.setPowerFactorLowerLimit(val);
 	            point.setActivePowerLowerLimit(val);
 	            point.setCurrentLowerLimit(val);
+	            point.setVibrationLowerLimit(val);
 	        }
 	        if (upper) {
 	            point.setRpmUpperLimit(val);
@@ -987,6 +1030,7 @@ public class FanProjectSetupController implements Initializable {//extends Ancho
 	            point.setPowerFactorUpperLimit(val);
 	            point.setActivePowerUpperLimit(val);
 	            point.setCurrentUpperLimit(val);
+	            point.setVibrationUpperLimit(val);
 	        }
 	    }
 	    

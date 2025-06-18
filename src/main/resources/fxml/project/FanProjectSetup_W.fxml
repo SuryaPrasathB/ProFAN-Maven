@@ -36,7 +36,7 @@
                         <children>
                            <HBox prefHeight="1022.0" prefWidth="18.0" />
                               
-                                    <VBox prefHeight="1022.0" prefWidth="1451.0" spacing="20">
+                                    <VBox prefHeight="1022.0" prefWidth="1595.0" spacing="20">
                               <HBox prefHeight="196.0" prefWidth="1451.0">
                                     <children>
                                        <VBox prefHeight="196.0" prefWidth="461.0">
@@ -134,6 +134,21 @@
                                     <VBox.margin>
                                        <Insets top="5.0" />
                                     </VBox.margin></HBox>
+                              <GridPane prefWidth="1451.0">
+                                <columnConstraints>
+                                       <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                       <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                </columnConstraints>
+                                <rowConstraints>
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                </rowConstraints>
+                                 <children>
+                                       <Button fx:id="addTestPointButton" alignment="CENTER" onAction="#btnAddTestPointOnClick" prefHeight="26.0" prefWidth="200.0" text="Add Test Point" GridPane.columnIndex="1" GridPane.halignment="CENTER" />
+                                       <Button fx:id="saveButton" onAction="#btnSaveOnClick" prefHeight="25.0" prefWidth="151.0" text="Save" GridPane.columnIndex="2" GridPane.halignment="CENTER" />
+                                 </children>
+                              </GridPane>
                               <TableView fx:id="tvTestSetup" prefHeight="535.0" prefWidth="1451.0">
                                  <columns>
                                        <TableColumn fx:id="colTestSetupSerialNo" prefWidth="49.60003584623337" text="S.No" />
@@ -141,55 +156,48 @@
                                        <TableColumn fx:id="colTestSetupTestPointName" prefWidth="153.59997940063477" text="Test Name" />
                                        <TableColumn fx:id="colTestSetupTargetVoltage" prefWidth="87.99998474121094" text="Target &#10;Voltage" />
                                        <TableColumn fx:id="colTestSetupTimeInSec" prefWidth="101.60002136230469" text="Setup Time &#10;in Sec" />
-                                       <TableColumn prefWidth="75.0" text="Rpm">
+                                       <TableColumn maxWidth="-Infinity" minWidth="-Infinity" prefWidth="75.0" text="Rpm">
                                           <columns>
-                                             <TableColumn fx:id="colTestSetupRpmLowerLimit" prefWidth="75.0" text="Lower &#10;Limit" />
-                                             <TableColumn fx:id="colTestSetupRpmUpperLimit" prefWidth="75.0" text="Upper &#10;Limit" />
+                                             <TableColumn fx:id="colTestSetupRpmLowerLimit" prefWidth="70.0" text="Lower &#10;Limit" />
+                                             <TableColumn fx:id="colTestSetupRpmUpperLimit" prefWidth="70.0" text="Upper &#10;Limit" />
                                           </columns>
                                        </TableColumn>
                                        <TableColumn prefWidth="75.0" text="Wind Speed">
                                           <columns>
-                                             <TableColumn fx:id="colTestSetupWindSpeedLowerLimit" prefWidth="75.0" text="Lower &#10;Limit" />
-                                             <TableColumn fx:id="colTestSetupWindSpeedUpperLimit" prefWidth="75.0" text="Upper &#10;Limit" />
+                                             <TableColumn fx:id="colTestSetupWindSpeedLowerLimit" prefWidth="70.0" text="Lower &#10;Limit" />
+                                             <TableColumn fx:id="colTestSetupWindSpeedUpperLimit" prefWidth="70.0" text="Upper &#10;Limit" />
                                           </columns>
                                        </TableColumn>
                                     <TableColumn prefWidth="124.7999267578125" text="Current">
                                           <columns>
-                                          <TableColumn fx:id="colTestSetupCurrentLowerLimit" minWidth="0.0" prefWidth="94.39996337890625" text="Lower &#10;Limit" />
-                                          <TableColumn fx:id="colTestSetupCurrentUpperLimit" maxWidth="1000.0" prefWidth="77.60003662109375" text="Upper &#10;Limit" />
+                                          <TableColumn fx:id="colTestSetupCurrentLowerLimit" minWidth="0.0" prefWidth="70.0" text="Lower &#10;Limit" />
+                                          <TableColumn fx:id="colTestSetupCurrentUpperLimit" maxWidth="1000.0" prefWidth="70.0" text="Upper &#10;Limit" />
                                           </columns></TableColumn>
                                     <TableColumn prefWidth="204.0" text="Watts">
                                           <columns>
-                                             <TableColumn fx:id="colTestSetupWattsLowerLimit" minWidth="0.0" prefWidth="94.39996337890625" text="Lower &#10;Limit" />
-                                             <TableColumn fx:id="colTestSetupWattsUpperLimit" maxWidth="1000.0" prefWidth="77.60003662109375" text="Upper &#10;Limit" />
+                                             <TableColumn fx:id="colTestSetupWattsLowerLimit" minWidth="0.0" prefWidth="70.0" text="Lower &#10;Limit" />
+                                             <TableColumn fx:id="colTestSetupWattsUpperLimit" maxWidth="1000.0" prefWidth="70.0" text="Upper &#10;Limit" />
                                           </columns></TableColumn>
                                        <TableColumn prefWidth="75.0" text="VA">
                                           <columns>
-                                             <TableColumn fx:id="colTestSetupActivePowerLowerLimit" prefWidth="75.0" text="Lower &#10;Limit" />
-                                             <TableColumn fx:id="colTestSetupActivePowerUpperLimit" prefWidth="75.0" text="Upper &#10;Limit" />
+                                             <TableColumn fx:id="colTestSetupActivePowerLowerLimit" prefWidth="70.0" text="Lower &#10;Limit" />
+                                             <TableColumn fx:id="colTestSetupActivePowerUpperLimit" prefWidth="70.0" text="Upper &#10;Limit" />
                                           </columns>
                                        </TableColumn>
                                        <TableColumn prefWidth="178.4000244140625" text="PF">
                                           <columns>
-                                             <TableColumn fx:id="colTestSetupPfLowerLimit" prefWidth="75.0" text="Lower &#10;Limit" />
-                                             <TableColumn fx:id="colTestSetupPfUpperLimit" prefWidth="75.0" text="Upper &#10;Limit" />
+                                             <TableColumn fx:id="colTestSetupPfLowerLimit" prefWidth="70.0" text="Lower &#10;Limit" />
+                                             <TableColumn fx:id="colTestSetupPfUpperLimit" prefWidth="70.0" text="Upper &#10;Limit" />
+                                          </columns>
+                                       </TableColumn>
+                                       <TableColumn prefWidth="75.0" text="Vibration">
+                                          <columns>
+                                             <TableColumn fx:id="colTestSetupVibLowerLimit" prefWidth="70.0" text="Lower &#10;Limit" />
+                                             <TableColumn fx:id="colTestSetupVibUpperLimit" prefWidth="70.0" text="Upper &#10;Limit" />
                                           </columns>
                                        </TableColumn>
                                  </columns>
                               </TableView>
-                              <GridPane prefWidth="1451.0">
-                                <columnConstraints>
-                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                </columnConstraints>
-                                <rowConstraints>
-                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                </rowConstraints>
-                                 <children>
-                                       <Button fx:id="addTestPointButton" alignment="CENTER" onAction="#btnAddTestPointOnClick" prefHeight="26.0" prefWidth="200.0" text="Add Test Point" GridPane.halignment="CENTER" />
-                                       <Button fx:id="saveButton" onAction="#btnSaveOnClick" prefHeight="25.0" prefWidth="151.0" text="Save" GridPane.columnIndex="1" GridPane.halignment="CENTER" />
-                                 </children>
-                              </GridPane>
                               </VBox>
                         </children>
                      </HBox>

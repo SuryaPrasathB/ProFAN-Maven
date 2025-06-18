@@ -18,7 +18,7 @@ import javafx.stage.*;
  * A simple non-modal popup that dynamically builds N textfields for wind-speed input,
  * and returns the average of the entered numeric values when the user clicks Save.
  */
-public class WindSpeedPopup {
+public class ManualReadingsInputPopup {
 
     private final Stage stage;
     private final List<TextField> fields = new ArrayList<>();
@@ -26,26 +26,32 @@ public class WindSpeedPopup {
     private final Map<TextField, Label> warningLabels = new HashMap<>();
 
     // Declare btnSave as a member variable
-    private final Button btnSave; // <<<--- IMPORTANT CHANGE: Declared here
+    private final Button btnSave;
 
     // Regex to allow optional negative sign, digits, and an optional decimal point followed by digits
     private static final Pattern NUMERIC_PATTERN = Pattern.compile("-?\\d*\\.?\\d*");
 
-    public WindSpeedPopup(int count) {
+    public ManualReadingsInputPopup(int count, String title) { // <<<--- MODIFIED: Added 'title' parameter
         this.stage = new Stage();
         stage.initModality(Modality.APPLICATION_MODAL); // BLOCK all interaction until closed via allowed action
-        stage.setTitle("Enter Wind Speed Readings");
+        stage.setTitle(title); // <<<--- MODIFIED: Use the passed title
 
         VBox root = new VBox(10);
         root.setPadding(new Insets(15)); // Set padding for the root VBox
+        root.setPrefWidth(400);
+        root.setPrefHeight(400);
+        // Set the background of the root VBox to black
+        //root.setBackground(new Background(new BackgroundFill(Color.BLACK, CornerRadii.EMPTY, Insets.EMPTY))); // <<<--- ADDED/MODIFIED LINE
 
         // Initialize btnSave here in the constructor
-        this.btnSave = new Button("Save & Next"); // <<<--- IMPORTANT CHANGE: Initialized here
+        this.btnSave = new Button("Save & Next");
         btnSave.setDisable(true); // initially disabled
 
         for (int i = 1; i <= count; i++) {
             TextField tf = new TextField();
             tf.setPromptText("Reading " + i);
+            // Optionally, set text field background to white for contrast on black background
+            tf.setStyle("-fx-control-inner-background: white; -fx-text-fill: black;"); // <<<--- ADDED/MODIFIED LINE
             fields.add(tf);
 
             Label warningLabel = new Label("Only numbers allowed!");
@@ -53,7 +59,9 @@ public class WindSpeedPopup {
             warningLabel.setVisible(false); // Initially hidden
             warningLabels.put(tf, warningLabel); // Store the warning label
 
-            HBox inputRow = new HBox(5, new Label("Reading " + i + ":"), tf);
+            Label readingLabel = new Label("Reading " + i + ":");
+            readingLabel.setTextFill(Color.WHITE); // <<<--- ADDED/MODIFIED LINE: Set label text color to white for contrast
+            HBox inputRow = new HBox(5, readingLabel, tf);
             inputRow.setAlignment(Pos.CENTER_LEFT); // Align elements in the HBox
 
             VBox fieldContainer = new VBox(2, inputRow, warningLabel); // Group input and warning
@@ -77,7 +85,7 @@ public class WindSpeedPopup {
                     }
                 } else {
                     tf.setText(oldValue); // Revert to old value if non-numeric character is typed
-                    currentWarningLabel.setText("Only numerical allowed!");
+                    currentWarningLabel.setText("Only numbers (0-9, decimal point, negative sign) allowed!"); // <<<--- MODIFIED: Clearer message
                     currentWarningLabel.setVisible(true);
                 }
 

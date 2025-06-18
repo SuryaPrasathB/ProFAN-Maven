@@ -259,18 +259,19 @@
                                                    </HBox>
                                                 <TableView fx:id="tvTestSetup" prefHeight="387.0" prefWidth="1705.0">
                                                    <columns>
-                                                         <TableColumn fx:id="colTestSetupSerialNo" prefWidth="60.0" resizable="false" text="S.No" />
+                                                         <TableColumn fx:id="colTestSetupSerialNo" prefWidth="50.0" resizable="false" text="S.No" />
                                                          <TableColumn fx:id="colTestSetupStatus" prefWidth="100.0" resizable="false" text="Status" />
-                                                         <TableColumn fx:id="colTestSetupTestPointName" prefWidth="200.0" resizable="false" text="Test Name" />
-                                                         <TableColumn fx:id="colTestSetupTargetVoltage" prefWidth="150.0" resizable="false" text="Target Voltage" />
-                                                         <TableColumn fx:id="colTestSetupTimeInSec" prefWidth="150.0" resizable="false" text="Setup Time in Sec" />
-                                                         <TableColumn fx:id="colTestSetupRpmActual" prefWidth="150.0" resizable="false" text="Actual Rpm" />
-                                                      <TableColumn fx:id="colTestSetupCurrentActual" minWidth="0.0" prefWidth="160.0" resizable="false" text="Actual Current" />
-                                                         <TableColumn fx:id="colTestSetupWattsActual" minWidth="0.0" prefWidth="160.0" resizable="false" text="Actual Watts" />
-                                                         <TableColumn fx:id="colTestSetupActivePowerActual" prefWidth="160.0" resizable="false" text="Actual VA" />
-                                                         <TableColumn fx:id="colTestSetupPfActual" prefWidth="160.0" resizable="false" text="Actual Pf" />
-                                                         <TableColumn fx:id="colTestSetupWindSpeedActual" prefWidth="160.0" resizable="false" text="Actual Wind Speed" />
-                                                         <TableColumn fx:id="colTestSetupProgress" prefWidth="120.0" resizable="false" text="Progress" />
+                                                         <TableColumn fx:id="colTestSetupTestPointName" prefWidth="190.0" resizable="false" text="Test Name" />
+                                                         <TableColumn fx:id="colTestSetupTargetVoltage" prefWidth="140.0" resizable="false" text="Target Voltage" />
+                                                         <TableColumn fx:id="colTestSetupTimeInSec" prefWidth="140.0" resizable="false" text="Setup Time in Sec" />
+                                                         <TableColumn fx:id="colTestSetupRpmActual" prefWidth="140.0" resizable="false" text="Actual Rpm" />
+                                                      <TableColumn fx:id="colTestSetupCurrentActual" minWidth="0.0" prefWidth="150.0" resizable="false" text="Actual Current" />
+                                                         <TableColumn fx:id="colTestSetupWattsActual" minWidth="0.0" prefWidth="150.0" resizable="false" text="Actual Watts" />
+                                                         <TableColumn fx:id="colTestSetupActivePowerActual" prefWidth="150.0" resizable="false" text="Actual VA" />
+                                                         <TableColumn fx:id="colTestSetupPfActual" prefWidth="150.0" resizable="false" text="Actual Pf" />
+                                                         <TableColumn fx:id="colTestSetupWindSpeedActual" prefWidth="150.0" resizable="false" text="Actual Wind Speed" />
+                                                         <TableColumn fx:id="colTestSetupVibActual" prefWidth="110.0" resizable="false" text="Actual Vibration" />
+                                                         <TableColumn fx:id="colTestSetupProgress" prefWidth="110.0" resizable="false" text="Progress" />
                                                    </columns>
                                                 </TableView>
                                                 <GridPane prefHeight="37.0" prefWidth="1738.0">

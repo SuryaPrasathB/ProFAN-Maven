@@ -41,7 +41,7 @@ import com.tasnetwork.calibration.energymeter.device.DeviceDataManagerController
 import com.tasnetwork.calibration.energymeter.device.DutSerialDataManager;
 import com.tasnetwork.calibration.energymeter.util.EditCell;
 import com.tasnetwork.calibration.energymeter.util.MyIntegerStringConverter;
-import com.tasnetwork.calibration.energymeter.util.WindSpeedPopup;
+import com.tasnetwork.calibration.energymeter.util.ManualReadingsInputPopup;
 import com.tasnetwork.spring.orm.model.DutCommand;
 import com.tasnetwork.spring.orm.model.DutMasterData;
 import com.tasnetwork.spring.orm.model.FanTestSetup;
@@ -489,6 +489,8 @@ public class FanProjectExecuteController implements Initializable {
 	@FXML private TableColumn<FanTestSetup, String> colTestSetupRpmActual;
 
 	@FXML private TableColumn<FanTestSetup, String> colTestSetupWindSpeedActual;
+	
+	@FXML private TableColumn<FanTestSetup, String> colTestSetupVibActual;
 
 	@FXML private TableColumn<FanTestSetup, String> colTestSetupCurrentActual;
 
@@ -787,7 +789,27 @@ public class FanProjectExecuteController implements Initializable {
 				if (!empty && item != null) {
 					setText(item);
 					FanTestSetup tp = getTableView().getItems().get(getIndex());
-					setStyle(ConstantCSS.FX_TEST_FILL + (tp.rpmValidProperty().get() ? ConstantCSS.COLOR_GREEN_SEMI_COLON : ConstantCSS.COLOR_RED_SEMI_COLON));
+					setStyle(ConstantCSS.FX_TEST_FILL + (tp.windSpeedValidProperty().get() ? ConstantCSS.COLOR_GREEN_SEMI_COLON : ConstantCSS.COLOR_RED_SEMI_COLON));
+					if (tp.windSpeedBlinkProperty().get() && !getStyleClass().contains("blinking-cell")) {
+						getStyleClass().add("blinking-cell");
+					}
+				}
+			}
+		});
+		
+		colTestSetupVibActual.setCellValueFactory(cellData -> cellData.getValue().vibrationActualProperty());
+		colTestSetupVibActual.setCellFactory(col -> new TableCell<FanTestSetup, String>() {
+			@Override
+			protected void updateItem(String item, boolean empty) {
+				super.updateItem(item, empty);
+				setText(null);
+				setStyle("");
+				getStyleClass().remove("blinking-cell");
+
+				if (!empty && item != null) {
+					setText(item);
+					FanTestSetup tp = getTableView().getItems().get(getIndex());
+					setStyle(ConstantCSS.FX_TEST_FILL + (tp.vibValidProperty().get() ? ConstantCSS.COLOR_GREEN_SEMI_COLON : ConstantCSS.COLOR_RED_SEMI_COLON));
 					if (tp.windSpeedBlinkProperty().get() && !getStyleClass().contains("blinking-cell")) {
 						getStyleClass().add("blinking-cell");
 					}
@@ -807,7 +829,7 @@ public class FanProjectExecuteController implements Initializable {
 				if (!empty && item != null) {
 					setText(item);
 					FanTestSetup tp = getTableView().getItems().get(getIndex());
-					setStyle(ConstantCSS.FX_TEST_FILL + (tp.rpmValidProperty().get() ? ConstantCSS.COLOR_GREEN_SEMI_COLON : ConstantCSS.COLOR_RED_SEMI_COLON));
+					setStyle(ConstantCSS.FX_TEST_FILL + (tp.currentValidProperty().get() ? ConstantCSS.COLOR_GREEN_SEMI_COLON : ConstantCSS.COLOR_RED_SEMI_COLON));
 					if (tp.currentBlinkProperty().get() && !getStyleClass().contains("blinking-cell")) {
 						getStyleClass().add("blinking-cell");
 					}
@@ -827,7 +849,7 @@ public class FanProjectExecuteController implements Initializable {
 				if (!empty && item != null) {
 					setText(item);
 					FanTestSetup tp = getTableView().getItems().get(getIndex());
-					setStyle(ConstantCSS.FX_TEST_FILL + (tp.rpmValidProperty().get() ? ConstantCSS.COLOR_GREEN_SEMI_COLON : ConstantCSS.COLOR_RED_SEMI_COLON));
+					setStyle(ConstantCSS.FX_TEST_FILL + (tp.wattsValidProperty().get() ? ConstantCSS.COLOR_GREEN_SEMI_COLON : ConstantCSS.COLOR_RED_SEMI_COLON));
 					if (tp.wattsBlinkProperty().get() && !getStyleClass().contains("blinking-cell")) {
 						getStyleClass().add("blinking-cell");
 					}
@@ -847,7 +869,7 @@ public class FanProjectExecuteController implements Initializable {
 				if (!empty && item != null) {
 					setText(item);
 					FanTestSetup tp = getTableView().getItems().get(getIndex());
-					setStyle(ConstantCSS.FX_TEST_FILL + (tp.rpmValidProperty().get() ? ConstantCSS.COLOR_GREEN_SEMI_COLON : ConstantCSS.COLOR_RED_SEMI_COLON));
+					setStyle(ConstantCSS.FX_TEST_FILL + (tp.vaValidProperty().get() ? ConstantCSS.COLOR_GREEN_SEMI_COLON : ConstantCSS.COLOR_RED_SEMI_COLON));
 					if (tp.vaBlinkProperty().get() && !getStyleClass().contains("blinking-cell")) {
 						getStyleClass().add("blinking-cell");
 					}
@@ -867,7 +889,7 @@ public class FanProjectExecuteController implements Initializable {
 				if (!empty && item != null) {
 					setText(item);
 					FanTestSetup tp = getTableView().getItems().get(getIndex());
-					setStyle(ConstantCSS.FX_TEST_FILL + (tp.rpmValidProperty().get() ? ConstantCSS.COLOR_GREEN_SEMI_COLON : ConstantCSS.COLOR_RED_SEMI_COLON));
+					setStyle(ConstantCSS.FX_TEST_FILL + (tp.pfValidProperty().get() ? ConstantCSS.COLOR_GREEN_SEMI_COLON : ConstantCSS.COLOR_RED_SEMI_COLON));
 					if (tp.pfBlinkProperty().get() && !getStyleClass().contains("blinking-cell")) {
 						getStyleClass().add("blinking-cell");
 					}
@@ -1611,7 +1633,7 @@ public class FanProjectExecuteController implements Initializable {
 			 * fanSerialNumber, testPointName, currentProjectRun, ConstantStatus.IN_PROG );
 			 */
 
-			if (existingResults == null) {
+			if (existingResults == null || existingResults.isEmpty()) {
 				createResult(fanSerialNumber, testPointName, defaultStatus, currentProjectRun);
 			} else {
 				appendLog("Skipping creation for test point " + testPointName + " (already INPROGRESS)", LogLevel.DEBUG);
@@ -2226,7 +2248,7 @@ public class FanProjectExecuteController implements Initializable {
 	 */
 	private double promptForWindSpeedReadings(int count) {
 		final FutureTask<Double> task = new FutureTask<>(() -> {
-			WindSpeedPopup popup = new WindSpeedPopup(count);
+			ManualReadingsInputPopup popup = new ManualReadingsInputPopup(count, "Wind Speed Readings");
 			return popup.showAndWaitAndReturnAverage(); // Should be blocking on FX thread
 		});
 
@@ -2253,7 +2275,7 @@ public class FanProjectExecuteController implements Initializable {
 	        // Reusing WindSpeedPopup for simplicity. Ideally, you might create a dedicated
 	        // 'VibrationPopup' class in 'com.tasnetwork.calibration.energymeter.util;'
 	        // if you need different UI or validation logic for vibration.
-	        WindSpeedPopup popup = new WindSpeedPopup(count);
+	        ManualReadingsInputPopup popup = new ManualReadingsInputPopup(count, "Vibration Readings");
 	        return popup.showAndWaitAndReturnAverage(); // Should be blocking on FX thread
 	    });
 
