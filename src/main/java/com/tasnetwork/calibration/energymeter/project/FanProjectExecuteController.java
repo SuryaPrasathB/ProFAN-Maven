@@ -1830,9 +1830,11 @@ public class FanProjectExecuteController implements Initializable {
 		updateResultMeasurements(
 				//currentProjectRun, 
 				fanSerialNumber, 
-				testPoint.getTestPointName(), 
+				testPoint.getTestPointName(),
+				currentResult.getVoltage(),
 				currentResult.getRpm(), 
 				currentResult.getWindSpeed(), 
+				currentResult.getVibration(),
 				currentResult.getWatts(), 
 				currentResult.getVa(), 
 				currentResult.getCurrent(), 
@@ -1925,8 +1927,8 @@ public class FanProjectExecuteController implements Initializable {
 	 * @param powerFactor     Measured power factor.
 	 * @param status          Final test status ("Completed", "Failed", etc.).
 	 */
-	public void updateResultMeasurements(String fanSerialNumber, String testPointName,
-			String rpm, String windspeed, String watts, String va, String current,
+	public void updateResultMeasurements(String fanSerialNumber, String testPointName, String voltage,
+			String rpm, String windspeed, String vibration, String watts, String va, String current,
 			String powerFactor, String status) {
 
 
@@ -1941,9 +1943,11 @@ public class FanProjectExecuteController implements Initializable {
 				.findByFanSerialNumberAndTestPointName(fanSerialNumber, testPointName);
 
 		if (result != null) {
+			result.setVoltage(voltage);
 			result.setRpm(rpm);
 			result.setWindSpeed(windspeed);
 			result.setWatts(watts);
+			result.setVibration(vibration);
 			result.setVa(va);
 			result.setCurrent(current);
 			result.setPowerFactor(powerFactor);
@@ -1979,7 +1983,17 @@ public class FanProjectExecuteController implements Initializable {
 				if (!isRunning || isStopped) break;
 
 				FanTestSetup testPoint = testPoints.get(currentIndex);
-				Platform.runLater(() -> testPoint.setStatus(ConstantStatus.IN_PROG));
+				Platform.runLater(() -> {
+					testPoint.setStatus(ConstantStatus.IN_PROG);
+					testPoint.setRpmActual("");
+					testPoint.setCurrentActual("");
+					testPoint.setWattsActual("");
+					testPoint.setActivePowerActual("");
+					testPoint.setPowerFactorActual("");
+					testPoint.setWindSpeedActual("");
+					testPoint.setVibrationActual("");
+					
+				});
 				appendLog("Running : Testpoint : " + (currentIndex + 1), LogLevel.INFO);
 				runSingleTestPoint(testPoint);
 
@@ -2137,7 +2151,7 @@ public class FanProjectExecuteController implements Initializable {
 					appendLog("Voltage : " + actual, LogLevel.INFO);
 					appendLog("Voltage Verified", LogLevel.INFO);
 					Platform.runLater(() -> testPoint.setProgress(0.3));
-					voltageVerified = true;
+					voltageVerified = true;					
 					break;
 				} else {
 					appendLog("Attempt " + attempt + ": Voltage mismatch. Got: " + actual, LogLevel.INFO);
@@ -2171,6 +2185,7 @@ public class FanProjectExecuteController implements Initializable {
 		// Step 5+: Loop measurement update until stop
 		currentResult = new Result();
 		currentResult.setFanSerialNumber(ref_txtNewFanSerialNo.getText());
+		currentResult.setVoltage(targetVoltage);
 		currentResult.setTestPointName(testPoint.getTestPointName());
 		currentResult.setProjectRun(currentProjectRun); // Pass the current ProjectRun entity
 		allValid = true; // Assume all passed initially
@@ -2186,8 +2201,10 @@ public class FanProjectExecuteController implements Initializable {
 				//currentProjectRun, 
 				fanSerialNumber, 
 				testPoint.getTestPointName(), 
+				currentResult.getVoltage(),
 				currentResult.getRpm(), 
 				currentResult.getWindSpeed(), 
+				currentResult.getVibration(),
 				currentResult.getWatts(), 
 				currentResult.getVa(), 
 				currentResult.getCurrent(), 

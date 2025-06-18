@@ -9,12 +9,20 @@ public class Result {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    
+    // This field is for UI selection state only and should NOT be persisted to the database.
+    // The @Transient annotation tells JPA/Hibernate to ignore this field during mapping.
+    @Transient // <--- ADDED THIS ANNOTATION
+    private boolean selected; 
 
     @Column(columnDefinition = "VARCHAR(45)")
     private String testPointName;
     
     @Column(columnDefinition = "VARCHAR(45)")
     private String fanSerialNumber;
+    
+    @Column(columnDefinition = "VARCHAR(45)")
+    private String voltage;
 
     @Column(columnDefinition = "VARCHAR(45)")
     private String rpm;
@@ -45,13 +53,16 @@ public class Result {
     private ProjectRun projectRun;
 
     public Result() {
+        // Initialize selected to false by default for new instances
+        this.selected = false; 
     }
 
-    public Result(String fanSerialNo, String testPointName, String rpm, String windSpeed, String vibration, String current,
+    public Result(String fanSerialNo, String testPointName, String voltage, String rpm, String windSpeed, String vibration, String current,
                   String watts, String va, String powerFactor, String testStatus,
                   ProjectRun projectRun) {
     	this.fanSerialNumber = fanSerialNo;
         this.testPointName = testPointName;
+        this.voltage = voltage;
         this.rpm = rpm;
         this.windSpeed = windSpeed;
         this.vibration = vibration;
@@ -61,6 +72,7 @@ public class Result {
         this.powerFactor = powerFactor;
         this.testStatus = testStatus;
         this.projectRun = projectRun;
+        this.selected = false; // Initialize to false when creating new Result objects
     }
 
     // Getters and Setters
@@ -68,7 +80,15 @@ public class Result {
         return id;
     }
 
-    public String getTestPointName() {
+    public boolean isSelected() {
+		return selected;
+	}
+
+	public void setSelected(boolean selected) {
+		this.selected = selected;
+	}
+
+	public String getTestPointName() {
         return testPointName;
     }
 
@@ -82,6 +102,14 @@ public class Result {
 
 	public void setFanSerialNumber(String fanSerialNumber) {
 		this.fanSerialNumber = fanSerialNumber;
+	}
+
+	public String getVoltage() {
+		return voltage;
+	}
+
+	public void setVoltage(String voltage) {
+		this.voltage = voltage;
 	}
 
 	public String getRpm() {
@@ -161,6 +189,7 @@ public class Result {
         return "Result{" +
                 "id=" + id +
                 ", fanSerialNo='" + fanSerialNumber + '\'' +
+                ", voltage='" + voltage + '\'' +
                 ", testPointName='" + testPointName + '\'' +
                 ", rpm='" + rpm + '\'' +
                 ", windSpeed='" + windSpeed + '\'' +
@@ -171,6 +200,7 @@ public class Result {
                 ", powerFactor='" + powerFactor + '\'' +
                 ", testStatus='" + testStatus + '\'' +
                 ", projectRun=" + (projectRun != null ? projectRun.getTestRunId() : null) +
+                ", selected=" + selected + 
                 '}';
     }
 }

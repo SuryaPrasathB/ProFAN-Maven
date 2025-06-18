@@ -1,0 +1,14 @@
+{
+  "propertyToCellRange": {
+    "testPointName": "X12:X24",
+    "current": "H12:H24",
+    "watts": "J12:J24",
+    "testStatus": "AC12:AC24",
+    "va": "AA12:AB24",
+    "fanSerialNumber": "C12:C24",
+    "windSpeed": "Y12:Y24",
+    "vibration": "Z12:Z24",
+    "rpm": "L12:L24",
+    "powerFactor": "AB12:AB24"
+  }
+}

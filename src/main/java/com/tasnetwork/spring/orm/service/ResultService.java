@@ -45,4 +45,8 @@ public class ResultService {
 		return resultRepo.findByFanSerialNumber(fanSerialNumber);
 	}
 
+	public List<Result> findall() {
+		return resultRepo.findAll();
+	}
+
 }
