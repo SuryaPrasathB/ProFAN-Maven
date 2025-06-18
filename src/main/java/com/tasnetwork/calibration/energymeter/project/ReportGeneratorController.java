@@ -7,7 +7,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane; // For the config dialog layout
-import javafx.scene.layout.HBox;
 import javafx.scene.web.WebView;
 import javafx.scene.web.WebEngine;
 import javafx.concurrent.Worker;
@@ -26,8 +25,6 @@ import java.io.FileReader;    // For reading JSON
 import java.io.FileWriter;    // For writing JSON
 import java.io.IOException;
 import java.net.URL;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.regex.Matcher;
@@ -41,8 +38,6 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 // Reflection imports for dynamic property access
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Field;
-
 // Gson imports for JSON serialization/deserialization
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -66,7 +61,7 @@ public class ReportGeneratorController implements Initializable {
     @FXML private TableColumn<Result, Boolean> selectColumn;
     @FXML private TableColumn<Result, String> serialColumn;
     @FXML private TableColumn<Result, String> testpointNameColumn;
-    @FXML private TableColumn<Result, String> voltageColumn;
+    @FXML private TableColumn<Result, String> voltageColumn; // This field must be correctly mapped in FXML
     @FXML private TableColumn<Result, String> rpmColumn;
     @FXML private TableColumn<Result, String> windspeedColumn;
     @FXML private TableColumn<Result, String> currentColumn;
@@ -82,7 +77,7 @@ public class ReportGeneratorController implements Initializable {
 
 
     // The path to your report templates folder
-    private static final String TEMPLATES_DIR_PATH = "D:\\tasworkspace\\ProFAN\\ProFAN-Maven-s0.0.0.7\\src\\main\\resources\\reportTemplates";
+    private static final String TEMPLATES_DIR_PATH = "C:\\Users\\Surya\\git\\ProFAN-Maven-s0.0.0.7\\src\\main\\resources\\reportTemplates";
 
     private ObservableList<Template> availableTemplates = FXCollections.observableArrayList();
     private Template selectedTemplate = null;
@@ -95,7 +90,7 @@ public class ReportGeneratorController implements Initializable {
     // List of Result properties that can be mapped to Excel (excluding 'id' and 'selected')
     // This list will define the fields shown in the configuration dialog.
     private static final List<String> RESULT_PROPERTIES_TO_MAP = Arrays.asList(
-        "fanSerialNumber", "testPointName", "rpm", "windSpeed",
+        "fanSerialNumber", "testPointName", "voltage", "rpm", "windSpeed", // Added "voltage" here
         "vibration", "current", "watts", "va", "powerFactor", "testStatus"
     );
 
@@ -154,7 +149,7 @@ public class ReportGeneratorController implements Initializable {
         selectColumn		.setCellValueFactory(new PropertyValueFactory<>("selected"));
         serialColumn		.setCellValueFactory(new PropertyValueFactory<>("fanSerialNumber"));
         testpointNameColumn .setCellValueFactory(new PropertyValueFactory<>("testPointName"));
-        voltageColumn		.setCellValueFactory(new PropertyValueFactory<>("voltage"));
+        voltageColumn		.setCellValueFactory(new PropertyValueFactory<>("voltage")); // This line was causing NPE if voltageColumn was null
         rpmColumn           .setCellValueFactory(new PropertyValueFactory<>("rpm"));  
         windspeedColumn     .setCellValueFactory(new PropertyValueFactory<>("windSpeed"));
         currentColumn       .setCellValueFactory(new PropertyValueFactory<>("current"));  
@@ -920,25 +915,6 @@ public class ReportGeneratorController implements Initializable {
 
         } // End of try-with-resources
     }
-
-    /**
-     * Scans the specified header row of an Excel sheet to create a mapping
-     * from Result property names to Excel column indices.
-     *
-     * @param sheet The Excel sheet to scan.
-     * @param headerRowIndex The 0-indexed row number where headers are located.
-     * @return A Map where keys are Result property names (e.g., "fanSerialNumber")
-     * and values are their corresponding 0-indexed Excel column numbers.
-     * @deprecated No longer used for data population; mapping is now configured via dialog.
-     */
-    @Deprecated // This method is no longer used for data population as mapping is user-defined
-    private Map<String, Integer> findColumnMappings(Sheet sheet, int headerRowIndex) {
-        // This method is now deprecated as the mapping is user-configured.
-        // It's kept for reference in case any other part of the code relies on it,
-        // but it will not be called for generateExcelReport.
-        return new HashMap<>(); // Return empty map as it's not used
-    }
-
 
     /**
      * Updates the enabled state and text of the generate report button

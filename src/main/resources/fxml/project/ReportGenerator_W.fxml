@@ -53,17 +53,22 @@
                   <Label fx:id="noResultsLabel" text="No fan results to display. Use the search above." visible="false" />
                   <TableView fx:id="fanTableView" minHeight="200.0" prefHeight="300.0" VBox.vgrow="ALWAYS">
                      <columns>
-                        <TableColumn fx:id="selectColumn" text="Select" />
-                        <TableColumn fx:id="serialColumn" prefWidth="150.0" text="Serial Number" />
-                        <TableColumn fx:id="testpointNameColumn" prefWidth="150.0" text="Test Point Name" />
-                        <TableColumn fx:id="rpmColumn" prefWidth="110.0" text="RPM" />
-                        <TableColumn fx:id="windspeedColumn" prefWidth="110.0" text="Wind Speed" />
-                        <TableColumn fx:id="currentColumn" prefWidth="110.0" text="Current" />
-                        <TableColumn fx:id="wattsColumn" prefWidth="110.0" text="Watts" />
-                        <TableColumn fx:id="vaColumn" prefWidth="110.0" text="VA" />
-                        <TableColumn fx:id="pfColumn" prefWidth="110.0" text="PF" />
-                        <TableColumn fx:id="vibrationColumn" prefWidth="110.0" text="VIBRATION" />
-                        <TableColumn fx:id="statusColumn" prefWidth="110.0" text="TEST STATUS" />
+                        <!-- Existing columns -->
+				        <TableColumn fx:id="selectColumn" text="Select" prefWidth="50" />
+				        <TableColumn fx:id="serialColumn" text="Serial Number" prefWidth="120" />
+				        <TableColumn fx:id="testpointNameColumn" text="Test Point" prefWidth="100" />
+				        
+				        <!-- Add this TableColumn for Voltage -->
+				        <TableColumn fx:id="voltageColumn" text="Voltage" prefWidth="80" /> 
+				        
+				        <TableColumn fx:id="rpmColumn" text="RPM" prefWidth="80" />
+				        <TableColumn fx:id="windspeedColumn" text="Wind Speed" prefWidth="100" />
+				        <TableColumn fx:id="currentColumn" text="Current" prefWidth="80" />
+				        <TableColumn fx:id="wattsColumn" text="Watts" prefWidth="80" />
+				        <TableColumn fx:id="vaColumn" text="VA" prefWidth="80" />
+				        <TableColumn fx:id="pfColumn" text="PF" prefWidth="80" />
+				        <TableColumn fx:id="vibrationColumn" text="Vibration" prefWidth="100" />
+				        <TableColumn fx:id="statusColumn" text="Status" prefWidth="80" />
                      </columns>
                      <columnResizePolicy>
                         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />

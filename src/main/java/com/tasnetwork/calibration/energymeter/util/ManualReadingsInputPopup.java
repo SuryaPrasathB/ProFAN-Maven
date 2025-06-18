@@ -3,7 +3,6 @@ package com.tasnetwork.calibration.energymeter.util;
 import java.util.*;
 import java.util.regex.Pattern; // Import Pattern for regex validation
 
-import com.sun.glass.ui.Application; // Consider if this is still needed or can be removed
 import com.tasnetwork.calibration.energymeter.ApplicationLauncher;
 
 import javafx.beans.value.ChangeListener;
@@ -60,7 +59,7 @@ public class ManualReadingsInputPopup {
             warningLabels.put(tf, warningLabel); // Store the warning label
 
             Label readingLabel = new Label("Reading " + i + ":");
-            readingLabel.setTextFill(Color.WHITE); // <<<--- ADDED/MODIFIED LINE: Set label text color to white for contrast
+            readingLabel.setTextFill(Color.BLACK); // <<<--- ADDED/MODIFIED LINE: Set label text color to white for contrast
             HBox inputRow = new HBox(5, readingLabel, tf);
             inputRow.setAlignment(Pos.CENTER_LEFT); // Align elements in the HBox
 
