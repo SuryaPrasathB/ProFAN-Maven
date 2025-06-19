@@ -86,10 +86,14 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.KeyCode; // Import KeyCode
+import javafx.scene.input.KeyEvent; // Import KeyEvent
+import javafx.scene.control.CheckBox; // Import CheckBox
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.GridPane; // Import GridPane
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -113,7 +117,10 @@ public class FanProjectExecuteController implements Initializable {
 	// Flag for simulation mode
 	private boolean SIMULATION_MODE = true; // Set to true to bypass hardware calls
 
-	// FXML Buttons ===============================================================================================================================
+	// Flag to enable/disable the secret shortcut for simulation mode configuration
+	private boolean isSimulationShortcutEnabled = true;
+
+	// FXML Buttons ==============================================================================================================================
 	@FXML private Button btnStart;
 	static private Button ref_btnStart;
 
@@ -135,6 +142,7 @@ public class FanProjectExecuteController implements Initializable {
 	static private Button ref_btnDimmerIsMinExecute;
 
 	@FXML private Button btnDimmerSetMinExecute;
+	
 	@FXML private Button btnDimmerForwardExecute;
 	static private Button ref_btnDimmerForwardExecute;
 
@@ -602,6 +610,20 @@ public class FanProjectExecuteController implements Initializable {
 			}
 		});
 
+		// Add global key event filter to the scene for the simulation mode shortcut
+        Platform.runLater(() -> {
+            if (tvTestSetup.getScene() != null) {
+                tvTestSetup.getScene().addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+                    // Detect CTRL + SHIFT + ` (back_quote)
+                    if (isSimulationShortcutEnabled && event.isControlDown() && event.isShiftDown() && event.getCode() == KeyCode.BACK_QUOTE) {
+                        openSimulationConfigurationDialog();
+                        event.consume(); // Consume the event so it doesn't propagate
+                    }
+                });
+            } else {
+                System.err.println("Warning: Scene not available during initialize, cannot set global key listener for simulation config.");
+            }
+        });
 
 
 		// TEXT BOX VALIDATION ===============================================================================
@@ -1326,7 +1348,7 @@ public class FanProjectExecuteController implements Initializable {
 		ref_btnBPhaseWatts       = btnBPhaseWatts;
 
 		ref_btnDimmerIsMin       = btnDimmerIsMin;
-		ref_btnDimmerIsMinExecute       = btnDimmerIsMinExecute;
+		ref_btnDimmerIsMinExecute        = btnDimmerIsMinExecute;
 		ref_btnFanRpm            = btnFanRpm;
 		ref_btnFanWindspeed      = btnFanWindspeed;
 
@@ -1555,7 +1577,7 @@ public class FanProjectExecuteController implements Initializable {
 
 		// Check if model selected
 		if (projectName == null || projectName.isEmpty()) {
-			Alert alert = new Alert(Alert.AlertType.ERROR);
+			Alert alert = new Alert(AlertType.ERROR);
 			alert.setTitle("Missing Project Name");
 			alert.setHeaderText(null);
 			alert.setContentText("Please select model.");
@@ -1568,7 +1590,7 @@ public class FanProjectExecuteController implements Initializable {
 
 		// Check if serial number is empty
 		if (fanSerialNumber.isEmpty()) {
-			Alert alert = new Alert(Alert.AlertType.ERROR);
+			Alert alert = new Alert(AlertType.ERROR);
 			alert.setTitle("Missing Serial Number");
 			alert.setHeaderText(null);
 			alert.setContentText("Please enter a valid fan serial number before starting the test.");
@@ -1582,7 +1604,7 @@ public class FanProjectExecuteController implements Initializable {
 		List<Result> existingResults = DeviceDataManagerController.getResultService().findByFanSerialNumber(fanSerialNumber);
 
 		if (existingResults != null && !existingResults.isEmpty()) {
-			Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+			Alert alert = new Alert(AlertType.CONFIRMATION);
 			alert.setTitle("Serial Number Exists");
 			alert.setHeaderText("The fan serial number '" + fanSerialNumber + "' already has test results.");
 			alert.setContentText("Do you want to continue with this serial number? This may overwrite or append to existing results.");
@@ -1796,7 +1818,7 @@ public class FanProjectExecuteController implements Initializable {
 
 		// Check if serial number is empty
 		if (fanSerialNumber.isEmpty()) {
-			Alert alert = new Alert(Alert.AlertType.ERROR);
+			Alert alert = new Alert(AlertType.ERROR);
 			alert.setTitle("Missing Serial Number");
 			alert.setHeaderText(null);
 			alert.setContentText("Please enter a valid fan serial number before starting the test.");
@@ -4837,6 +4859,42 @@ public class FanProjectExecuteController implements Initializable {
 	public void setFirstTestPointInSequence(boolean isFirstTestPointInSequence) {
 		this.isFirstTestPointInSequence = isFirstTestPointInSequence;
 	}
+	
+    /**
+     * Opens a dialog for the user to configure the simulation mode.
+     * This dialog allows the user to toggle the SIMULATION_MODE flag.
+     */
+    @FXML
+    private void openSimulationConfigurationDialog() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/project/SimulationConfig.fxml"));
+            Parent root = loader.load();
+
+            // Get the controller for the SimulationConfig.fxml
+            SimulationConfigController simulationController = loader.getController();
+
+            // Pass the current simulation mode and a callback to update it
+            simulationController.setCurrentSimulationMode(SIMULATION_MODE);
+            simulationController.setSimulationModeUpdateCallback(newVal -> {
+                SIMULATION_MODE = newVal;
+                appendLog("Simulation Mode set to: " + SIMULATION_MODE, LogLevel.INFO);
+            });
+
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Simulation Configuration");
+            dialogStage.setScene(new Scene(root));
+            dialogStage.initOwner(btnSettings.getScene().getWindow()); // Tie to main window
+            dialogStage.initModality(Modality.APPLICATION_MODAL); // Blocking dialog
+            dialogStage.setResizable(false);
+            dialogStage.showAndWait(); // Show and wait for it to close
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            //showAlert(Alert.AlertType.ERROR, "Error Loading Simulation Config",
+              //        "Could not load the simulation configuration dialog: " + e.getMessage());
+            appendLog("Error loading simulation config dialog: " + e.getMessage(), LogLevel.ERROR);
+        }
+    }
 
 
 }
