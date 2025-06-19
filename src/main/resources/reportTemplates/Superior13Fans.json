@@ -9,6 +9,7 @@
     "windSpeed": "Y12:Y24",
     "vibration": "Z12:Z24",
     "rpm": "L12:L24",
+    "voltage": "E12:E24",
     "powerFactor": "AB12:AB24"
   }
 }
