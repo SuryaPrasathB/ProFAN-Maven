@@ -7,6 +7,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane; // For the config dialog layout
+import javafx.scene.layout.HBox;
 import javafx.scene.web.WebView;
 import javafx.scene.web.WebEngine;
 import javafx.concurrent.Worker;
@@ -17,6 +18,10 @@ import javafx.stage.Stage;    // For dialog window
 import javafx.stage.Window;
 import javafx.util.Callback;
 import javafx.geometry.Insets; // For dialog layout padding
+import javafx.scene.input.KeyCode; // For key event handling
+import javafx.scene.input.KeyEvent; // For key event handling
+import javafx.application.Platform; // For Platform.runLater
+import javafx.beans.value.ObservableValue; // For listener reference
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -42,7 +47,7 @@ import java.lang.reflect.Method;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
-
+import com.tasnetwork.calibration.energymeter.ApplicationLauncher;
 import com.tasnetwork.calibration.energymeter.device.DeviceDataManagerController;
 import com.tasnetwork.spring.orm.model.Result;
 
@@ -61,7 +66,7 @@ public class ReportGeneratorController implements Initializable {
     @FXML private TableColumn<Result, Boolean> selectColumn;
     @FXML private TableColumn<Result, String> serialColumn;
     @FXML private TableColumn<Result, String> testpointNameColumn;
-    @FXML private TableColumn<Result, String> voltageColumn; // This field must be correctly mapped in FXML
+    @FXML private TableColumn<Result, String> voltageColumn;
     @FXML private TableColumn<Result, String> rpmColumn;
     @FXML private TableColumn<Result, String> windspeedColumn;
     @FXML private TableColumn<Result, String> currentColumn;
@@ -70,28 +75,33 @@ public class ReportGeneratorController implements Initializable {
     @FXML private TableColumn<Result, String> pfColumn;
     @FXML private TableColumn<Result, String> vibrationColumn;
     @FXML private TableColumn<Result, String> statusColumn;
-    @FXML private CheckBox selectAllCheckbox;
+    @FXML private CheckBox selectAllCheckbox; // Keeping it a CheckBox, but it behaves like a button
     @FXML private Button generateReportButton;
     @FXML private Label errorMessageLabel;
     @FXML private Label noResultsLabel;
-    @FXML private ComboBox<String> filterComboBox; // Added FXML for filter ComboBox
+    @FXML private ComboBox<String> filterComboBox; 
 
-
-    // The path to your report templates folder
-    private static final String TEMPLATES_DIR_PATH = "D:\\tasworkspace\\ProFAN\\ProFAN-Maven-s0.0.0.7\\src\\main\\resources\\reportTemplates";
+    // Default template directory path (used if no config file or invalid config)
+    private static String TEMPLATES_DIR_PATH = "D:\\tasworkspace\\ProFAN\\ProFAN-Maven-s0.0.0.7\\src\\main\\resources\\reportTemplates";
+    // Configuration file for storing the template directory path
+    private static final String TEMPLATES_CONFIG_FILE_NAME = "templates_config.json";
 
     private ObservableList<Template> availableTemplates = FXCollections.observableArrayList();
     private Template selectedTemplate = null;
     
-    // Fetch all results from the service once at startup.
-    // In a large-scale application, you would typically fetch data
-    // on-demand based on search criteria rather than loading all at once.
+    // Stores the maximum number of records that can be selected for the currently active template.
+    // Defaults to Integer.MAX_VALUE (no limit) if no template is selected or config is invalid.
+    private int currentTemplateMaxRecords = 0 ; 
+
+    // Flag to prevent recursive calls/multiple warnings when programmatic selection occurs.
+    // This flag is ONLY for individual row checkboxes. The selectAllCheckbox now uses setOnAction.
+    private volatile boolean isProgrammaticSelection = false; // Use volatile for thread visibility
+
     List<Result> allResults = DeviceDataManagerController.getResultService().findall();
 
     // List of Result properties that can be mapped to Excel (excluding 'id' and 'selected')
-    // This list will define the fields shown in the configuration dialog.
     private static final List<String> RESULT_PROPERTIES_TO_MAP = Arrays.asList(
-        "fanSerialNumber", "testPointName", "voltage", "rpm", "windSpeed", // Added "voltage" here
+        "fanSerialNumber", "testPointName", "voltage", "rpm", "windSpeed",
         "vibration", "current", "watts", "va", "powerFactor", "testStatus"
     );
 
@@ -103,29 +113,89 @@ public class ReportGeneratorController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        // Load templates from the specified directory
-        availableTemplates = loadTemplatesFromDirectory();
-        templateListView.setItems(availableTemplates.stream().map(Template::getName).collect(Collectors.toCollection(FXCollections::observableArrayList)));
+        // Load the configured template directory path and reload templates
+        // Using Platform.runLater to ensure the scene is available
+        Platform.runLater(() -> {
+            loadConfiguredTemplatesDirPath();
+            reloadTemplates();
+
+            // Add global key event filter to the scene
+            if (templateListView.getScene() != null) {
+                templateListView.getScene().addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+                    // Detect CTRL + SHIFT + ` (back_quote)
+                    if (event.isControlDown() && event.isShiftDown() && event.getCode() == KeyCode.BACK_QUOTE) {
+                        openPathConfigurationDialog();
+                        event.consume(); // Consume the event so it doesn't propagate
+                    }
+                });
+            } else {
+                ApplicationLauncher.logger.error("Warning: Scene not available during initialize, cannot set global key listener.");
+            }
+        });
 
         // Listener for template selection (single click to select, double click to configure)
         templateListView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            ApplicationLauncher.logger.info("Template selection changed from '" + oldVal + "' to '" + newVal + "'");
             if (newVal != null) {
                 selectedTemplate = availableTemplates.stream()
-                        .filter(t -> t.getName().equals(newVal))
+                        .filter(t -> t.getDisplayName().equals(newVal))
                         .findFirst()
                         .orElse(null);
                 
-                // Update preview on single selection
+                // Clear all existing selections when a new template is selected
+                // This is crucial for correctly applying new selection limits.
+                ApplicationLauncher.logger.info("Clearing all previous selections due to new template selection.");
+                fanTableView.getItems().forEach(fan -> fan.setSelected(false));
+                fanTableView.refresh(); // Important to refresh to visually clear checkboxes
+                updateGenerateReportButtonState();
+                updateSelectAllCheckboxState(); // Update the selectAll checkbox state
+
+                // Load config for the newly selected template to get numRecords
+                currentTemplateMaxRecords = Integer.MAX_VALUE; // Default to no limit
+                if (selectedTemplate != null) {
+                    File configFile = getConfigFile(selectedTemplate);
+                    if (configFile.exists()) {
+                        try (FileReader reader = new FileReader(configFile)) {
+                            TemplateConfig config = GSON.fromJson(reader, TemplateConfig.class);
+                            if (config != null && config.getNumRecords() > 0) {
+                                currentTemplateMaxRecords = config.getNumRecords();
+                                selectAllCheckbox.setText("Select First " + currentTemplateMaxRecords + " Records");
+                                ApplicationLauncher.logger.info("Loaded template config. Max records for selection: " + currentTemplateMaxRecords);
+                            } else {
+                                ApplicationLauncher.logger.info("Config for " + selectedTemplate.getName() + " is invalid or missing numRecords. No selection limit enforced.");
+                                showAlert(Alert.AlertType.INFORMATION, "Template Configuration Info", 
+                                          "The selected template '" + selectedTemplate.getDisplayName() + "' does not have a valid 'Number of Records' configured. No selection limit will be enforced for this template.");
+                            }
+                        } catch (IOException | JsonSyntaxException e) {
+                            ApplicationLauncher.logger.error("Error loading config for " + selectedTemplate.getName() + ": " + e.getMessage());
+                            showAlert(Alert.AlertType.ERROR, "Config Load Error", 
+                                      "Error loading configuration for template '" + selectedTemplate.getDisplayName() + "'. No selection limit will be enforced.");
+                            // currentTemplateMaxRecords remains Integer.MAX_VALUE
+                        }
+                    } else {
+                        ApplicationLauncher.logger.info("No config file found for " + selectedTemplate.getName() + ". No selection limit enforced.");
+                        showAlert(Alert.AlertType.INFORMATION, "Template Configuration Info", 
+                                  "No configuration file found for the selected template '" + selectedTemplate.getDisplayName() + "'. No selection limit will be enforced. Double-click the template to configure.");
+                    }
+                }
                 updateTemplatePreview(selectedTemplate);
             } else {
+                ApplicationLauncher.logger.info("No template selected. Clearing preview and resetting max records.");
                 selectedTemplate = null;
                 updateTemplatePreview(null); // Clear preview
+                currentTemplateMaxRecords = Integer.MAX_VALUE; // No template selected, no limit
+                // Clear all selections when no template is selected
+                fanTableView.getItems().forEach(fan -> fan.setSelected(false)); 
+                fanTableView.refresh();
+                updateGenerateReportButtonState();
+                updateSelectAllCheckboxState();
             }
         });
 
         // Handle double-click to open configuration dialog
         templateListView.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2 && selectedTemplate != null) {
+                ApplicationLauncher.logger.info("Double-click detected on template: " + selectedTemplate.getDisplayName());
                 openTemplateConfigurationDialog(selectedTemplate);
             }
         });
@@ -145,19 +215,80 @@ public class ReportGeneratorController implements Initializable {
         vibrationColumn     .setCellValueFactory(new PropertyValueFactory<>("vibration"));
         statusColumn		.setCellValueFactory(new PropertyValueFactory<>("testStatus"));
 
-        // Custom cell factory for the select checkbox column
         selectColumn.setCellFactory(new Callback<TableColumn<Result, Boolean>, TableCell<Result, Boolean>>() {
             @Override
             public TableCell<Result, Boolean> call(TableColumn<Result, Boolean> param) {
                 return new TableCell<Result, Boolean>() {
                     private final CheckBox checkBox = new CheckBox();
+                    private Boolean lastProcessedState = null;
+                    private boolean isUpdating = false; // Guard to prevent recursive updates
+
                     {
                         checkBox.selectedProperty().addListener((obs, oldVal, newVal) -> {
-                            Result fan = (Result) getTableRow().getItem();
-                            if (fan != null) {
+                            if (isUpdating) {
+                                ApplicationLauncher.logger.info("  -> Ignoring recursive checkbox update.");
+                                return; // Prevent recursive updates
+                            }
+                            if (newVal.equals(lastProcessedState)) {
+                                ApplicationLauncher.logger.info("  -> Ignoring redundant checkbox event for state: " + newVal);
+                                return; // Skip redundant events
+                            }
+                            lastProcessedState = newVal;
+
+                            Result fan = getTableRow().getItem();
+                            if (fan == null) {
+                                ApplicationLauncher.logger.info("Warning: Checkbox listener triggered for null fan. Ignoring.");
+                                return; // Prevent processing null rows
+                            }
+                            ApplicationLauncher.logger.info("Individual checkbox changed for fan: " + fan.getFanSerialNumber() + ", oldVal: " + oldVal + ", newVal: " + newVal + ", isProgrammaticSelection: " + isProgrammaticSelection);
+
+                            if (isProgrammaticSelection) {
+                                isUpdating = true;
+                                try {
+                                    fan.setSelected(newVal);
+                                    ApplicationLauncher.logger.info("  -> Programmatic change, skipping limit check.");
+                                } finally {
+                                    isUpdating = false;
+                                }
+                                return;
+                            }
+
+                            // For manual selections, check limit considering this change
+                            long currentSelectedCount = fanTableView.getItems().stream().filter(Result::isSelected).count();
+                            if (newVal) { // Attempting to select
+                                // Adjust count to exclude the current row if it was previously selected
+                                long adjustedCount = currentSelectedCount; // If already selected, it's included in currentSelectedCount
+                                if (fan.isSelected() && oldVal) { // If the checkbox was true and is still true, and was already selected
+                                    // This case implies oldVal == newVal == true, which should be caught by redundant event check.
+                                    // If oldVal was false and newVal is true, and fan was already selected (due to external means), this is unexpected.
+                                    // A simpler check: if we are trying to select this checkbox and it causes total selected count to exceed limit.
+                                }
+                                
+                                // Recalculate based on future state: current selected + 1 (if selecting this one)
+                                if (!fan.isSelected() && newVal && currentSelectedCount >= currentTemplateMaxRecords) { // If not already selected, but trying to select and hitting limit
+                                    ApplicationLauncher.logger.info("  -> Selection limit exceeded. Reverting checkbox.");
+                                    isUpdating = true;
+                                    try {
+                                        checkBox.setSelected(false);
+                                        showAlert(Alert.AlertType.WARNING, "Selection Limit Exceeded",
+                                                "Number of records for selected template is '" + currentTemplateMaxRecords + "'. Cannot select more.");
+                                    } finally {
+                                        isUpdating = false;
+                                    }
+                                    return;
+                                }
+                            }
+                            // Allow the selection/deselection
+                            ApplicationLauncher.logger.info("  -> Manual selection allowed. Setting fan selected: " + newVal);
+                            isUpdating = true;
+                            try {
                                 fan.setSelected(newVal);
-                                updateGenerateReportButtonState();
-                                updateSelectAllCheckboxState();
+                                Platform.runLater(() -> {
+                                    updateGenerateReportButtonState();
+                                    updateSelectAllCheckboxState();
+                                });
+                            } finally {
+                                isUpdating = false;
                             }
                         });
                     }
@@ -165,11 +296,17 @@ public class ReportGeneratorController implements Initializable {
                     @Override
                     protected void updateItem(Boolean item, boolean empty) {
                         super.updateItem(item, empty);
-                        if (empty || getItem() == null) {
+                        if (empty || item == null || getTableRow().getItem() == null) {
                             setGraphic(null);
+                            lastProcessedState = null; // Reset state for empty cells
                         } else {
-                            checkBox.setSelected(item);
-                            setGraphic(checkBox);
+                            isUpdating = true;
+                            try {
+                                checkBox.setSelected(item);
+                                setGraphic(checkBox);
+                            } finally {
+                                isUpdating = false;
+                            }
                         }
                     }
                 };
@@ -207,26 +344,20 @@ public class ReportGeneratorController implements Initializable {
         filterComboBox.setItems(FXCollections.observableArrayList("NONE", "PASSED", "FAILED"));
         filterComboBox.getSelectionModel().select("NONE"); // Set default filter
         // Add listener to filter ComboBox
-        filterComboBox.valueProperty().addListener((obs, oldVal, newVal) -> applyStatusFilter(newVal));
-
-
-        // Set initial fan data by converting the List to an ObservableList
-        // The applyStatusFilter will be called once on initialization due to default selection,
-        // so no need to explicitly set all results here again.
-        // fanTableView.setItems(FXCollections.observableArrayList(allResults)); 
-        // updateTableViewVisibility(); // This will be called by applyStatusFilter
-
-        // Add listener to selectAllCheckbox
-        selectAllCheckbox.selectedProperty().addListener((obs, oldVal, newVal) -> {
-            for (Result fan : fanTableView.getItems()) {
-                fan.setSelected(newVal);
-            }
-            fanTableView.refresh(); // Refresh table to update checkboxes and status colors
-            updateGenerateReportButtonState();
+        filterComboBox.valueProperty().addListener((obs, oldVal, newVal) -> {
+            ApplicationLauncher.logger.info("Filter ComboBox changed from '" + oldVal + "' to '" + newVal + "'");
+            applyStatusFilter(newVal);
         });
 
+        // IMPORTANT: Use setOnAction for the selectAllCheckbox to treat it as a button
+        // This avoids the recursive listener issue with selectedProperty().
+        selectAllCheckbox.setOnAction(event -> handleSelectAllAction());
+
         // Add action listener to serialInputTextField to trigger search on Enter key press
-        serialInputTextField.setOnAction(event -> handleSearchFans());
+        serialInputTextField.setOnAction(event -> {
+            ApplicationLauncher.logger.info("Enter key pressed in serial input field. Triggering search.");
+            handleSearchFans();
+        });
 
         // Initialize button state
         updateGenerateReportButtonState();
@@ -236,10 +367,181 @@ public class ReportGeneratorController implements Initializable {
         templatePreviewWebView.setVisible(false);
         noPreviewLabel.setVisible(true);
         noPreviewLabel.setText("Select a template to see its preview.");
-
-        // Apply initial filter (NONE by default) to populate the table
-        applyStatusFilter(filterComboBox.getSelectionModel().getSelectedItem());
     }
+
+    /**
+     * Handles the action for the "Select All" checkbox, behaving like a toggle button.
+     * Selects the first 'N' records if none or some are selected, or clears all if fully selected.
+     */
+    private void handleSelectAllAction() {
+        ApplicationLauncher.logger.info("handleSelectAllAction called.");
+        long selectedCount = fanTableView.getItems().stream().filter(Result::isSelected).count();
+        long totalItems = fanTableView.getItems().size();
+
+        // Perform the core logic within a Platform.runLater to ensure all UI updates
+        // and flag changes are on the FX Application Thread and sequenced correctly.
+        Platform.runLater(() -> {
+            isProgrammaticSelection = true; // Set flag when starting programmatic changes
+            ApplicationLauncher.logger.info("  isProgrammaticSelection set to TRUE for Select All action (inside Platform.runLater).");
+            try {
+                // If nothing or some are selected, intent is to select the first N (or all if no limit)
+                if (selectedCount == 0 || (selectedCount == totalItems && selectAllCheckbox.isSelected())) { // Checkbox might be "selected" visually but mean "clear"
+                    ApplicationLauncher.logger.info("  -> Current state: Not all selected, or partially selected. Attempting to select first " + currentTemplateMaxRecords + " records.");
+                    
+                    // Clear all current selections first to ensure a clean "select first N" operation
+                    fanTableView.getItems().forEach(fan -> fan.setSelected(false));
+
+                    int countSelected = 0;
+                    for (Result fan : fanTableView.getItems()) {
+                        if (countSelected < currentTemplateMaxRecords) {
+                            fan.setSelected(true);
+                            countSelected++;
+                        } else {
+                            // Ensure any items beyond limit are deselected if they somehow were selected
+                            if (fan.isSelected()) {
+                                fan.setSelected(false);
+                            }
+                        }
+                    }
+
+                    // Show informational alert only if actual limiting occurred
+                    if (totalItems > currentTemplateMaxRecords && currentTemplateMaxRecords != Integer.MAX_VALUE) {
+                        showAlert(Alert.AlertType.INFORMATION, "Selection Limited",
+                                "Only the first " + currentTemplateMaxRecords + " records were selected based on the template configuration.");
+                    }
+
+                } else { // If all items are currently selected (meaning the button shows "Clear Selection")
+                    ApplicationLauncher.logger.info("  -> Current state: All selected. Clearing all selections.");
+                    fanTableView.getItems().forEach(fan -> fan.setSelected(false));
+                }
+            } finally {
+                isProgrammaticSelection = false; // Reset flag after programmatic changes are done
+                ApplicationLauncher.logger.info("  isProgrammaticSelection set to FALSE after Select All action (inside Platform.runLater).");
+                
+                // Now refresh UI elements AFTER all data model changes are complete and flag is reset
+                fanTableView.refresh();
+                updateGenerateReportButtonState();
+                updateSelectAllCheckboxState();
+            }
+        });
+    }
+
+
+    /**
+     * Loads the configured template directory path from a JSON file.
+     * If the file doesn't exist or is invalid, it falls back to the default path.
+     */
+    private void loadConfiguredTemplatesDirPath() {
+        File configFile = new File(TEMPLATES_CONFIG_FILE_NAME);
+        if (configFile.exists()) {
+            try (FileReader reader = new FileReader(configFile)) {
+                Properties configProps = GSON.fromJson(reader, Properties.class);
+                if (configProps != null && configProps.containsKey("templatesDirPath")) {
+                    TEMPLATES_DIR_PATH = configProps.getProperty("templatesDirPath");
+                    ApplicationLauncher.logger.info("Loaded TEMPLATES_DIR_PATH from config: " + TEMPLATES_DIR_PATH);
+                } else {
+                    ApplicationLauncher.logger.error("Config file exists but is empty or missing 'templatesDirPath'. Using default path.");
+                }
+            } catch (IOException | JsonSyntaxException e) {
+                ApplicationLauncher.logger.error("Error reading templates config file: " + e.getMessage());
+                // Fallback to default path
+            }
+        } else {
+            ApplicationLauncher.logger.info("Templates config file not found. Using default path: " + TEMPLATES_DIR_PATH);
+        }
+        
+    }
+
+    /**
+     * Saves the provided template directory path to a JSON file.
+     * @param newPath The new path to save.
+     */
+    private void saveConfiguredTemplatesDirPath(String newPath) {
+        File configFile = new File(TEMPLATES_CONFIG_FILE_NAME);
+        try (FileWriter writer = new FileWriter(configFile)) {
+            Properties configProps = new Properties();
+            configProps.setProperty("templatesDirPath", newPath);
+            GSON.toJson(configProps, writer);
+            TEMPLATES_DIR_PATH = newPath; // Update the static variable
+            ApplicationLauncher.logger.info("TEMPLATES_DIR_PATH saved to config: " + newPath);
+        } catch (IOException e) {
+            ApplicationLauncher.logger.error("Error saving templates config file: " + e.getMessage());
+            showAlert(Alert.AlertType.ERROR, "Save Error", "Failed to save template path: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Reloads the templates from the current TEMPLATES_DIR_PATH.
+     * This method re-scans the directory, updates the ListView, and clears selection/preview.
+     */
+    private void reloadTemplates() {
+        ApplicationLauncher.logger.info("Reloading templates from: " + TEMPLATES_DIR_PATH);
+        availableTemplates.clear();
+        availableTemplates.addAll(loadTemplatesFromDirectory());
+        templateListView.setItems(availableTemplates.stream().map(Template::getDisplayName).collect(Collectors.toCollection(FXCollections::observableArrayList)));
+        
+        selectedTemplate = null; // Clear selected template
+        updateTemplatePreview(null); // Clear preview area
+        
+        // Also re-apply filters and search to ensure the table reflects the data from the new path
+        handleSearchFans(); // This will trigger applyStatusFilter as well
+    }
+
+    /**
+     * Opens a dialog for the user to configure the TEMPLATES_DIR_PATH.
+     */
+    private void openPathConfigurationDialog() {
+        ApplicationLauncher.logger.info("Opening Path Configuration Dialog.");
+        Stage dialogStage = new Stage();
+        dialogStage.setTitle("Configure Template Directory");
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.initOwner(templateListView.getScene().getWindow());
+
+        GridPane grid = new GridPane();
+        grid.setPadding(new Insets(10));
+        grid.setHgap(10);
+        grid.setVgap(5);
+
+        Label pathLabel = new Label("New Template Directory Path:");
+        TextField pathTextField = new TextField(TEMPLATES_DIR_PATH); // Pre-fill with current path
+        pathTextField.setPrefWidth(400); // Make it wide enough
+
+        Button saveButton = new Button("Save and Reload");
+        Button cancelButton = new Button("Cancel");
+        Label statusLabel = new Label();
+        statusLabel.setWrapText(true);
+
+        grid.addRow(0, pathLabel, pathTextField);
+        grid.addRow(1, saveButton, cancelButton);
+        GridPane.setColumnSpan(statusLabel, 2);
+        grid.addRow(2, statusLabel);
+
+        saveButton.setOnAction(event -> {
+            String newPath = pathTextField.getText().trim();
+            File newDir = new File(newPath);
+            if (newPath.isEmpty() || !newDir.exists() || !newDir.isDirectory()) {
+                statusLabel.setText("Invalid path. Please enter a valid existing directory.");
+                statusLabel.setTextFill(Color.RED);
+                ApplicationLauncher.logger.info("Invalid path entered in config dialog: " + newPath);
+            } else {
+                saveConfiguredTemplatesDirPath(newPath);
+                reloadTemplates(); // Reload templates from the new path
+                statusLabel.setText("Path saved and templates reloaded successfully.");
+                statusLabel.setTextFill(Color.GREEN);
+                ApplicationLauncher.logger.info("Path saved and reloaded: " + newPath);
+                dialogStage.close(); // Close dialog on success
+            }
+        });
+
+        cancelButton.setOnAction(event -> {
+            ApplicationLauncher.logger.info("Path Configuration Dialog cancelled.");
+            dialogStage.close();
+        });
+
+        dialogStage.setScene(new javafx.scene.Scene(grid));
+        dialogStage.showAndWait();
+    }
+
 
     /**
      * Updates the WebView to show the preview of the selected template.
@@ -254,9 +556,9 @@ public class ReportGeneratorController implements Initializable {
                     engine.load(imageFile.toURI().toURL().toExternalForm());
                     templatePreviewWebView.setVisible(true);
                     noPreviewLabel.setVisible(false);
-                    System.out.println("Attempting to load JPG: " + imageFile.toURI().toURL().toExternalForm());
+                    ApplicationLauncher.logger.info("Attempting to load JPG: " + imageFile.toURI().toURL().toExternalForm());
                 } catch (Exception e) {
-                    System.err.println("Failed to load JPG preview for: " + template.getName() + " - " + e.getMessage());
+                    ApplicationLauncher.logger.error("Failed to load JPG preview for: " + template.getName() + " - " + e.getMessage());
                     engine.loadContent("<h1>Error</h1><p>Could not load image preview. Error: " + escapeHtml(e.getMessage()) + "</p>");
                     templatePreviewWebView.setVisible(true);
                     noPreviewLabel.setVisible(false);
@@ -266,7 +568,7 @@ public class ReportGeneratorController implements Initializable {
                 templatePreviewWebView.setVisible(false);
                 noPreviewLabel.setText("No JPG preview available for " + template.getName() + ".");
                 noPreviewLabel.setVisible(true);
-                System.out.println("No JPG file found for: " + template.getName() + " at " + (imageFile != null ? imageFile.getAbsolutePath() : "null path"));
+                ApplicationLauncher.logger.info("No JPG file found for: " + template.getName() + " at " + (imageFile != null ? imageFile.getAbsolutePath() : "null path"));
             }
         } else {
             engine.loadContent("");
@@ -286,12 +588,12 @@ public class ReportGeneratorController implements Initializable {
         File templateDir = new File(TEMPLATES_DIR_PATH);
 
         if (!templateDir.exists()) {
-            System.err.println("Template directory does not exist: " + TEMPLATES_DIR_PATH);
+            ApplicationLauncher.logger.error("Template directory does not exist: " + TEMPLATES_DIR_PATH);
             errorMessageLabel.setText("Error: Template directory not found.");
             return templates;
         }
         if (!templateDir.isDirectory()) {
-            System.err.println("Path is not a directory: " + TEMPLATES_DIR_PATH);
+            ApplicationLauncher.logger.error("Path is not a directory: " + TEMPLATES_DIR_PATH);
             errorMessageLabel.setText("Error: Template path is not a directory.");
             return templates;
         }
@@ -308,7 +610,7 @@ public class ReportGeneratorController implements Initializable {
                 templates.add(new Template(xlsxFile.getName(), xlsxFile, imageFile));
             }
         } else {
-            System.err.println("Could not list files in directory: " + TEMPLATES_DIR_PATH);
+            ApplicationLauncher.logger.error("Could not list files in directory: " + TEMPLATES_DIR_PATH);
             errorMessageLabel.setText("Error: Could not access template files.");
         }
         return templates;
@@ -321,7 +623,7 @@ public class ReportGeneratorController implements Initializable {
         int dotIndex = fileName.lastIndexOf('.');
         if (dotIndex > 0) {
             return fileName.substring(0, dotIndex);
-        }
+            }
         return fileName;
     }
 
@@ -538,40 +840,43 @@ public class ReportGeneratorController implements Initializable {
      */
     @FXML
     private void handleSearchFans() {
+        ApplicationLauncher.logger.info("handleSearchFans called.");
         errorMessageLabel.setText(""); // Clear previous error messages
         String input = serialInputTextField.getText().trim();
 
+        List<Result> currentFilteredData;
+
         if (input.isEmpty()) {
-            // If input is empty, reset filters and display all results
-            filterComboBox.getSelectionModel().select("NONE"); // This will internally call applyStatusFilter
-            return;
+            ApplicationLauncher.logger.info("  Serial input is empty. Filtering all results.");
+            // If serial input is empty, revert to all results before applying status filter
+            currentFilteredData = allResults;
+        } else {
+            List<SearchQuery> searchQueries = parseSerialQueries(input);
+            ApplicationLauncher.logger.info("  Parsed search queries: " + searchQueries.stream().map(q -> q.isRange() ? q.prefix + "[" + q.startNumeric + "-" + q.endNumeric + "]" : q.exactSerialNumber).collect(Collectors.toList()));
+
+            // If there was an error during parsing, searchQueries will be empty
+            // and errorMessageLabel would have been set. In this case, clear table.
+            if (searchQueries.isEmpty() && !errorMessageLabel.getText().isEmpty()) {
+                 ApplicationLauncher.logger.info("  Search query parsing failed. Clearing table.");
+                 fanTableView.setItems(FXCollections.emptyObservableList());
+                 updateTableViewVisibility();
+                 updateSelectAllCheckboxState();
+                 updateGenerateReportButtonState();
+                 return;
+            }
+
+            // Apply search filter
+            currentFilteredData = allResults.stream() // Filtering the already loaded 'allResults' for demonstration
+                                        .filter(fan -> 
+                                            searchQueries.stream()
+                                                    .anyMatch(query -> query.matches(fan.getFanSerialNumber())))
+                                        .collect(Collectors.toList());
+            ApplicationLauncher.logger.info("  Found " + currentFilteredData.size() + " fans matching search queries.");
         }
 
-        List<SearchQuery> searchQueries = parseSerialQueries(input);
-
-        // If there was an error during parsing, searchQueries will be empty
-        // and errorMessageLabel would have been set. In this case, clear table.
-        if (searchQueries.isEmpty() && !errorMessageLabel.getText().isEmpty()) {
-             fanTableView.setItems(FXCollections.emptyObservableList());
-             updateTableViewVisibility();
-             updateSelectAllCheckboxState();
-             updateGenerateReportButtonState();
-             return;
-        }
-
-        // Apply search filter
-        ObservableList<Result> searchFilteredFans = FXCollections.observableArrayList(
-                allResults.stream() // Filtering the already loaded 'allResults' for demonstration
-                    .filter(fan -> {
-                        // A fan matches if its serial number matches ANY of the parsed search queries
-                        return searchQueries.stream()
-                                .anyMatch(query -> query.matches(fan.getFanSerialNumber()));
-                    })
-                    .collect(Collectors.toList())
-        );
-
-        // Now, apply the status filter on top of the search results
-        applyStatusFilter(filterComboBox.getSelectionModel().getSelectedItem(), searchFilteredFans);
+        // Now, apply the status filter on top of the search results (or all results if no search)
+        ApplicationLauncher.logger.info("  Applying status filter: " + filterComboBox.getSelectionModel().getSelectedItem());
+        applyStatusFilter(filterComboBox.getSelectionModel().getSelectedItem(), currentFilteredData);
     }
 
     /**
@@ -581,6 +886,7 @@ public class ReportGeneratorController implements Initializable {
      * @param sourceList The list of Result objects to filter from. If null, 'allResults' will be used.
      */
     private void applyStatusFilter(String selectedFilter, List<Result> sourceList) {
+        ApplicationLauncher.logger.info("applyStatusFilter called with filter: " + selectedFilter);
         List<Result> listToFilter = (sourceList != null) ? sourceList : allResults;
         ObservableList<Result> filteredData = FXCollections.observableArrayList();
 
@@ -596,10 +902,11 @@ public class ReportGeneratorController implements Initializable {
             filteredData.addAll(listToFilter);
         }
 
+        ApplicationLauncher.logger.info("  Filtered data size: " + filteredData.size());
         fanTableView.setItems(filteredData);
         fanTableView.refresh(); // Refresh table to ensure colors and selection states are correct
         updateTableViewVisibility();
-        updateSelectAllCheckboxState();
+        updateSelectAllCheckboxState(); // Update the Select All checkbox's label (itself)
         updateGenerateReportButtonState();
     }
 
@@ -608,7 +915,10 @@ public class ReportGeneratorController implements Initializable {
      * @param selectedFilter The selected filter string ("NONE", "PASSED", "FAILED").
      */
     private void applyStatusFilter(String selectedFilter) {
-        applyStatusFilter(selectedFilter, null); // Pass null to indicate filtering from allResults
+        // When triggered by ComboBox change, ensure serial filter is also considered.
+        // Re-call handleSearchFans() which will then call applyStatusFilter with current search terms.
+        ApplicationLauncher.logger.info("applyStatusFilter overload called, calling handleSearchFans().");
+        handleSearchFans(); 
     }
 
 
@@ -618,33 +928,38 @@ public class ReportGeneratorController implements Initializable {
      */
     @FXML
     private void handleGenerateReport() {
+        ApplicationLauncher.logger.info("Generate Report button clicked.");
         List<Result> fansToReport = fanTableView.getItems().stream()
                 .filter(Result::isSelected)
                 .collect(Collectors.toList());
 
         if (fansToReport.isEmpty()) {
+            ApplicationLauncher.logger.info("  No fans selected for report.");
             showAlert(Alert.AlertType.WARNING, "No Fans Selected", "Please select at least one fan to generate a report.");
             return;
         }
 
         if (selectedTemplate == null) {
+            ApplicationLauncher.logger.info("  No template selected for report.");
             showAlert(Alert.AlertType.WARNING, "No Template Selected", "Please select an Excel template to generate the report.");
             return;
         }
 
         try {
+            ApplicationLauncher.logger.info("  Initiating Excel report generation for " + fansToReport.size() + " fans.");
             generateExcelReport(selectedTemplate, fansToReport);
+            ApplicationLauncher.logger.info("  Report generation complete.");
             showAlert(Alert.AlertType.INFORMATION, "Report Generation Complete",
                     "Report successfully generated and saved to your chosen location.");
         } catch (IOException e) {
+            ApplicationLauncher.logger.error("  Report generation failed due to I/O error: " + e.getMessage());
             showAlert(Alert.AlertType.ERROR, "Report Generation Failed",
-                    "Failed to generate report due to an I/O error: " + e.getMessage());
-            System.err.println("Error generating report: " + e.getMessage());
+                    "Failed to generate report due1 to an I/O error: " + e.getMessage());
             e.printStackTrace();
         } catch (Exception e) {
+            ApplicationLauncher.logger.error("  Unexpected error during report generation: " + e.getMessage());
             showAlert(Alert.AlertType.ERROR, "Report Generation Failed",
                     "An unexpected error occurred during report generation: " + e.getMessage());
-            System.err.println("Unexpected error during report generation: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -666,12 +981,23 @@ public class ReportGeneratorController implements Initializable {
 
         Map<String, TextField> propertyTextFields = new LinkedHashMap<>(); // To maintain order and access fields
 
-        int rowIdx = 0;
+        // New field for Number of Records
+        TextField recordsTextField = new TextField();
+        recordsTextField.setPromptText("e.g., 10");
+        recordsTextField.setTextFormatter(new TextFormatter<>(change -> { // Allow only numeric input
+            if (change.getControlNewText().matches("\\d*")) {
+                return change;
+            }
+            return null;
+        }));
+        grid.addRow(0, new Label("Number of Records:"), recordsTextField);
+
+        int rowIdx = 1; // Start from second row for other properties
         // Dynamically create input fields for each mappable Result property
         for (String propertyName : RESULT_PROPERTIES_TO_MAP) {
-            Label label = new Label(camelCaseToTitleCase(propertyName) + " Cell Range:");
+            Label label = new Label(camelCaseToTitleCase(propertyName) + " Start Cell:"); // Changed prompt
             TextField textField = new TextField();
-            textField.setPromptText("e.g., A2:A10 or C5");
+            textField.setPromptText("e.g., A2"); // Changed prompt
             propertyTextFields.put(propertyName, textField);
             grid.addRow(rowIdx++, label, textField);
         }
@@ -688,31 +1014,38 @@ public class ReportGeneratorController implements Initializable {
         // --- Load Configuration Logic ---
         File configFile = getConfigFile(template);
         loadButton.setOnAction(event -> {
+            ApplicationLauncher.logger.info("Loading template config for: " + template.getName());
             if (configFile.exists()) {
                 try (FileReader reader = new FileReader(configFile)) {
                     TemplateConfig config = GSON.fromJson(reader, TemplateConfig.class);
-                    if (config != null && config.getPropertyToCellRange() != null) {
-                        for (Map.Entry<String, String> entry : config.getPropertyToCellRange().entrySet()) {
-                            TextField tf = propertyTextFields.get(entry.getKey());
-                            if (tf != null) {
-                                tf.setText(entry.getValue());
+                    if (config != null) {
+                        recordsTextField.setText(String.valueOf(config.getNumRecords())); // Set numRecords
+                        if (config.getPropertyToCellRange() != null) {
+                            for (Map.Entry<String, String> entry : config.getPropertyToCellRange().entrySet()) {
+                                TextField tf = propertyTextFields.get(entry.getKey());
+                                if (tf != null) {
+                                    tf.setText(entry.getValue());
+                                }
                             }
                         }
                         statusLabel.setText("Configuration loaded successfully from " + configFile.getName());
                         statusLabel.setTextFill(Color.GREEN);
+                        ApplicationLauncher.logger.info("  Config loaded. Num records: " + config.getNumRecords());
                     } else {
                         statusLabel.setText("Configuration file empty or invalid.");
                         statusLabel.setTextFill(Color.ORANGE);
+                        ApplicationLauncher.logger.info("  Config file empty/invalid.");
                     }
                 } catch (IOException | JsonSyntaxException e) {
                     statusLabel.setText("Error loading configuration: " + e.getMessage());
                     statusLabel.setTextFill(Color.RED);
-                    System.err.println("Error loading config for " + template.getName() + ": " + e.getMessage());
+                    ApplicationLauncher.logger.error("  Error loading config: " + e.getMessage());
                     e.printStackTrace();
                 }
             } else {
                 statusLabel.setText("No existing configuration found for this template.");
                 statusLabel.setTextFill(Color.BLUE);
+                ApplicationLauncher.logger.info("  No config file found.");
             }
         });
         // Automatically load on dialog open if config exists
@@ -720,44 +1053,71 @@ public class ReportGeneratorController implements Initializable {
 
         // --- Save Configuration Logic ---
         saveButton.setOnAction(event -> {
+            ApplicationLauncher.logger.info("Saving template config for: " + template.getName());
             TemplateConfig config = new TemplateConfig();
             Map<String, String> newMapping = new HashMap<>();
             boolean hasInvalidInput = false;
+
+            // Validate and set numRecords
+            try {
+                int numRec = Integer.parseInt(recordsTextField.getText().trim());
+                if (numRec <= 0) {
+                    statusLabel.setText("Number of records must be a positive integer.");
+                    statusLabel.setTextFill(Color.RED);
+                    hasInvalidInput = true;
+                    ApplicationLauncher.logger.info("  Invalid num records (non-positive): " + numRec);
+                } else {
+                    config.setNumRecords(numRec);
+                    ApplicationLauncher.logger.info("  Num records set to: " + numRec);
+                }
+            } catch (NumberFormatException e) {
+                statusLabel.setText("Invalid number of records. Please enter a valid integer.");
+                statusLabel.setTextFill(Color.RED);
+                hasInvalidInput = true;
+                ApplicationLauncher.logger.info("  Invalid num records (not an integer): " + recordsTextField.getText());
+            }
+
+            if (hasInvalidInput) {
+                return; // Stop saving if number of records is invalid
+            }
+
+
             for (Map.Entry<String, TextField> entry : propertyTextFields.entrySet()) {
                 String propertyName = entry.getKey();
-                String cellRange = entry.getValue().getText().trim();
-                if (!cellRange.isEmpty()) {
-                    // Basic validation: ensure it looks like a cell reference
-                    // Updated regex to allow single cell (e.g., A1) or range (e.g., A1:B2)
-                    if (!Pattern.matches("^[A-Z]+[0-9]+(:[A-Z]+[0-9]+)?$", cellRange.toUpperCase())) {
-                        statusLabel.setText("Invalid cell range format for " + camelCaseToTitleCase(propertyName) + ": " + cellRange);
+                String cellReference = entry.getValue().getText().trim();
+                if (!cellReference.isEmpty()) {
+                    // Validation for single cell reference (e.g., A1, B10, not A1:B2)
+                    if (!Pattern.matches("^[A-Z]+[0-9]+$", cellReference.toUpperCase())) {
+                        statusLabel.setText("Invalid cell format for " + camelCaseToTitleCase(propertyName) + ": " + cellReference + ". Expected single cell (e.g., A2).");
                         statusLabel.setTextFill(Color.RED);
                         hasInvalidInput = true;
+                        ApplicationLauncher.logger.info("  Invalid cell format for " + propertyName + ": " + cellReference);
                         break;
                     }
-                    newMapping.put(propertyName, cellRange);
+                    newMapping.put(propertyName, cellReference);
                 }
             }
 
             if (hasInvalidInput) {
-                return; // Stop saving if input is invalid
+                return; // Stop saving if any cell input is invalid
             }
 
-            if (newMapping.isEmpty()) {
-                statusLabel.setText("No mappings entered. Configuration will be empty.");
+            if (newMapping.isEmpty() && config.getNumRecords() == 0) { // Consider it empty if no records and no mappings
+                statusLabel.setText("No mappings or records entered. Configuration will be empty.");
                 statusLabel.setTextFill(Color.ORANGE);
+                ApplicationLauncher.logger.info("  No mappings or records entered. Config will be empty.");
             }
 
-            config.setPropertyToCellRange(newMapping);
+            config.setPropertyToCellRange(newMapping); // Update the config with valid mappings
 
             try (FileWriter writer = new FileWriter(configFile)) {
                 GSON.toJson(config, writer);
                 statusLabel.setText("Configuration saved successfully to " + configFile.getName());
                 statusLabel.setTextFill(Color.GREEN);
+                ApplicationLauncher.logger.info("  Config saved successfully.");
             } catch (IOException e) {
                 statusLabel.setText("Error saving configuration: " + e.getMessage());
                 statusLabel.setTextFill(Color.RED);
-                System.err.println("Error saving config for " + template.getName() + ": " + e.getMessage());
                 e.printStackTrace();
             }
         });
@@ -810,26 +1170,30 @@ public class ReportGeneratorController implements Initializable {
      */
     private void generateExcelReport(Template template, List<Result> fansToReport)
             throws IOException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        ApplicationLauncher.logger.info("generateExcelReport called for template: " + template.getDisplayName() + ", fans count: " + fansToReport.size());
 
         File configFile = getConfigFile(template);
         if (!configFile.exists()) {
+            ApplicationLauncher.logger.info("  Config file not found for template: " + template.getName());
             showAlert(Alert.AlertType.ERROR, "Configuration Missing",
-                    "Configuration file not found for template '" + template.getName() + "'. Please double-click the template to configure cell mappings.");
+                    "Configuration file not found for template '" + template.getDisplayName() + "'. Please double-click the template to configure cell mappings.");
             return; // Exit method
         }
 
         TemplateConfig config;
         try (FileReader reader = new FileReader(configFile)) {
             config = GSON.fromJson(reader, TemplateConfig.class);
-            if (config == null || config.getPropertyToCellRange() == null || config.getPropertyToCellRange().isEmpty()) {
+            // Changed validation for numRecords to be > 0 AND mappings not empty
+            if (config == null || config.getNumRecords() <= 0 || config.getPropertyToCellRange() == null || config.getPropertyToCellRange().isEmpty()) {
+                ApplicationLauncher.logger.info("  Config is empty, invalid, or missing numRecords/mappings.");
                 showAlert(Alert.AlertType.ERROR, "Configuration Empty/Invalid",
-                        "Configuration for template '" + template.getName() + "' is empty or invalid. Please configure cell mappings.");
+                        "Configuration for template '" + template.getDisplayName() + "' is incomplete or invalid. Please configure 'Number of Records' and cell mappings.");
                 return; // Exit method
             }
         } catch (JsonSyntaxException e) {
+            ApplicationLauncher.logger.error("  Error parsing config for template: " + template.getName() + " - " + e.getMessage());
             showAlert(Alert.AlertType.ERROR, "Configuration Error",
-                    "Error parsing configuration for template '" + template.getName() + "'. It might be malformed JSON. Error: " + e.getMessage());
-            System.err.println("Error parsing config for " + template.getName() + ": " + e.getMessage());
+                    "Error parsing configuration for template '" + template.getDisplayName() + "'. It might be malformed JSON. Error: " + e.getMessage());
             e.printStackTrace();
             return; // Exit method
         }
@@ -840,58 +1204,74 @@ public class ReportGeneratorController implements Initializable {
              XSSFWorkbook workbook = new XSSFWorkbook(fis)) {
 
             Sheet sheet = workbook.getSheetAt(0); // Get the first sheet of the workbook
+            ApplicationLauncher.logger.info("  Processing sheet: " + sheet.getSheetName());
 
-            // Prepare a map to keep track of the current row index for each configured column
-            // This ensures data is appended correctly if multiple properties map to the same column.
+            int numRecordsToProcess = config.getNumRecords();
+            ApplicationLauncher.logger.info("  Number of records configured in template: " + numRecordsToProcess);
+
+            // Prepare a map to keep track of the current row index for each configured column.
+            // This ensures data is appended sequentially within each column's defined range.
             Map<Integer, Integer> currentRowIndexForColumn = new HashMap<>();
             
             // Initialize the current row index for each configured column based on its start row
+            // and determine the max end row for any column based on numRecords.
+            Map<Integer, Integer> endRowIndexForColumn = new HashMap<>();
+
+
             for (Map.Entry<String, String> entry : config.getPropertyToCellRange().entrySet()) {
-                String cellRangeStr = entry.getValue();
-                int startColIdx = TemplateConfig.getColumnIndexFromCellRange(cellRangeStr);
-                int startRowIdx = TemplateConfig.getStartRowIndexFromCellRange(cellRangeStr);
+                String cellRefStr = entry.getValue(); // This is now a single cell like "A2"
+                int startColIdx = TemplateConfig.getColumnIndexFromCellReference(cellRefStr);
+                int startRowIdx = TemplateConfig.getRowIndexFromCellReference(cellRefStr);
                 
                 if (startColIdx != -1 && startRowIdx != -1) {
                     currentRowIndexForColumn.put(startColIdx, startRowIdx);
+                    // Calculate the end row for this specific column based on numRecords
+                    int calculatedEndRowIdx = TemplateConfig.getEndRowIndex(startRowIdx, numRecordsToProcess);
+                    endRowIndexForColumn.put(startColIdx, calculatedEndRowIdx);
+                    ApplicationLauncher.logger.info("  Mapping: " + entry.getKey() + " to Start Cell: " + cellRefStr + " (Col: " + startColIdx + ", Row: " + startRowIdx + ") End Row: " + calculatedEndRowIdx);
+                } else {
+                    ApplicationLauncher.logger.error("Warning: Invalid starting cell reference '" + cellRefStr + "' for property '" + entry.getKey() + "'. This mapping will be skipped.");
                 }
             }
 
 
             // 1. Populate data rows based on configuration
-            for (Result fan : fansToReport) {
+            // Iterate through selected fans and populate the cells
+            for (int i = 0; i < fansToReport.size(); i++) {
+                Result fan = fansToReport.get(i);
+                ApplicationLauncher.logger.info("  Populating data for fan: " + fan.getFanSerialNumber() + " (Record " + (i + 1) + "/" + fansToReport.size() + ")");
+
                 for (Map.Entry<String, String> mapping : config.getPropertyToCellRange().entrySet()) {
-                    String resultPropertyName = mapping.getKey(); // e.g., "fanSerialNumber"
-                    String cellRangeStr = mapping.getValue();     // e.g., "A2:A10"
+                    String resultPropertyName = mapping.getKey(); 
+                    String cellRefStr = mapping.getValue(); // This is the starting cell like "A2"
 
-                    // Get value from Result object using reflection
-                    Object value = null;
-                    try {
-                        String getterMethodName = "get" + resultPropertyName.substring(0, 1).toUpperCase() + resultPropertyName.substring(1);
-                        Method getter = Result.class.getMethod(getterMethodName);
-                        value = getter.invoke(fan);
-                    } catch (NoSuchMethodException e) {
-                        System.err.println("Warning: Getter method not found for property '" + resultPropertyName + "'. Skipping this data for fan " + fan.getFanSerialNumber());
-                        continue; // Skip this property if getter not found
-                    } catch (IllegalAccessException | InvocationTargetException e) {
-                        System.err.println("Error invoking getter for property '" + resultPropertyName + "': " + e.getMessage());
-                        // Consider throwing this as a higher-level error or logging
-                        continue;
-                    }
-
-                    // Parse cell range and place value
-                    int targetColIdx = TemplateConfig.getColumnIndexFromCellRange(cellRangeStr);
-                    int startRowIdx = TemplateConfig.getStartRowIndexFromCellRange(cellRangeStr);
-                    int endRowIdx = TemplateConfig.getEndRowIndexFromCellRange(cellRangeStr);
-
-                    if (targetColIdx == -1 || startRowIdx == -1 || endRowIdx == -1) {
-                        System.err.println("Invalid cell range for property '" + resultPropertyName + "': " + cellRangeStr + ". Skipping.");
-                        continue; // Skip if cell range is invalid
+                    int targetColIdx = TemplateConfig.getColumnIndexFromCellReference(cellRefStr);
+                    int startRowIdx = TemplateConfig.getRowIndexFromCellReference(cellRefStr);
+                    
+                    if (targetColIdx == -1 || startRowIdx == -1) {
+                        // Error already logged during initialization of currentRowIndexForColumn
+                        continue; 
                     }
 
                     // Get the current row index for this specific column
                     int currentRowForThisColumn = currentRowIndexForColumn.getOrDefault(targetColIdx, startRowIdx);
+                    int maxEndRowForThisColumn = endRowIndexForColumn.getOrDefault(targetColIdx, startRowIdx); // Max row for this column
 
-                    if (currentRowForThisColumn <= endRowIdx) {
+                    // Only write if there's space left in the configured range for this column
+                    if (currentRowForThisColumn <= maxEndRowForThisColumn) {
+                        Object value = null;
+                        try {
+                            String getterMethodName = "get" + resultPropertyName.substring(0, 1).toUpperCase() + resultPropertyName.substring(1);
+                            Method getter = Result.class.getMethod(getterMethodName);
+                            value = getter.invoke(fan);
+                            ApplicationLauncher.logger.info("    Property: " + resultPropertyName + ", Value: " + value + ", Target Cell: R" + (currentRowForThisColumn + 1) + "C" + (targetColIdx + 1));
+                        } catch (NoSuchMethodException e) {
+                            ApplicationLauncher.logger.error("Warning: Getter method not found for property '" + resultPropertyName + "'. Skipping this data for fan " + fan.getFanSerialNumber());
+                            continue;
+                        } catch (IllegalAccessException | InvocationTargetException e) {
+                            ApplicationLauncher.logger.error("Error invoking getter for property '" + resultPropertyName + "': " + e.getMessage());
+                            continue;
+                        }
                         Row dataRow = sheet.getRow(currentRowForThisColumn);
                         if (dataRow == null) {
                             dataRow = sheet.createRow(currentRowForThisColumn);
@@ -913,7 +1293,11 @@ public class ReportGeneratorController implements Initializable {
                         // Increment the current row index for this column for the next fan
                         currentRowIndexForColumn.put(targetColIdx, currentRowForThisColumn + 1);
                     } else {
-                        System.err.println("Warning: No more space in configured range '" + cellRangeStr + "' for property '" + resultPropertyName + "'. Data for fan " + fan.getFanSerialNumber() + " will not fit.");
+                    	ApplicationLauncher.logger.error("Warning: Configured range for property '" + resultPropertyName + 
+                    		    "' (starting at " + cellRefStr + " for " + numRecordsToProcess + 
+                    		    " records) is full. Data for fan " + fan.getFanSerialNumber() + 
+                    		    " (record #" + (i + 1) + ") will not fit.");
+                    	
                     }
                 }
             }
@@ -928,10 +1312,12 @@ public class ReportGeneratorController implements Initializable {
             File outputFile = fileChooser.showSaveDialog(stage);
 
             if (outputFile != null) {
+                ApplicationLauncher.logger.info("  Saving generated report to: " + outputFile.getAbsolutePath());
                 try (FileOutputStream fos = new FileOutputStream(outputFile)) {
                     workbook.write(fos);
                 }
             } else {
+                ApplicationLauncher.logger.info("  Report save cancelled by user.");
                 throw new IOException("Report save cancelled by user.");
             }
 
@@ -944,34 +1330,80 @@ public class ReportGeneratorController implements Initializable {
      */
     private void updateGenerateReportButtonState() {
         long selectedCount = fanTableView.getItems().stream().filter(Result::isSelected).count();
-        generateReportButton.setDisable(selectedCount == 0);
+        ApplicationLauncher.logger.info("Update Generate Report Button State. Selected count: " + selectedCount);
+
+        boolean shouldBeEnabled = selectedCount > 0;
+        
+        // Update button text
         generateReportButton.setText("Generate Report (" + selectedCount + " selected)");
+
+        // Update disabled state
+        if (generateReportButton.isDisabled() == !shouldBeEnabled) {
+            ApplicationLauncher.logger.info("  -> No change in generateReportButton disabled state. Skipping update.");
+            return;
+        }
+
+        generateReportButton.setDisable(!shouldBeEnabled);
     }
 
     /**
-     * Updates the state of the selectAll checkbox based on the selection status
+     * Updates the text of the selectAll checkbox based on the current selection status
      * of individual fans in the table.
+     * This method does NOT set `setSelected` or `setIndeterminate` on the selectAllCheckbox.
      */
     private void updateSelectAllCheckboxState() {
+        ApplicationLauncher.logger.info("updateSelectAllCheckboxState called.");
         if (fanTableView.getItems().isEmpty()) {
-            selectAllCheckbox.setSelected(false);
+            ApplicationLauncher.logger.info("  Table is empty. Disabling selectAll checkbox.");
             selectAllCheckbox.setDisable(true);
+            selectAllCheckbox.setText("Select All");
+            selectAllCheckbox.setSelected(false);
+            selectAllCheckbox.setIndeterminate(false);
             return;
         }
+
         selectAllCheckbox.setDisable(false);
         long selectedCount = fanTableView.getItems().stream().filter(Result::isSelected).count();
-        selectAllCheckbox.setSelected(selectedCount == fanTableView.getItems().size());
-        selectAllCheckbox.setIndeterminate(selectedCount > 0 && selectedCount < fanTableView.getItems().size());
+        long totalItems = fanTableView.getItems().size();
+
+        // Check if state has changed to avoid redundant updates
+        String expectedText = selectedCount == 0 ? "Select First " + currentTemplateMaxRecords + " Records" : "Clear Selection";
+        boolean expectedSelected = selectedCount > 0;
+        boolean expectedIndeterminate = selectedCount > 0 && selectedCount < totalItems;
+
+        if (selectAllCheckbox.getText().equals(expectedText) &&
+            selectAllCheckbox.isSelected() == expectedSelected &&
+            selectAllCheckbox.isIndeterminate() == expectedIndeterminate) {
+            ApplicationLauncher.logger.info("  -> No change in selectAllCheckbox state. Skipping update.");
+            return;
+        }
+
+        ApplicationLauncher.logger.info("  Selected count: " + selectedCount + ", Total items: " + totalItems);
+
+        if (selectedCount == 0) {
+            selectAllCheckbox.setText("Select First " + currentTemplateMaxRecords + " Records");
+            // Although it behaves like a button, the internal state might influence visual style
+            selectAllCheckbox.setSelected(false); 
+            selectAllCheckbox.setIndeterminate(false);
+        } else {
+            selectAllCheckbox.setText("Clear Selection");
+            // Set to true when selectedCount > 0 to visually indicate "something is selected"
+            selectAllCheckbox.setSelected(true); 
+            // Set indeterminate if some, but not all, are selected
+            selectAllCheckbox.setIndeterminate(selectedCount > 0 && selectedCount < totalItems);
+        }
     }
 
     /**
      * Shows or hides the fan table and a "no results" label based on data presence.
      */
     private void updateTableViewVisibility() {
+        ApplicationLauncher.logger.info("updateTableViewVisibility called.");
         boolean hasResults = !fanTableView.getItems().isEmpty();
         fanTableView.setVisible(hasResults);
         noResultsLabel.setVisible(!hasResults);
         selectAllCheckbox.setDisable(!hasResults); // Disable select all if no results
+        ApplicationLauncher.logger.info("  Table visible: " + hasResults + ", No Results Label visible: " + !hasResults);
     }
 
     /**
@@ -981,6 +1413,7 @@ public class ReportGeneratorController implements Initializable {
      * @param message The message content of the alert.
      */
     private void showAlert(Alert.AlertType type, String title, String message) {
+        ApplicationLauncher.logger.info("Showing Alert: [" + type + "] " + title + " - " + message);
         Alert alert = new Alert(type);
         alert.setTitle(title);
         alert.setHeaderText(null); // No header text
@@ -1005,6 +1438,18 @@ public class ReportGeneratorController implements Initializable {
 
         public String getName() {
             return name;
+        }
+
+        /**
+         * Returns the display name of the template (filename without .xlsx extension).
+         */
+        public String getDisplayName() {
+            String fileName = getName();
+            int dotIndex = fileName.lastIndexOf('.');
+            if (dotIndex > 0) {
+                return fileName.substring(0, dotIndex);
+            }
+            return fileName;
         }
 
         public File getXlsxFile() {

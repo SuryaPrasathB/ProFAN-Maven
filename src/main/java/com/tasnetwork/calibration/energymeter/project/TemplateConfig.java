@@ -8,14 +8,26 @@ import java.util.regex.Pattern;
 /**
  * Configuration class for mapping Result properties to Excel cell ranges.
  * This class is used to serialize and deserialize template configurations to/from JSON.
+ * It now includes a 'numRecords' field and handles single start cell references.
  */
 public class TemplateConfig {
-    // Map where key = Result property name (camelCase), value = Excel cell range string (e.g., "A2:A10")
+    // Number of records to be written into the Excel template. This determines the range size.
+    private int numRecords;
+
+    // Map where key = Result property name (camelCase), value = Excel STARTING cell string (e.g., "A2", "B5")
     private Map<String, String> propertyToCellRange;
 
     public TemplateConfig() {
-        // Initialize with an empty map or default values if desired
+        this.numRecords = 0; // Default value
         this.propertyToCellRange = new HashMap<>();
+    }
+
+    public int getNumRecords() {
+        return numRecords;
+    }
+
+    public void setNumRecords(int numRecords) {
+        this.numRecords = numRecords;
     }
 
     public Map<String, String> getPropertyToCellRange() {
@@ -27,18 +39,18 @@ public class TemplateConfig {
     }
 
     /**
-     * Helper method to get the start column index (0-indexed) from a cell range string.
-     * Assumes single-column range for now (e.g., "A2:A10" refers to column A).
-     * @param cellRange The cell range string (e.g., "A2:A10", "B5").
+     * Helper method to get the column index (0-indexed) from a single cell reference string.
+     * e.g., "A2" -> 0, "B5" -> 1
+     * @param cellReference The single cell reference string (e.g., "A2", "B5").
      * @return The 0-indexed column number, or -1 if invalid.
      */
-    public static int getColumnIndexFromCellRange(String cellRange) {
-        if (cellRange == null || cellRange.trim().isEmpty()) {
+    public static int getColumnIndexFromCellReference(String cellReference) {
+        if (cellReference == null || cellReference.trim().isEmpty()) {
             return -1;
         }
         // Extract the column part (e.g., "A", "AA")
         Pattern columnPattern = Pattern.compile("^([A-Z]+)");
-        Matcher matcher = columnPattern.matcher(cellRange.trim().toUpperCase());
+        Matcher matcher = columnPattern.matcher(cellReference.trim().toUpperCase());
         if (matcher.find()) {
             String columnLetters = matcher.group(1);
             int col = 0;
@@ -51,16 +63,17 @@ public class TemplateConfig {
     }
 
     /**
-     * Helper method to get the start row index (0-indexed) from a cell range string.
-     * @param cellRange The cell range string (e.g., "A2:A10", "B5").
+     * Helper method to get the row index (0-indexed) from a single cell reference string.
+     * e.g., "A2" -> 1, "B5" -> 4
+     * @param cellReference The single cell reference string (e.g., "A2", "B5").
      * @return The 0-indexed row number, or -1 if invalid.
      */
-    public static int getStartRowIndexFromCellRange(String cellRange) {
-        if (cellRange == null || cellRange.trim().isEmpty()) {
+    public static int getRowIndexFromCellReference(String cellReference) {
+        if (cellReference == null || cellReference.trim().isEmpty()) {
             return -1;
         }
-        Pattern rowPattern = Pattern.compile("([0-9]+)"); // Get first number
-        Matcher matcher = rowPattern.matcher(cellRange.trim());
+        Pattern rowPattern = Pattern.compile("([0-9]+)$"); // Get number at the end
+        Matcher matcher = rowPattern.matcher(cellReference.trim());
         if (matcher.find()) {
             try {
                 return Integer.parseInt(matcher.group(1)) - 1; // Convert to 0-indexed
@@ -70,29 +83,17 @@ public class TemplateConfig {
         }
         return -1;
     }
-
+    
     /**
-     * Helper method to get the end row index (0-indexed) from a cell range string.
-     * Handles both single cell (e.g., "A5" -> returns 4) and range (e.g., "A2:A10" -> returns 9).
-     * @param cellRange The cell range string (e.g., "A2:A10", "B5").
-     * @return The 0-indexed end row number, or -1 if invalid.
+     * Calculates the end row index (0-indexed) for a given starting row and number of records.
+     * @param startRowIndex The 0-indexed starting row.
+     * @param numRecords The total number of records that will occupy rows starting from startRowIndex.
+     * @return The 0-indexed end row number.
      */
-    public static int getEndRowIndexFromCellRange(String cellRange) {
-        if (cellRange == null || cellRange.trim().isEmpty()) {
-            return -1;
+    public static int getEndRowIndex(int startRowIndex, int numRecords) {
+        if (numRecords <= 0) {
+            return startRowIndex; // If no records, or invalid count, end at start row.
         }
-        String[] parts = cellRange.trim().split(":");
-        String endCellPart = (parts.length > 1) ? parts[1] : parts[0];
-
-        Pattern rowPattern = Pattern.compile("([0-9]+)$"); // Get number at the end
-        Matcher matcher = rowPattern.matcher(endCellPart.toUpperCase());
-        if (matcher.find()) {
-            try {
-                return Integer.parseInt(matcher.group(1)) - 1; // Convert to 0-indexed
-            } catch (NumberFormatException e) {
-                return -1;
-            }
-        }
-        return -1;
+        return startRowIndex + numRecords - 1;
     }
 }
