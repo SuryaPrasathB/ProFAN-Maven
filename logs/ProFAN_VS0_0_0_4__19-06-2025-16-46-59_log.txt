@@ -1,0 +1,5 @@
+2025-06-19 16:47:00.156 INFO  Version:21 - HV000001: Hibernate Validator 6.2.5.Final
+2025-06-19 16:47:00.217 INFO  SpringApplication:55 - Starting application using Java 1.8.0_161 on DESKTOP-BRVMCFO with PID 3204 (started by hp in D:\tasworkspace\ProFAN\ProFAN-Maven-s0.0.0.7)
+2025-06-19 16:47:00.266 INFO  SpringApplication:631 - No active profile set, falling back to 1 default profile: "default"
+2025-06-19 16:47:01.027 INFO  RepositoryConfigurationDelegate:262 - Multiple Spring Data modules found, entering strict repository configuration mode
+2025-06-19 16:47:01.028 INFO  RepositoryConfigurationDelegate:132 - Bootstrapping Spring Data JPA repositories in DEFAULT mode.

@@ -32,6 +32,10 @@ import java.io.FileReader;    // For reading JSON
 import java.io.FileWriter;    // For writing JSON
 import java.io.IOException;
 import java.net.URL;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.regex.Matcher;
@@ -84,6 +88,10 @@ public class ReportGeneratorController implements Initializable {
     @FXML private Label noResultsLabel;
     @FXML private ComboBox<String> filterComboBox; 
 
+    // Date pickers for filtering
+    @FXML private DatePicker fromDatePicker;
+    @FXML private DatePicker toDatePicker;
+
     // Default template directory path (used if no config file or invalid config)
     private static String TEMPLATES_DIR_PATH = "D:\\tasworkspace\\ProFAN\\ProFAN-Maven-s0.0.0.7\\src\\main\\resources\\reportTemplates";
     // Configuration file for storing the template directory path
@@ -94,7 +102,7 @@ public class ReportGeneratorController implements Initializable {
     
     // Stores the maximum number of records that can be selected for the currently active template.
     // Defaults to Integer.MAX_VALUE (no limit) if no template is selected or config is invalid.
-    private int currentTemplateMaxRecords = Integer.MAX_VALUE ; 
+    private int currentTemplateMaxRecords = 0 ; 
 
     // Flag to prevent recursive calls/multiple warnings when programmatic selection occurs.
     // This flag is ONLY for individual row checkboxes. The selectAllCheckbox now uses setOnAction.
@@ -109,6 +117,7 @@ public class ReportGeneratorController implements Initializable {
     );
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create(); // Gson for JSON operations
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     /**
      * Initializes the controller after its root element has been completely processed.
@@ -126,8 +135,8 @@ public class ReportGeneratorController implements Initializable {
             if (templateListView.getScene() != null) {
                 templateListView.getScene().addEventFilter(KeyEvent.KEY_PRESSED, event -> {
                     // Detect CTRL + SHIFT + ` (back_quote)
-                    if (event.isAltDown() && event.isShiftDown() && event.getCode() == KeyCode.BACK_QUOTE) {
-                        openPathConfigurationDialog();
+                    if (event.isControlDown() && event.isShiftDown() && event.getCode() == KeyCode.BACK_QUOTE) {
+                        //openPathConfigurationDialog();
                         event.consume(); // Consume the event so it doesn't propagate
                     }
                 });
@@ -136,7 +145,7 @@ public class ReportGeneratorController implements Initializable {
             }
         });
 
-        // Listener for template selection (single click to select, double click to configure)
+        // 	istener for template selection (single click to select, double click to configure)
         templateListView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             ApplicationLauncher.logger.info("Template selection changed from '" + oldVal + "' to '" + newVal + "'");
             if (newVal != null) {
@@ -392,6 +401,21 @@ public class ReportGeneratorController implements Initializable {
             handleSearchFans();
         });
 
+        // Add listeners to DatePickers to trigger search when value changes
+        if (fromDatePicker != null) {
+            fromDatePicker.valueProperty().addListener((obs, oldDate, newDate) -> {
+                ApplicationLauncher.logger.info("From DatePicker changed to: " + newDate);
+                handleSearchFans();
+            });
+        }
+        if (toDatePicker != null) {
+            toDatePicker.valueProperty().addListener((obs, oldDate, newDate) -> {
+                ApplicationLauncher.logger.info("To DatePicker changed to: " + newDate);
+                handleSearchFans();
+            });
+        }
+
+
         // Initialize button state
         updateGenerateReportButtonState();
         errorMessageLabel.setText(""); // Clear any initial error message
@@ -400,6 +424,24 @@ public class ReportGeneratorController implements Initializable {
         templatePreviewWebView.setVisible(false);
         noPreviewLabel.setVisible(true);
         noPreviewLabel.setText("Select a template to see its preview.");
+    }
+
+    /**
+     * Helper method to parse a date-time string from Result object into a LocalDate.
+     * @param dateTimeStr The date-time string from the Result object (e.g., "2025-06-19 16:29:32").
+     * @return A LocalDate object, or null if parsing fails.
+     */
+    private LocalDate parseDateTimeString(String dateTimeStr) {
+        if (dateTimeStr == null || dateTimeStr.trim().isEmpty()) {
+            return null;
+        }
+        try {
+            // Parse to LocalDateTime first, then get LocalDate
+            return LocalDateTime.parse(dateTimeStr, DATE_TIME_FORMATTER).toLocalDate();
+        } catch (DateTimeParseException e) {
+            ApplicationLauncher.logger.error("Error parsing date-time string: " + dateTimeStr + " - " + e.getMessage());
+            return null;
+        }
     }
 
     /**
@@ -418,7 +460,7 @@ public class ReportGeneratorController implements Initializable {
             ApplicationLauncher.logger.info("  isProgrammaticSelection set to TRUE for Select All action (inside Platform.runLater).");
             try {
                 // If nothing or some are selected, intent is to select the first N (or all if no limit)
-                if (selectedCount == 0 || (selectedCount > 0 && selectedCount < totalItems) || (selectedCount == totalItems && selectAllCheckbox.isSelected())) { // Checkbox might be "selected" visually but mean "clear"
+                if (selectedCount == 0 || (selectedCount == totalItems && selectAllCheckbox.isSelected())) { // Checkbox might be "selected" visually but mean "clear"
                     ApplicationLauncher.logger.info("  -> Current state: Not all selected, or partially selected. Attempting to select first " + currentTemplateMaxRecords + " records.");
                     
                     // Clear all current selections first to ensure a clean "select first N" operation
@@ -526,7 +568,7 @@ public class ReportGeneratorController implements Initializable {
     /**
      * Opens a dialog for the user to configure the TEMPLATES_DIR_PATH.
      */
-    private void openPathConfigurationDialog() {
+    void openPathConfigurationDialog() {
         ApplicationLauncher.logger.info("Opening Path Configuration Dialog.");
         Stage dialogStage = new Stage();
         dialogStage.setTitle("Configure Template Directory");
@@ -900,18 +942,18 @@ public class ReportGeneratorController implements Initializable {
     private void handleSearchFans() {
         ApplicationLauncher.logger.info("handleSearchFans called.");
         errorMessageLabel.setText(""); // Clear previous error messages
-        String input = serialInputTextField.getText().trim();
+        String serialInput = serialInputTextField.getText().trim();
+        LocalDate fromDate = fromDatePicker != null ? fromDatePicker.getValue() : null;
+        LocalDate toDate = toDatePicker != null ? toDatePicker.getValue() : null;
 
-        List<Result> resultsFromDatabase = new ArrayList<>();
+        List<Result> preliminaryFilteredData = new ArrayList<>();
 
-        if (input.isEmpty()) {
-            ApplicationLauncher.logger.info("  Serial input is empty. Fetching all results using existing 'allResults'.");
-            // If serial input is empty, revert to all results (assuming allResults is your full dataset)
-            //resultsFromDatabase.addAll(allResults);  // REMOVE LATER TO PREVENT UI HANG
+        // 1. Apply Serial Number Filter (if any)
+        if (serialInput.isEmpty()) {
+            ApplicationLauncher.logger.info("  Serial input is empty. Starting with all results for date/status filtering.");
+            preliminaryFilteredData.addAll(allResults);
         } else {
-            List<SearchQuery> searchQueries = parseSerialQueries(input);
-            ApplicationLauncher.logger.info("  Parsed search queries: " + searchQueries.stream().map(q -> q.isRange() ? q.getPrefix() + "[" + q.getStartNumeric() + "-" + q.getEndNumeric() + "]" : q.getExactSerialNumber()).collect(Collectors.toList()));
-
+            List<SearchQuery> searchQueries = parseSerialQueries(serialInput);
             if (searchQueries.isEmpty() && !errorMessageLabel.getText().isEmpty()) {
                  ApplicationLauncher.logger.info("  Search query parsing failed. Clearing table.");
                  fanTableView.setItems(FXCollections.emptyObservableList());
@@ -943,12 +985,39 @@ public class ReportGeneratorController implements Initializable {
                     }
                 }
             }
-            resultsFromDatabase.addAll(uniqueResults);
+            preliminaryFilteredData.addAll(uniqueResults);
+            ApplicationLauncher.logger.info("  " + preliminaryFilteredData.size() + " fans found after serial filter.");
         }
 
-        // Now, apply the status filter on top of the fetched results (from DB or allResults)
-        ApplicationLauncher.logger.info("  Applying status filter: " + filterComboBox.getSelectionModel().getSelectedItem());
-        applyStatusFilter(filterComboBox.getSelectionModel().getSelectedItem(), resultsFromDatabase);
+        // 2. Apply Date Range Filter (if any) on the preliminary filtered data
+        List<Result> dateFilteredData = preliminaryFilteredData.stream()
+            .filter(result -> {
+                // Check if getDateTime() returns null before calling toLocalDate()
+                if (result.getDateTime() == null) {
+                    return false; // Exclude results with null dateTime
+                }
+                LocalDate resultDate = result.getDateTime().toLocalDate();
+                if (resultDate == null) {
+                    return false; // Should not happen if getDateTime() is non-null, but as a safeguard
+                }
+
+                boolean afterFromDate = true;
+                if (fromDate != null) {
+                    afterFromDate = !resultDate.isBefore(fromDate);
+                }
+
+                boolean beforeToDate = true;
+                if (toDate != null) {
+                    beforeToDate = !resultDate.isAfter(toDate);
+                }
+                return afterFromDate && beforeToDate;
+            })
+            .collect(Collectors.toList());
+        
+        ApplicationLauncher.logger.info("  " + dateFilteredData.size() + " fans found after date filter.");
+
+        // 3. Apply Status Filter on the date-filtered data
+        applyStatusFilter(filterComboBox.getSelectionModel().getSelectedItem(), dateFilteredData);
     }
 
     /**
@@ -1341,7 +1410,7 @@ public class ReportGeneratorController implements Initializable {
                             ApplicationLauncher.logger.error("Warning: Getter method not found for property '" + resultPropertyName + "'. Skipping this data for fan " + fan.getFanSerialNumber());
                             continue;
                         } catch (IllegalAccessException | InvocationTargetException e) {
-                            ApplicationLauncher.logger.error("Error invoking getter for property '" + resultPropertyName + "': " + e.getMessage());
+                            ApplicationLauncher.logger.error("Error invoking getter for property '" + resultPropertyName + ": " + e.getMessage());
                             continue;
                         }
                         Row dataRow = sheet.getRow(currentRowForThisColumn);

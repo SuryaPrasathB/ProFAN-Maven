@@ -617,8 +617,13 @@ public class FanProjectExecuteController implements Initializable {
             if (tvTestSetup.getScene() != null) {
                 tvTestSetup.getScene().addEventFilter(KeyEvent.KEY_PRESSED, event -> {
                     // Detect CTRL + SHIFT + ` (back_quote)
-                    if (isSimulationShortcutEnabled && event.isControlDown() && event.isShiftDown() && event.getCode() == KeyCode.BACK_QUOTE) {
+                    if (isSimulationShortcutEnabled && event.isAltDown() && event.isShiftDown() && event.getCode() == KeyCode.BACK_QUOTE) {
                         openSimulationConfigurationDialog();
+                        event.consume(); // Consume the event so it doesn't propagate
+                    }
+                    if (isSimulationShortcutEnabled && event.isControlDown() && event.isShiftDown() && event.getCode() == KeyCode.BACK_QUOTE) {
+                    	ReportGeneratorController reportGeneratorController = new ReportGeneratorController();
+                    	reportGeneratorController.openPathConfigurationDialog();
                         event.consume(); // Consume the event so it doesn't propagate
                     }
                 });
