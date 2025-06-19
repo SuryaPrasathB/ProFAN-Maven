@@ -1854,6 +1854,7 @@ public class FanProjectExecuteController implements Initializable {
 		updateResultMeasurements(
 				//currentProjectRun, 
 				fanSerialNumber, 
+				LocalDateTime.now(),
 				testPoint.getTestPointName(),
 				currentResult.getVoltage(),
 				currentResult.getRpm(), 
@@ -1951,7 +1952,7 @@ public class FanProjectExecuteController implements Initializable {
 	 * @param powerFactor     Measured power factor.
 	 * @param status          Final test status ("Completed", "Failed", etc.).
 	 */
-	public void updateResultMeasurements(String fanSerialNumber, String testPointName, String voltage,
+	public void updateResultMeasurements(String fanSerialNumber,LocalDateTime dateTime, String testPointName, String voltage,
 			String rpm, String windspeed, String vibration, String watts, String va, String current,
 			String powerFactor, String status) {
 
@@ -1967,6 +1968,7 @@ public class FanProjectExecuteController implements Initializable {
 				.findByFanSerialNumberAndTestPointName(fanSerialNumber, testPointName);
 
 		if (result != null) {
+			result.setDateTime(dateTime);
 			result.setVoltage(voltage);
 			result.setRpm(rpm);
 			result.setWindSpeed(windspeed);
@@ -2223,7 +2225,8 @@ public class FanProjectExecuteController implements Initializable {
 		// Update results to DB
 		updateResultMeasurements(
 				//currentProjectRun, 
-				fanSerialNumber, 
+				fanSerialNumber,
+				LocalDateTime.now(),
 				testPoint.getTestPointName(), 
 				currentResult.getVoltage(),
 				currentResult.getRpm(), 

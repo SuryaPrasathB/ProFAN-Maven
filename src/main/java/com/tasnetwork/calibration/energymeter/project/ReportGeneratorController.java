@@ -22,6 +22,8 @@ import javafx.scene.input.KeyCode; // For key event handling
 import javafx.scene.input.KeyEvent; // For key event handling
 import javafx.application.Platform; // For Platform.runLater
 import javafx.beans.value.ObservableValue; // For listener reference
+import javafx.geometry.Pos; // For centering cells
+import javafx.beans.property.ReadOnlyStringWrapper; 
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -65,6 +67,7 @@ public class ReportGeneratorController implements Initializable {
     @FXML private TableView<Result> fanTableView;
     @FXML private TableColumn<Result, Boolean> selectColumn;
     @FXML private TableColumn<Result, String> serialColumn;
+    @FXML private TableColumn<Result, String> serialNoColumn;
     @FXML private TableColumn<Result, String> testpointNameColumn;
     @FXML private TableColumn<Result, String> voltageColumn;
     @FXML private TableColumn<Result, String> rpmColumn;
@@ -91,7 +94,7 @@ public class ReportGeneratorController implements Initializable {
     
     // Stores the maximum number of records that can be selected for the currently active template.
     // Defaults to Integer.MAX_VALUE (no limit) if no template is selected or config is invalid.
-    private int currentTemplateMaxRecords = 0 ; 
+    private int currentTemplateMaxRecords = Integer.MAX_VALUE ; 
 
     // Flag to prevent recursive calls/multiple warnings when programmatic selection occurs.
     // This flag is ONLY for individual row checkboxes. The selectAllCheckbox now uses setOnAction.
@@ -203,7 +206,7 @@ public class ReportGeneratorController implements Initializable {
 
         // Setup Result TableView columns
         selectColumn		.setCellValueFactory(new PropertyValueFactory<>("selected"));
-        serialColumn		.setCellValueFactory(new PropertyValueFactory<>("fanSerialNumber"));
+        serialColumn		.setCellValueFactory(new PropertyValueFactory<>("fanSerialNumber")); // Now correctly binds to fanSerialNumber
         testpointNameColumn .setCellValueFactory(new PropertyValueFactory<>("testPointName"));
         voltageColumn		.setCellValueFactory(new PropertyValueFactory<>("voltage")); 
         rpmColumn           .setCellValueFactory(new PropertyValueFactory<>("rpm"));  
@@ -215,6 +218,7 @@ public class ReportGeneratorController implements Initializable {
         vibrationColumn     .setCellValueFactory(new PropertyValueFactory<>("vibration"));
         statusColumn		.setCellValueFactory(new PropertyValueFactory<>("testStatus"));
 
+        // Center the checkboxes in the selectColumn
         selectColumn.setCellFactory(new Callback<TableColumn<Result, Boolean>, TableCell<Result, Boolean>>() {
             @Override
             public TableCell<Result, Boolean> call(TableColumn<Result, Boolean> param) {
@@ -224,6 +228,9 @@ public class ReportGeneratorController implements Initializable {
                     private boolean isUpdating = false; // Guard to prevent recursive updates
 
                     {
+                        // Set alignment for the cell containing the checkbox
+                        setAlignment(Pos.CENTER);
+
                         checkBox.selectedProperty().addListener((obs, oldVal, newVal) -> {
                             if (isUpdating) {
                                 ApplicationLauncher.logger.info("  -> Ignoring recursive checkbox update.");
@@ -313,6 +320,32 @@ public class ReportGeneratorController implements Initializable {
             }
         });
 
+        // Ensure the serialColumn content (fanSerialNumber) is centered
+        serialColumn.setCellFactory(column -> new TableCell<Result, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(item);
+                setAlignment(Pos.CENTER); // Center the text for fanSerialNumber
+            }
+        });
+
+        // Populate and center the content in the serialNoColumn with incrementing numbers
+        serialNoColumn.setCellValueFactory(cellData -> {
+            // Get the index of the row and convert it to a string for display
+            // This will ensure the serial number column is always populated sequentially (1, 2, 3...).
+            // Note: getTableView().getItems().indexOf(cellData.getValue()) returns 0-based index.
+            return new ReadOnlyStringWrapper(String.valueOf(cellData.getTableView().getItems().indexOf(cellData.getValue()) + 1));
+        });
+        serialNoColumn.setCellFactory(column -> new TableCell<Result, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(item);
+                setAlignment(Pos.CENTER); // Center the text
+            }
+        });
+
         // Custom cell factory for the status column to color the text
         statusColumn.setCellFactory(new Callback<TableColumn<Result, String>, TableCell<Result, String>>() {
             @Override
@@ -385,7 +418,7 @@ public class ReportGeneratorController implements Initializable {
             ApplicationLauncher.logger.info("  isProgrammaticSelection set to TRUE for Select All action (inside Platform.runLater).");
             try {
                 // If nothing or some are selected, intent is to select the first N (or all if no limit)
-                if (selectedCount == 0 || (selectedCount == totalItems && selectAllCheckbox.isSelected())) { // Checkbox might be "selected" visually but mean "clear"
+                if (selectedCount == 0 || (selectedCount > 0 && selectedCount < totalItems) || (selectedCount == totalItems && selectAllCheckbox.isSelected())) { // Checkbox might be "selected" visually but mean "clear"
                     ApplicationLauncher.logger.info("  -> Current state: Not all selected, or partially selected. Attempting to select first " + currentTemplateMaxRecords + " records.");
                     
                     // Clear all current selections first to ensure a clean "select first N" operation
@@ -667,6 +700,7 @@ public class ReportGeneratorController implements Initializable {
         private String prefix;            // For range searches, e.g., "SN-"
         private int startNumeric;         // Start of numeric range, e.g., 1
         private int endNumeric;           // End of numeric range, e.g., 100
+        private int numericPartLengthForRange; // New field for padding, used during range query generation
 
         /**
          * Constructor for an exact serial number match.
@@ -681,11 +715,13 @@ public class ReportGeneratorController implements Initializable {
          * @param prefix The common alphanumeric prefix (e.g., "SN-", "LSCS-").
          * @param startNumeric The starting numeric value in the range.
          * @param endNumeric The ending numeric value in the range.
+         * @param numericPartLengthForRange The detected length of the numeric part for padding.
          */
-        public SearchQuery(String prefix, int startNumeric, int endNumeric) {
+        public SearchQuery(String prefix, int startNumeric, int endNumeric, int numericPartLengthForRange) {
             this.prefix = prefix;
             this.startNumeric = startNumeric;
             this.endNumeric = endNumeric;
+            this.numericPartLengthForRange = numericPartLengthForRange;
         }
 
         /**
@@ -696,8 +732,15 @@ public class ReportGeneratorController implements Initializable {
             return prefix != null;
         }
 
+        // Getters for use in handleSearchFans
+        public String getPrefix() { return prefix; }
+        public int getStartNumeric() { return startNumeric; }
+        public int getEndNumeric() { return endNumeric; }
+        public int getNumericPartLengthForRange() { return numericPartLengthForRange; }
+        public String getExactSerialNumber() { return exactSerialNumber; }
+
         /**
-         * Determines if a given fan serial number matches this search query.
+         * Determines if a given fan serial number matches this search query (used for in-memory filtering if applicable).
          * For range queries, it checks if the prefix matches and the numeric part falls within the range.
          * For exact queries, it performs a case-insensitive exact match.
          * @param fanSerialNumber The serial number of a fan to check.
@@ -720,6 +763,12 @@ public class ReportGeneratorController implements Initializable {
                 try {
                     // Extract the numeric part of the fan's serial number
                     String fanNumericPartStr = fanSerialNumber.substring(this.prefix.length());
+                    
+                    // Optional: enforce padding consistency if required for stricter matching
+                    // if (numericPartLengthForRange > 0 && fanNumericPartStr.length() != numericPartLengthForRange) {
+                    //     return false; // Mismatch in padding
+                    // }
+
                     int fanNumericPart = Integer.parseInt(fanNumericPartStr);
 
                     // Check if the numeric part is within the specified range
@@ -759,22 +808,11 @@ public class ReportGeneratorController implements Initializable {
             if (trimmedPart.contains("-")) {
                 // This is a potential range query
                 String[] rangeParts = trimmedPart.split("-");
-                // A more robust split for ranges: check if there's exactly one hyphen for a simple "start-end"
-                // or if it's a more complex serial that happens to have hyphens in the prefix.
-                // For "SN-001-SN-100" or "SN-001-100", simple split on first hyphen is okay if it produces 2 parts.
                 
                 int firstHyphenIndex = trimmedPart.indexOf('-');
                 if (firstHyphenIndex == -1 || trimmedPart.lastIndexOf('-') == firstHyphenIndex) {
-                    // Only one hyphen, or no hyphen (handled by 'else' branch below)
-                    // If one hyphen, it's a simple X-Y or PREFIXNUM-NUM
                     rangeParts = trimmedPart.split("-");
                 } else {
-                    // Multiple hyphens (e.g., "LSCS-123-LSCS-145") or "SN-A-10-SN-B-20"
-                    // We need to be careful to parse only the main range.
-                    // Assuming "START_SERIAL-END_SERIAL" where START_SERIAL and END_SERIAL can contain hyphens,
-                    // but the *main* range separator is the first or last hyphen if there are multiple.
-                    // For now, let's stick to simple "PART1-PART2" structure and improve if needed for more complex cases.
-                    // A simple split with limit 2 ensures we get two parts if multiple hyphens are present
                     rangeParts = trimmedPart.split("-", 2); // Split only on the first hyphen
                 }
 
@@ -794,13 +832,16 @@ public class ReportGeneratorController implements Initializable {
                     return new ArrayList<>();
                 }
                 String startPrefix = startMatcher.group(1);
+                String startNumericPartStr = startMatcher.group(2); // Get original numeric string for padding length
                 int startNumeric;
                 try {
-                    startNumeric = Integer.parseInt(startMatcher.group(2));
+                    startNumeric = Integer.parseInt(startNumericPartStr);
                 } catch (NumberFormatException e) {
                      errorMessageLabel.setText(String.format("Invalid numeric part in start serial: '%s'.", startStr));
                      return new ArrayList<>();
                 }
+                int detectedPaddingLength = startNumericPartStr.length(); // Capture padding length here
+
 
                 // Parse the end part of the range
                 Matcher endMatcher = serialPattern.matcher(endStr);
@@ -839,7 +880,8 @@ public class ReportGeneratorController implements Initializable {
                     startNumeric = endNumeric;
                     endNumeric = temp;
                 }
-                queries.add(new SearchQuery(commonPrefix, startNumeric, endNumeric));
+                // Pass the detected padding length to the SearchQuery constructor
+                queries.add(new SearchQuery(commonPrefix, startNumeric, endNumeric, detectedPaddingLength));
 
             } else {
                 // This is a single serial number for exact matching
@@ -860,18 +902,16 @@ public class ReportGeneratorController implements Initializable {
         errorMessageLabel.setText(""); // Clear previous error messages
         String input = serialInputTextField.getText().trim();
 
-        List<Result> currentFilteredData;
+        List<Result> resultsFromDatabase = new ArrayList<>();
 
         if (input.isEmpty()) {
-            ApplicationLauncher.logger.info("  Serial input is empty. Filtering all results.");
-            // If serial input is empty, revert to all results before applying status filter
-            currentFilteredData = allResults;
+            ApplicationLauncher.logger.info("  Serial input is empty. Fetching all results using existing 'allResults'.");
+            // If serial input is empty, revert to all results (assuming allResults is your full dataset)
+            //resultsFromDatabase.addAll(allResults);  // REMOVE LATER TO PREVENT UI HANG
         } else {
             List<SearchQuery> searchQueries = parseSerialQueries(input);
-            ApplicationLauncher.logger.info("  Parsed search queries: " + searchQueries.stream().map(q -> q.isRange() ? q.prefix + "[" + q.startNumeric + "-" + q.endNumeric + "]" : q.exactSerialNumber).collect(Collectors.toList()));
+            ApplicationLauncher.logger.info("  Parsed search queries: " + searchQueries.stream().map(q -> q.isRange() ? q.getPrefix() + "[" + q.getStartNumeric() + "-" + q.getEndNumeric() + "]" : q.getExactSerialNumber()).collect(Collectors.toList()));
 
-            // If there was an error during parsing, searchQueries will be empty
-            // and errorMessageLabel would have been set. In this case, clear table.
             if (searchQueries.isEmpty() && !errorMessageLabel.getText().isEmpty()) {
                  ApplicationLauncher.logger.info("  Search query parsing failed. Clearing table.");
                  fanTableView.setItems(FXCollections.emptyObservableList());
@@ -881,18 +921,34 @@ public class ReportGeneratorController implements Initializable {
                  return;
             }
 
-            // Apply search filter
-            currentFilteredData = allResults.stream() // Filtering the already loaded 'allResults' for demonstration
-                                        .filter(fan -> 
-                                            searchQueries.stream()
-                                                    .anyMatch(query -> query.matches(fan.getFanSerialNumber())))
-                                        .collect(Collectors.toList());
-            ApplicationLauncher.logger.info("  Found " + currentFilteredData.size() + " fans matching search queries.");
+            Set<Result> uniqueResults = new HashSet<>(); // Use a Set to handle duplicates from multiple queries
+
+            for (SearchQuery query : searchQueries) {
+                if (query.isRange()) {
+                    int paddingLength = query.getNumericPartLengthForRange();
+                    for (int i = query.getStartNumeric(); i <= query.getEndNumeric(); i++) {
+                        // Format the serial number with leading zeros if necessary
+                        String formattedSerial = String.format("%s%0" + paddingLength + "d", query.getPrefix(), i);
+                        ApplicationLauncher.logger.info("  Querying DB for serial (range): " + formattedSerial);
+                        List<Result> foundFans = DeviceDataManagerController.getResultService().findByFanSerialNumber(formattedSerial);
+                        if (foundFans != null) {
+                            uniqueResults.addAll(foundFans);
+                        }
+                    }
+                } else {
+                    ApplicationLauncher.logger.info("  Querying DB for serial (exact): " + query.getExactSerialNumber());
+                    List<Result> foundFans = DeviceDataManagerController.getResultService().findByFanSerialNumber(query.getExactSerialNumber());
+                    if (foundFans != null) {
+                        uniqueResults.addAll(foundFans);
+                    }
+                }
+            }
+            resultsFromDatabase.addAll(uniqueResults);
         }
 
-        // Now, apply the status filter on top of the search results (or all results if no search)
+        // Now, apply the status filter on top of the fetched results (from DB or allResults)
         ApplicationLauncher.logger.info("  Applying status filter: " + filterComboBox.getSelectionModel().getSelectedItem());
-        applyStatusFilter(filterComboBox.getSelectionModel().getSelectedItem(), currentFilteredData);
+        applyStatusFilter(filterComboBox.getSelectionModel().getSelectedItem(), resultsFromDatabase);
     }
 
     /**

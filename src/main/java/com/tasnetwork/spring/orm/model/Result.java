@@ -1,5 +1,7 @@
 package com.tasnetwork.spring.orm.model;
 
+import java.time.LocalDateTime;
+
 import javax.persistence.*;
 
 @Entity
@@ -14,6 +16,9 @@ public class Result {
     // The @Transient annotation tells JPA/Hibernate to ignore this field during mapping.
     @Transient // <--- ADDED THIS ANNOTATION
     private boolean selected; 
+    
+    @Column(name = "date_time", columnDefinition = "TIMESTAMP")
+    private LocalDateTime dateTime;	
 
     @Column(columnDefinition = "VARCHAR(45)")
     private String testPointName;
@@ -86,6 +91,14 @@ public class Result {
 
 	public void setSelected(boolean selected) {
 		this.selected = selected;
+	}
+
+	public LocalDateTime getDateTime() {
+		return dateTime;
+	}
+
+	public void setDateTime(LocalDateTime dateTime) {
+		this.dateTime = dateTime;
 	}
 
 	public String getTestPointName() {

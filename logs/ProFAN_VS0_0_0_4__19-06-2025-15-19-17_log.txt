@@ -1,0 +1,9 @@
+2025-06-19 15:19:17.604 INFO  Version:21 - HV000001: Hibernate Validator 6.2.5.Final
+2025-06-19 15:19:17.649 INFO  SpringApplication:55 - Starting application using Java 1.8.0_161 on Jarvis with PID 13628 (started by Surya in C:\Users\Surya\git\ProFAN-Maven-s0.0.0.7)
+2025-06-19 15:19:17.690 INFO  SpringApplication:631 - No active profile set, falling back to 1 default profile: "default"
+2025-06-19 15:19:18.488 INFO  RepositoryConfigurationDelegate:262 - Multiple Spring Data modules found, entering strict repository configuration mode
+2025-06-19 15:19:18.490 INFO  RepositoryConfigurationDelegate:132 - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-06-19 15:19:18.626 INFO  RepositoryConfigurationDelegate:201 - Finished Spring Data repository scanning in 121 ms. Found 13 JPA repository interfaces.
+2025-06-19 15:19:18.870 INFO  RepositoryConfigurationDelegate:262 - Multiple Spring Data modules found, entering strict repository configuration mode
+2025-06-19 15:19:18.870 INFO  RepositoryConfigurationDelegate:132 - Bootstrapping Spring Data JDBC repositories in DEFAULT mode.
+2025-06-19 15:19:19.047 INFO  RepositoryConfigurationDelegate:201 - Finished Spring Data repository scanning in 175 ms. Found 0 JDBC repository interfaces.

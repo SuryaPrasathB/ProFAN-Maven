@@ -66,9 +66,10 @@
                   <TableView fx:id="fanTableView" minHeight="200.0" prefHeight="300.0" VBox.vgrow="ALWAYS">
                      <columns>
                         <!-- Existing columns -->
-				        <TableColumn fx:id="selectColumn" prefWidth="50" text="Select" />
+				        <TableColumn fx:id="selectColumn" prefWidth="10.0" />
+                        <TableColumn fx:id="serialNoColumn" prefWidth="50" text="S.No" />
 				        <TableColumn fx:id="serialColumn" prefWidth="120" text="Serial Number" />
-				        <TableColumn fx:id="testpointNameColumn" prefWidth="100" text="Test Point" />
+				        <TableColumn fx:id="testpointNameColumn" prefWidth="120.0" text="Test Point" />
 				        
 				        <!-- Add this TableColumn for Voltage -->
 				        <TableColumn fx:id="voltageColumn" prefWidth="80" text="Voltage" /> 
