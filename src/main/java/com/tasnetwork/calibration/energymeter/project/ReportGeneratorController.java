@@ -8,10 +8,12 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane; // For the config dialog layout
 import javafx.scene.layout.HBox;
-import javafx.scene.web.WebView;
-import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView; // Still imported for potential other uses, but preview now uses ImageView
+import javafx.scene.web.WebEngine; // Still imported for potential other uses
 import javafx.concurrent.Worker;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
@@ -67,7 +69,7 @@ public class ReportGeneratorController implements Initializable {
 
     // FXML UI elements
     @FXML private ListView<String> templateListView;
-    @FXML private WebView templatePreviewWebView;
+    @FXML private ImageView templatePreviewImageView; // Changed from WebView
     @FXML private Label noPreviewLabel;
     @FXML private TextField serialInputTextField;
     @FXML private TableView<Result> fanTableView;
@@ -104,13 +106,14 @@ public class ReportGeneratorController implements Initializable {
     
     // Stores the maximum number of records that can be selected for the currently active template.
     // Defaults to Integer.MAX_VALUE (no limit) if no template is selected or config is invalid.
-    private int currentTemplateMaxRecords = 0 ; 
+    private int currentTemplateMaxRecords = Integer.MAX_VALUE ; // Corrected default value
 
     // Flag to prevent recursive calls/multiple warnings when programmatic selection occurs.
     // This flag is ONLY for individual row checkboxes. The selectAllCheckbox now uses setOnAction.
     private volatile boolean isProgrammaticSelection = false; // Use volatile for thread visibility
 
-    List<Result> allResults = DeviceDataManagerController.getResultService().findall();
+    // Removed: List<Result> allResults = DeviceDataManagerController.getResultService().findall(); 
+    // Data will now always be fetched via service methods as needed.
 
     // List of Result properties that can be mapped to Excel (excluding 'id' and 'selected')
     private static final List<String> RESULT_PROPERTIES_TO_MAP = Arrays.asList(
@@ -138,7 +141,7 @@ public class ReportGeneratorController implements Initializable {
                 templateListView.getScene().addEventFilter(KeyEvent.KEY_PRESSED, event -> {
                     // Detect CTRL + SHIFT + ` (back_quote)
                     if (event.isControlDown() && event.isShiftDown() && event.getCode() == KeyCode.BACK_QUOTE) {
-                        //openPathConfigurationDialog();
+                        openPathConfigurationDialog(); 
                         event.consume(); // Consume the event so it doesn't propagate
                     }
                 });
@@ -147,7 +150,7 @@ public class ReportGeneratorController implements Initializable {
             }
         });
 
-        // 	istener for template selection (single click to select, double click to configure)
+        // Listener for template selection (single click to select, double click to configure)
         templateListView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             ApplicationLauncher.logger.info("Template selection changed from '" + oldVal + "' to '" + newVal + "'");
             if (newVal != null) {
@@ -274,14 +277,6 @@ public class ReportGeneratorController implements Initializable {
                             // For manual selections, check limit considering this change
                             long currentSelectedCount = fanTableView.getItems().stream().filter(Result::isSelected).count();
                             if (newVal) { // Attempting to select
-                                // Adjust count to exclude the current row if it was previously selected
-                                long adjustedCount = currentSelectedCount; // If already selected, it's included in currentSelectedCount
-                                if (fan.isSelected() && oldVal) { // If the checkbox was true and is still true, and was already selected
-                                    // This case implies oldVal == newVal == true, which should be caught by redundant event check.
-                                    // If oldVal was false and newVal is true, and fan was already selected (due to external means), this is unexpected.
-                                    // A simpler check: if we are trying to select this checkbox and it causes total selected count to exceed limit.
-                                }
-                                
                                 // Recalculate based on future state: current selected + 1 (if selecting this one)
                                 if (!fan.isSelected() && newVal && currentSelectedCount >= currentTemplateMaxRecords) { // If not already selected, but trying to select and hitting limit
                                     ApplicationLauncher.logger.info("  -> Selection limit exceeded. Reverting checkbox.");
@@ -423,7 +418,7 @@ public class ReportGeneratorController implements Initializable {
         errorMessageLabel.setText(""); // Clear any initial error message
 
         // Initial state for preview area
-        templatePreviewWebView.setVisible(false);
+        templatePreviewImageView.setVisible(false); // Changed from templatePreviewWebView
         noPreviewLabel.setVisible(true);
         noPreviewLabel.setText("Select a template to see its preview.");
     }
@@ -567,9 +562,6 @@ public class ReportGeneratorController implements Initializable {
     /**
      * Opens a dialog for the user to configure the TEMPLATES_DIR_PATH.
      */
-    /**
-     * Opens a dialog for the user to configure the TEMPLATES_DIR_PATH.
-     */
     void openPathConfigurationDialog() {
         ApplicationLauncher.logger.info("Opening Path Configuration Dialog.");
         Stage dialogStage = new Stage();
@@ -637,35 +629,36 @@ public class ReportGeneratorController implements Initializable {
 
 
     /**
-     * Updates the WebView to show the preview of the selected template.
+     * Updates the ImageView to show the preview of the selected template.
      * @param template The template whose preview to show, or null to clear.
      */
     private void updateTemplatePreview(Template template) {
-        WebEngine engine = templatePreviewWebView.getEngine();
         if (template != null) {
             File imageFile = template.getImageFile();
             if (imageFile != null && imageFile.exists() && imageFile.isFile()) {
                 try {
-                    engine.load(imageFile.toURI().toURL().toExternalForm());
-                    templatePreviewWebView.setVisible(true);
+                    Image image = new Image(imageFile.toURI().toString());
+                    templatePreviewImageView.setImage(image);
+                    templatePreviewImageView.setVisible(true);
                     noPreviewLabel.setVisible(false);
-                    ApplicationLauncher.logger.info("Attempting to load JPG: " + imageFile.toURI().toURL().toExternalForm());
+                    ApplicationLauncher.logger.info("Successfully loaded JPG: " + imageFile.getAbsolutePath());
                 } catch (Exception e) {
                     ApplicationLauncher.logger.error("Failed to load JPG preview for: " + template.getName() + " - " + e.getMessage());
-                    engine.loadContent("<h1>Error</h1><p>Could not load image preview. Error: " + escapeHtml(e.getMessage()) + "</p>");
-                    templatePreviewWebView.setVisible(true);
-                    noPreviewLabel.setVisible(false);
+                    templatePreviewImageView.setImage(null); // Clear image on error
+                    templatePreviewImageView.setVisible(false);
+                    noPreviewLabel.setText("Could not load image preview. Error: " + e.getMessage());
+                    noPreviewLabel.setVisible(true);
                 }
             } else {
-                engine.loadContent("");
-                templatePreviewWebView.setVisible(false);
+                templatePreviewImageView.setImage(null); // Clear image if no file or invalid
+                templatePreviewImageView.setVisible(false);
                 noPreviewLabel.setText("No JPG preview available for " + template.getName() + ".");
                 noPreviewLabel.setVisible(true);
                 ApplicationLauncher.logger.info("No JPG file found for: " + template.getName() + " at " + (imageFile != null ? imageFile.getAbsolutePath() : "null path"));
             }
         } else {
-            engine.loadContent("");
-            templatePreviewWebView.setVisible(false);
+            templatePreviewImageView.setImage(null); // Clear image when no template selected
+            templatePreviewImageView.setVisible(false);
             noPreviewLabel.setText("Select a template to see its preview.");
             noPreviewLabel.setVisible(true);
         }
@@ -948,15 +941,10 @@ public class ReportGeneratorController implements Initializable {
         LocalDate fromDate = fromDatePicker != null ? fromDatePicker.getValue() : null;
         LocalDate toDate = toDatePicker != null ? toDatePicker.getValue() : null;
 
-        List<Result> preliminaryFilteredData = new ArrayList<>();
-
-        // 1. Apply Serial Number Filter (if any)
-        if (serialInput.isEmpty()) {
-            ApplicationLauncher.logger.info("  Serial input is empty. Starting with all results for date/status filtering.");
-            preliminaryFilteredData.addAll(allResults);
-        } else {
-            List<SearchQuery> searchQueries = parseSerialQueries(serialInput);
-            if (searchQueries.isEmpty() && !errorMessageLabel.getText().isEmpty()) {
+        List<SearchQuery> serialSearchQueries = new ArrayList<>();
+        if (!serialInput.isEmpty()) {
+            serialSearchQueries = parseSerialQueries(serialInput);
+            if (serialSearchQueries.isEmpty() && !errorMessageLabel.getText().isEmpty()) {
                  ApplicationLauncher.logger.info("  Search query parsing failed. Clearing table.");
                  fanTableView.setItems(FXCollections.emptyObservableList());
                  updateTableViewVisibility();
@@ -964,62 +952,29 @@ public class ReportGeneratorController implements Initializable {
                  updateGenerateReportButtonState();
                  return;
             }
+        }
+        
+        // Determine if any serial or date filters are active based on user input
+        boolean isSerialInputProvided = !serialInput.isEmpty();
+        boolean isDateFilterActive = (fromDate != null || toDate != null);
 
-            Set<Result> uniqueResults = new HashSet<>(); // Use a Set to handle duplicates from multiple queries
+        List<Result> preliminaryFilteredData;
 
-            for (SearchQuery query : searchQueries) {
-                if (query.isRange()) {
-                    int paddingLength = query.getNumericPartLengthForRange();
-                    for (int i = query.getStartNumeric(); i <= query.getEndNumeric(); i++) {
-                        // Format the serial number with leading zeros if necessary
-                        String formattedSerial = String.format("%s%0" + paddingLength + "d", query.getPrefix(), i);
-                        ApplicationLauncher.logger.info("  Querying DB for serial (range): " + formattedSerial);
-                        List<Result> foundFans = DeviceDataManagerController.getResultService().findByFanSerialNumber(formattedSerial);
-                        if (foundFans != null) {
-                            uniqueResults.addAll(foundFans);
-                        }
-                    }
-                } else {
-                    ApplicationLauncher.logger.info("  Querying DB for serial (exact): " + query.getExactSerialNumber());
-                    List<Result> foundFans = DeviceDataManagerController.getResultService().findByFanSerialNumber(query.getExactSerialNumber());
-                    if (foundFans != null) {
-                        uniqueResults.addAll(foundFans);
-                    }
-                }
-            }
-            preliminaryFilteredData.addAll(uniqueResults);
-            ApplicationLauncher.logger.info("  " + preliminaryFilteredData.size() + " fans found after serial filter.");
+        if (isSerialInputProvided || isDateFilterActive) {
+            // If either serial input or date range is provided, use the service method to query the database
+            // The service method should handle cases where serialQueries is empty, or fromDate/toDate are null.
+            preliminaryFilteredData = DeviceDataManagerController.getResultService()
+                                        .findBySerialAndDateRange(serialSearchQueries, fromDate, toDate);
+            ApplicationLauncher.logger.info("  " + preliminaryFilteredData.size() + " fans found after serial and/or date database filter.");
+        } else {
+            // If neither serial input nor date range is provided, fetch all results from the database.
+            // This is the default "show all" state.
+            ApplicationLauncher.logger.info("  No serial or date filters active. Fetching all results from database.");
+            preliminaryFilteredData = DeviceDataManagerController.getResultService().findall(); 
         }
 
-        // 2. Apply Date Range Filter (if any) on the preliminary filtered data
-        List<Result> dateFilteredData = preliminaryFilteredData.stream()
-            .filter(result -> {
-                // Check if getDateTime() returns null before calling toLocalDate()
-                if (result.getDateTime() == null) {
-                    return false; // Exclude results with null dateTime
-                }
-                LocalDate resultDate = result.getDateTime().toLocalDate();
-                if (resultDate == null) {
-                    return false; // Should not happen if getDateTime() is non-null, but as a safeguard
-                }
-
-                boolean afterFromDate = true;
-                if (fromDate != null) {
-                    afterFromDate = !resultDate.isBefore(fromDate);
-                }
-
-                boolean beforeToDate = true;
-                if (toDate != null) {
-                    beforeToDate = !resultDate.isAfter(toDate);
-                }
-                return afterFromDate && beforeToDate;
-            })
-            .collect(Collectors.toList());
-        
-        ApplicationLauncher.logger.info("  " + dateFilteredData.size() + " fans found after date filter.");
-
-        // 3. Apply Status Filter on the date-filtered data
-        applyStatusFilter(filterComboBox.getSelectionModel().getSelectedItem(), dateFilteredData);
+        // Apply the status filter on the results (already filtered by serial and date if applicable)
+        applyStatusFilter(filterComboBox.getSelectionModel().getSelectedItem(), preliminaryFilteredData);
     }
 
     /**
@@ -1030,7 +985,7 @@ public class ReportGeneratorController implements Initializable {
      */
     private void applyStatusFilter(String selectedFilter, List<Result> sourceList) {
         ApplicationLauncher.logger.info("applyStatusFilter called with filter: " + selectedFilter);
-        List<Result> listToFilter = (sourceList != null) ? sourceList : allResults;
+        List<Result> listToFilter = (sourceList != null) ? sourceList : new ArrayList<>(); // Ensure sourceList is not null
         ObservableList<Result> filteredData = FXCollections.observableArrayList();
 
         if ("PASSED".equalsIgnoreCase(selectedFilter)) {
@@ -1412,7 +1367,7 @@ public class ReportGeneratorController implements Initializable {
                             ApplicationLauncher.logger.error("Warning: Getter method not found for property '" + resultPropertyName + "'. Skipping this data for fan " + fan.getFanSerialNumber());
                             continue;
                         } catch (IllegalAccessException | InvocationTargetException e) {
-                            ApplicationLauncher.logger.error("Error invoking getter for property '" + resultPropertyName + ": " + e.getMessage());
+                            ApplicationLauncher.logger.error("Error invoking getter for property '" + resultPropertyName + "': " + e.getMessage());
                             continue;
                         }
                         Row dataRow = sheet.getRow(currentRowForThisColumn);
