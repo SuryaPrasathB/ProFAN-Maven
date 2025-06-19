@@ -63,6 +63,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
@@ -101,6 +102,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 
 
 /**
@@ -4860,41 +4862,72 @@ public class FanProjectExecuteController implements Initializable {
 		this.isFirstTestPointInSequence = isFirstTestPointInSequence;
 	}
 	
-    /**
-     * Opens a dialog for the user to configure the simulation mode.
-     * This dialog allows the user to toggle the SIMULATION_MODE flag.
-     */
-    @FXML
-    private void openSimulationConfigurationDialog() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/project/SimulationConfig.fxml"));
-            Parent root = loader.load();
+	private void openSimulationConfigurationDialog() {
+	    ApplicationLauncher.logger.info("Opening Simulation Configuration Dialog.");
+	    
+	    Stage dialogStage = new Stage();
+	    dialogStage.setTitle("Simulation Configuration");
 
-            // Get the controller for the SimulationConfig.fxml
-            SimulationConfigController simulationController = loader.getController();
+	    try {
+	        Window owner = btnSettings != null && btnSettings.getScene() != null
+	                       ? btnSettings.getScene().getWindow()
+	                       : null;
+	        if (owner != null) {
+	            dialogStage.initOwner(owner);
+	        } else {
+	            ApplicationLauncher.logger.warn("btnSettings or its scene is null. Opening dialog without owner.");
+	        }
+	    } catch (Exception e) {
+	        ApplicationLauncher.logger.warn("Failed to set dialog owner: " + e.getMessage());
+	    }
 
-            // Pass the current simulation mode and a callback to update it
-            simulationController.setCurrentSimulationMode(SIMULATION_MODE);
-            simulationController.setSimulationModeUpdateCallback(newVal -> {
-                SIMULATION_MODE = newVal;
-                appendLog("Simulation Mode set to: " + SIMULATION_MODE, LogLevel.INFO);
-            });
+	    dialogStage.initModality(Modality.APPLICATION_MODAL);
 
-            Stage dialogStage = new Stage();
-            dialogStage.setTitle("Simulation Configuration");
-            dialogStage.setScene(new Scene(root));
-            dialogStage.initOwner(btnSettings.getScene().getWindow()); // Tie to main window
-            dialogStage.initModality(Modality.APPLICATION_MODAL); // Blocking dialog
-            dialogStage.setResizable(false);
-            dialogStage.showAndWait(); // Show and wait for it to close
+	    GridPane grid = new GridPane();
+	    grid.setPadding(new Insets(10));
+	    grid.setHgap(10);
+	    grid.setVgap(10);
 
-        } catch (IOException e) {
-            e.printStackTrace();
-            //showAlert(Alert.AlertType.ERROR, "Error Loading Simulation Config",
-              //        "Could not load the simulation configuration dialog: " + e.getMessage());
-            appendLog("Error loading simulation config dialog: " + e.getMessage(), LogLevel.ERROR);
-        }
-    }
+	    Label label = new Label("Enable Simulation Mode:");
+	    CheckBox simulationCheckBox = new CheckBox();
+	    simulationCheckBox.setSelected(SIMULATION_MODE);
 
+	    Button saveButton = new Button("Save");
+	    Button cancelButton = new Button("Cancel");
+	    Label statusLabel = new Label();
+	    statusLabel.setWrapText(true);
+
+	    grid.add(label, 0, 0);
+	    grid.add(simulationCheckBox, 1, 0);
+	    grid.add(saveButton, 0, 1);
+	    grid.add(cancelButton, 1, 1);
+	    GridPane.setColumnSpan(statusLabel, 2);
+	    grid.add(statusLabel, 0, 2);
+
+	    saveButton.setOnAction(event -> {
+	        boolean newMode = simulationCheckBox.isSelected();
+	        if (SIMULATION_MODE != newMode) {
+	            SIMULATION_MODE = newMode;
+	            appendLog("Simulation Mode set to: " + SIMULATION_MODE, LogLevel.INFO);
+	            statusLabel.setText("Simulation mode updated successfully.");
+	            statusLabel.setTextFill(Color.GREEN);
+	            ApplicationLauncher.logger.info("Simulation mode updated: " + SIMULATION_MODE);
+	        } else {
+	            statusLabel.setText("No change detected.");
+	            statusLabel.setTextFill(Color.GRAY);
+	            ApplicationLauncher.logger.info("Simulation mode unchanged.");
+	        }
+	        dialogStage.close();
+	    });
+
+	    cancelButton.setOnAction(event -> {
+	        ApplicationLauncher.logger.info("Simulation Configuration Dialog cancelled.");
+	        dialogStage.close();
+	    });
+
+	    dialogStage.setScene(new Scene(grid));
+	    dialogStage.setResizable(false);
+	    dialogStage.showAndWait();
+	}
 
 }

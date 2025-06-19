@@ -123,7 +123,7 @@ public class ReportGeneratorController implements Initializable {
             if (templateListView.getScene() != null) {
                 templateListView.getScene().addEventFilter(KeyEvent.KEY_PRESSED, event -> {
                     // Detect CTRL + SHIFT + ` (back_quote)
-                    if (event.isControlDown() && event.isShiftDown() && event.getCode() == KeyCode.BACK_QUOTE) {
+                    if (event.isAltDown() && event.isShiftDown() && event.getCode() == KeyCode.BACK_QUOTE) {
                         openPathConfigurationDialog();
                         event.consume(); // Consume the event so it doesn't propagate
                     }
@@ -235,7 +235,7 @@ public class ReportGeneratorController implements Initializable {
                             }
                             lastProcessedState = newVal;
 
-                            Result fan = getTableRow().getItem();
+                            Result fan = (Result) getTableRow().getItem();
                             if (fan == null) {
                                 ApplicationLauncher.logger.info("Warning: Checkbox listener triggered for null fan. Ignoring.");
                                 return; // Prevent processing null rows
@@ -490,12 +490,27 @@ public class ReportGeneratorController implements Initializable {
     /**
      * Opens a dialog for the user to configure the TEMPLATES_DIR_PATH.
      */
+    /**
+     * Opens a dialog for the user to configure the TEMPLATES_DIR_PATH.
+     */
     private void openPathConfigurationDialog() {
         ApplicationLauncher.logger.info("Opening Path Configuration Dialog.");
         Stage dialogStage = new Stage();
         dialogStage.setTitle("Configure Template Directory");
         dialogStage.initModality(Modality.APPLICATION_MODAL);
-        dialogStage.initOwner(templateListView.getScene().getWindow());
+
+        try {
+            Window owner = templateListView != null && templateListView.getScene() != null
+                           ? templateListView.getScene().getWindow()
+                           : null;
+            if (owner != null) {
+                dialogStage.initOwner(owner);
+            } else {
+                ApplicationLauncher.logger.warn("templateListView or its scene is null. Dialog will open without an owner.");
+            }
+        } catch (Exception e) {
+            ApplicationLauncher.logger.warn("Failed to set dialog owner: " + e.getMessage());
+        }
 
         GridPane grid = new GridPane();
         grid.setPadding(new Insets(10));
@@ -541,6 +556,7 @@ public class ReportGeneratorController implements Initializable {
         dialogStage.setScene(new javafx.scene.Scene(grid));
         dialogStage.showAndWait();
     }
+
 
 
     /**
