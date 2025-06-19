@@ -74,10 +74,11 @@ public class ReportGeneratorController implements Initializable {
     @FXML private Button generateReportButton;
     @FXML private Label errorMessageLabel;
     @FXML private Label noResultsLabel;
+    @FXML private ComboBox<String> filterComboBox; // Added FXML for filter ComboBox
 
 
     // The path to your report templates folder
-    private static final String TEMPLATES_DIR_PATH = "C:\\Users\\Surya\\git\\ProFAN-Maven-s0.0.0.7\\src\\main\\resources\\reportTemplates";
+    private static final String TEMPLATES_DIR_PATH = "D:\\tasworkspace\\ProFAN\\ProFAN-Maven-s0.0.0.7\\src\\main\\resources\\reportTemplates";
 
     private ObservableList<Template> availableTemplates = FXCollections.observableArrayList();
     private Template selectedTemplate = null;
@@ -105,21 +106,6 @@ public class ReportGeneratorController implements Initializable {
         // Load templates from the specified directory
         availableTemplates = loadTemplatesFromDirectory();
         templateListView.setItems(availableTemplates.stream().map(Template::getName).collect(Collectors.toCollection(FXCollections::observableArrayList)));
-
-        // --- WEBVIEW DEBUGGING SETUP (Optional, but good for troubleshooting) ---
-        WebEngine engine = templatePreviewWebView.getEngine();
-        engine.getLoadWorker().stateProperty().addListener((obs, oldState, newState) -> {
-            if (newState == Worker.State.SUCCEEDED) {
-                System.out.println("WebView finished loading (SUCCEEDED). Current URL: " + engine.getLocation());
-            } else if (newState == Worker.State.FAILED) {
-                System.err.println("WebView failed to load URL: " + engine.getLocation());
-                System.err.println("Error: " + engine.getLoadWorker().getException());
-            }
-        });
-
-        engine.setOnAlert(event -> System.out.println("WebView Alert: " + event.getData()));
-        engine.setOnStatusChanged(event -> System.out.println("WebView Status: " + event.getData()));
-        // --- END WEBVIEW DEBUGGING SETUP ---
 
         // Listener for template selection (single click to select, double click to configure)
         templateListView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
@@ -149,7 +135,7 @@ public class ReportGeneratorController implements Initializable {
         selectColumn		.setCellValueFactory(new PropertyValueFactory<>("selected"));
         serialColumn		.setCellValueFactory(new PropertyValueFactory<>("fanSerialNumber"));
         testpointNameColumn .setCellValueFactory(new PropertyValueFactory<>("testPointName"));
-        voltageColumn		.setCellValueFactory(new PropertyValueFactory<>("voltage")); // This line was causing NPE if voltageColumn was null
+        voltageColumn		.setCellValueFactory(new PropertyValueFactory<>("voltage")); 
         rpmColumn           .setCellValueFactory(new PropertyValueFactory<>("rpm"));  
         windspeedColumn     .setCellValueFactory(new PropertyValueFactory<>("windSpeed"));
         currentColumn       .setCellValueFactory(new PropertyValueFactory<>("current"));  
@@ -217,9 +203,18 @@ public class ReportGeneratorController implements Initializable {
             }
         });
 
+        // Initialize filter ComboBox
+        filterComboBox.setItems(FXCollections.observableArrayList("NONE", "PASSED", "FAILED"));
+        filterComboBox.getSelectionModel().select("NONE"); // Set default filter
+        // Add listener to filter ComboBox
+        filterComboBox.valueProperty().addListener((obs, oldVal, newVal) -> applyStatusFilter(newVal));
+
+
         // Set initial fan data by converting the List to an ObservableList
-        fanTableView.setItems(FXCollections.observableArrayList(allResults));
-        updateTableViewVisibility();
+        // The applyStatusFilter will be called once on initialization due to default selection,
+        // so no need to explicitly set all results here again.
+        // fanTableView.setItems(FXCollections.observableArrayList(allResults)); 
+        // updateTableViewVisibility(); // This will be called by applyStatusFilter
 
         // Add listener to selectAllCheckbox
         selectAllCheckbox.selectedProperty().addListener((obs, oldVal, newVal) -> {
@@ -230,6 +225,9 @@ public class ReportGeneratorController implements Initializable {
             updateGenerateReportButtonState();
         });
 
+        // Add action listener to serialInputTextField to trigger search on Enter key press
+        serialInputTextField.setOnAction(event -> handleSearchFans());
+
         // Initialize button state
         updateGenerateReportButtonState();
         errorMessageLabel.setText(""); // Clear any initial error message
@@ -238,6 +236,9 @@ public class ReportGeneratorController implements Initializable {
         templatePreviewWebView.setVisible(false);
         noPreviewLabel.setVisible(true);
         noPreviewLabel.setText("Select a template to see its preview.");
+
+        // Apply initial filter (NONE by default) to populate the table
+        applyStatusFilter(filterComboBox.getSelectionModel().getSelectedItem());
     }
 
     /**
@@ -493,7 +494,7 @@ public class ReportGeneratorController implements Initializable {
                     String endPrefix = endMatcher.group(1);
                     try {
                         endNumeric = Integer.parseInt(endMatcher.group(2));
-                    } catch (NumberFormatException e) {
+                    }  catch (NumberFormatException e) {
                          errorMessageLabel.setText(String.format("Invalid numeric part in end serial: '%s'.", endStr));
                          return new ArrayList<>();
                     }
@@ -533,6 +534,7 @@ public class ReportGeneratorController implements Initializable {
     /**
      * Handles the search button click event.
      * Parses the serial input and filters the fan data based on fanSerialNumber.
+     * This method is triggered by the search button or by pressing Enter in the serialInputTextField.
      */
     @FXML
     private void handleSearchFans() {
@@ -540,11 +542,8 @@ public class ReportGeneratorController implements Initializable {
         String input = serialInputTextField.getText().trim();
 
         if (input.isEmpty()) {
-            // If input is empty, display all results fetched initially.
-            fanTableView.setItems(FXCollections.observableArrayList(allResults)); 
-            updateTableViewVisibility();
-            updateSelectAllCheckboxState();
-            updateGenerateReportButtonState();
+            // If input is empty, reset filters and display all results
+            filterComboBox.getSelectionModel().select("NONE"); // This will internally call applyStatusFilter
             return;
         }
 
@@ -560,20 +559,8 @@ public class ReportGeneratorController implements Initializable {
              return;
         }
 
-        // --- IMPORTANT NOTE ON DATABASE FETCHING ---
-        // In a real-world scenario, to "fetch from the database and display" each time
-        // a search is performed, you would typically call a service method that
-        // queries the database directly with the search terms/ranges.
-        // For example, if your ResultService had methods like:
-        // List<Result> findByFanSerialNumberExact(String serial);
-        // List<Result> findByFanSerialNumberRange(String prefix, int startNum, int endNum);
-        //
-        // You would dynamically build your database query here based on the 'searchQueries' list.
-        // For this example, we filter the 'allResults' list already loaded in memory,
-        // which simulates the filtering but operates on in-memory data.
-        // ------------------------------------------
-
-        ObservableList<Result> filteredFans = FXCollections.observableArrayList(
+        // Apply search filter
+        ObservableList<Result> searchFilteredFans = FXCollections.observableArrayList(
                 allResults.stream() // Filtering the already loaded 'allResults' for demonstration
                     .filter(fan -> {
                         // A fan matches if its serial number matches ANY of the parsed search queries
@@ -583,12 +570,47 @@ public class ReportGeneratorController implements Initializable {
                     .collect(Collectors.toList())
         );
 
-        fanTableView.setItems(filteredFans);
-        fanTableView.refresh(); // Refresh table to ensure colors are applied on filtered data
-        updateTableViewVisibility();
-        updateSelectAllCheckboxState(); // Update select all checkbox based on filtered results
-        updateGenerateReportButtonState(); // Update generate button state
+        // Now, apply the status filter on top of the search results
+        applyStatusFilter(filterComboBox.getSelectionModel().getSelectedItem(), searchFilteredFans);
     }
+
+    /**
+     * Applies a status filter to the fanTableView.
+     * This method can filter either the entire 'allResults' list or a pre-filtered list (e.g., from search).
+     * @param selectedFilter The selected filter string ("NONE", "PASSED", "FAILED").
+     * @param sourceList The list of Result objects to filter from. If null, 'allResults' will be used.
+     */
+    private void applyStatusFilter(String selectedFilter, List<Result> sourceList) {
+        List<Result> listToFilter = (sourceList != null) ? sourceList : allResults;
+        ObservableList<Result> filteredData = FXCollections.observableArrayList();
+
+        if ("PASSED".equalsIgnoreCase(selectedFilter)) {
+            filteredData.addAll(listToFilter.stream()
+                                    .filter(r -> "PASSED".equalsIgnoreCase(r.getTestStatus()))
+                                    .collect(Collectors.toList()));
+        } else if ("FAILED".equalsIgnoreCase(selectedFilter)) {
+            filteredData.addAll(listToFilter.stream()
+                                    .filter(r -> "FAILED".equalsIgnoreCase(r.getTestStatus()))
+                                    .collect(Collectors.toList()));
+        } else { // "NONE" or any other value
+            filteredData.addAll(listToFilter);
+        }
+
+        fanTableView.setItems(filteredData);
+        fanTableView.refresh(); // Refresh table to ensure colors and selection states are correct
+        updateTableViewVisibility();
+        updateSelectAllCheckboxState();
+        updateGenerateReportButtonState();
+    }
+
+    /**
+     * Overload for applyStatusFilter to simplify calls when filtering from allResults.
+     * @param selectedFilter The selected filter string ("NONE", "PASSED", "FAILED").
+     */
+    private void applyStatusFilter(String selectedFilter) {
+        applyStatusFilter(selectedFilter, null); // Pass null to indicate filtering from allResults
+    }
+
 
     /**
      * Handles the generate report button click event.

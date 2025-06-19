@@ -1,0 +1,1280 @@
+2025-06-18 15:23:52.402 INFO  Version:21 - HV000001: Hibernate Validator 6.2.5.Final
+2025-06-18 15:23:52.469 INFO  SpringApplication:55 - Starting application using Java 1.8.0_161 on DESKTOP-BRVMCFO with PID 36704 (started by hp in D:\tasworkspace\ProFAN\ProFAN-Maven-s0.0.0.7)
+2025-06-18 15:23:52.521 INFO  SpringApplication:631 - No active profile set, falling back to 1 default profile: "default"
+2025-06-18 15:23:53.264 INFO  RepositoryConfigurationDelegate:262 - Multiple Spring Data modules found, entering strict repository configuration mode
+2025-06-18 15:23:53.264 INFO  RepositoryConfigurationDelegate:132 - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-06-18 15:23:53.399 INFO  RepositoryConfigurationDelegate:201 - Finished Spring Data repository scanning in 114 ms. Found 13 JPA repository interfaces.
+2025-06-18 15:23:53.695 INFO  RepositoryConfigurationDelegate:262 - Multiple Spring Data modules found, entering strict repository configuration mode
+2025-06-18 15:23:53.696 INFO  RepositoryConfigurationDelegate:132 - Bootstrapping Spring Data JDBC repositories in DEFAULT mode.
+2025-06-18 15:23:54.126 INFO  RepositoryConfigurationDelegate:201 - Finished Spring Data repository scanning in 429 ms. Found 0 JDBC repository interfaces.
+2025-06-18 15:23:55.159 INFO  TomcatWebServer:108 - Tomcat initialized with port(s): 8085 (http)
+2025-06-18 15:23:55.182 INFO  Http11NioProtocol:173 - Initializing ProtocolHandler ["http-nio-8085"]
+2025-06-18 15:23:55.182 INFO  StandardService:173 - Starting service [Tomcat]
+2025-06-18 15:23:55.183 INFO  StandardEngine:173 - Starting Servlet engine: [Apache Tomcat/9.0.75]
+2025-06-18 15:23:55.391 INFO  [/]:173 - Initializing Spring embedded WebApplicationContext
+2025-06-18 15:23:55.391 INFO  ServletWebServerApplicationContext:292 - Root WebApplicationContext: initialization completed in 2795 ms
+2025-06-18 15:23:55.583 INFO  LogHelper:31 - HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-06-18 15:23:55.655 INFO  Version:44 - HHH000412: Hibernate ORM core version 5.6.15.Final
+2025-06-18 15:23:55.925 INFO  Version:56 - HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
+2025-06-18 15:23:56.083 INFO  HikariDataSource:110 - HikariPool-1 - Starting...
+2025-06-18 15:23:56.353 INFO  HikariDataSource:123 - HikariPool-1 - Start completed.
+2025-06-18 15:23:56.377 INFO  Dialect:175 - HHH000400: Using dialect: org.hibernate.dialect.MySQL5Dialect
+2025-06-18 15:23:57.961 INFO  JtaPlatformInitiator:52 - HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2025-06-18 15:23:57.973 INFO  LocalContainerEntityManagerFactoryBean:437 - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-06-18 15:23:57.977 INFO  AutowiredAnnotationBeanPostProcessor:477 - Autowired annotation is not supported on static fields: private static com.tasnetwork.spring.config.ConfigLoader com.tasnetwork.calibration.energymeter.ApplicationLauncher.configLoader
+2025-06-18 15:23:59.042 WARN  JpaBaseConfiguration$JpaWebConfiguration:223 - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-06-18 15:23:59.658 INFO  Http11NioProtocol:173 - Starting ProtocolHandler ["http-nio-8085"]
+2025-06-18 15:23:59.702 INFO  TomcatWebServer:220 - Tomcat started on port(s): 8085 (http) with context path ''
+2025-06-18 15:23:59.713 INFO  SpringApplication:61 - Started application in 7.793 seconds (JVM running for 9.254)
+2025-06-18 15:23:59.734 INFO  ApplicationLauncher:1472 - <------------ProFAN Version S0.0.0.4----LAUNCHED---------->
+
+2025-06-18 15:23:59.745 INFO  ApplicationLauncher:2256 - LoadConfigProperty: getConfigFileVersion: 2.1
+2025-06-18 15:23:59.746 INFO  ApplicationLauncher:2259 - LoadConfigProperty : APP_CONFIG_CUSTOMER_FILE_NAME: app_config_fan_v1_6.json
+2025-06-18 15:23:59.746 INFO  ApplicationLauncher:2262 - LoadConfigProperty : CONFIG_FILE_PATH: config/app/
+2025-06-18 15:23:59.750 DEBUG ApplicationLauncher:530 - setAppConfigFilePathName : ConstantMasterConfig.CONFIG_FILE_PATH  :config/app/
+2025-06-18 15:23:59.751 INFO  ApplicationLauncher:2273 - LoadConfigProperty : ConstantAppConfigReader.getAppConfigFilePathName: config/app/app_config_fan_v1_6.json
+2025-06-18 15:23:59.757 DEBUG ApplicationLauncher:487 - ConstantAppConfigReader : jarPath: D:\tasworkspace\ProFAN\ProFAN-Maven-s0.0.0.7
+2025-06-18 15:23:59.758 DEBUG ApplicationLauncher:490 - ConstantAppConfigReader : externalFilePath: D:\tasworkspace\ProFAN\ProFAN-Maven-s0.0.0.7\config\app\app_config_fan_v1_6.json
+2025-06-18 15:23:59.758 DEBUG ApplicationLauncher:500 - ConstantAppConfigReader : External file not found. Loading from JAR resources...
+2025-06-18 15:23:59.772 DEBUG ApplicationLauncher:515 - ConstantAppConfigReader: Loaded config json property:{"ConfigFileVersionComment1_5":" added ReportProfileDefaultActiveGroupId","ConfigFileVersionComment1_3":" added BNC_OutputPort","ConfigFileVersionComment1_4":" added RefStdFeedBackControl","AcceptedCurrentRange":{"HTCT_CurrentMin":0.03,"HTCT_CurrentMax":10.0,"LTCT_CurrentMax":100.0,"LTCT_CurrentMin":0.03},"AcceptedErrorPercentage":{"DefaultFrequencyAcceptedPercentage":0.5,"CurrentZeroAcceptedValue":4.0,"DegreeZeroAcceptedValue":2.0,"DefaultCurrentAcceptedPercentage":10,"DefaultHarVoltAcceptedPercentage":30,"DefaultPhaseAcceptedPercentage":10,"VoltZeroAcceptedValue":50.0,"DefaultVoltAcceptedPercentage":10,"DefaultHarCurrentAcceptedPercentage":30},"AcceptedVoltageRange":{"LTCT_VoltMax":300.0,"LTCT_VoltMin":30.0,"HTCT_VoltMax":120.0,"HTCT_VoltMin":0.0},"DataValidation":{"DutIdBlackList1":"12345","DutIdValidateAlreadyTested":false,"DutIdBlackList2":"TNEB1234","DutIdWhiteListValidation":false,"TotalDutIdBlackList":2,"TotalDutIdWhiteList":2,"DutIdWhiteList2":"TNEB4567","DutIdWhiteList1":"123456","DutIdBlackListValidation":false,"DutIdValidateForEmpty":false},"ImportDeploymentData":{"MeterConstantHeader":"Meter Constant","RackPositionSelectedHeader":"Select","PtRatioHeader":"PTR Ratio","MeterModelNoHeader":"ModelNo","RackPositionIdHeader":"Rack ID","MeterMakeHeader":"Make","SerialNoHeader":"Serial No","ImportDeploymentDataFeatureEnabled":true,"CtRatioHeader":"CTR Ratio"},"ConfigFileName":{"ConveyorProfileConfigFileName":"conveyor_config.json","PythonScriptLocation":"C:\\TAS_Network\\Procal_Excel\\python\\ProCalSaveAsPDF_MergeV1_3.py","ProPowerCalibrationFileName":"lscs_neolink_dec2022_calibration.json","PythonExeLocation":"C:\\Users\\nana\\AppData\\Local\\Programs\\Python\\Python37\\python.exe","RefStdConstantConfigFileName":"RefStd_Kre9xxx.json","ReportProfileV2FileName":"ReportProfileV2_1.json","PythonExeLocation1":"C:\\Users\\HP\\AppData\\Local\\Programs\\Python\\Python38\\python.exe","ReportConfigFileName":"report_config.json"},"PhaseReversal":{"PhaseReversalRB":"120","NormalRB":"240","PhaseReversalRY":"240","NormalRY":"120"},"TestPointUserEntryLimit":{"deploymentVoltagePercentValidation":true,"IterationAllowedMax":30,"ActiveEnergy_kWh_AllowedMax":10.0,"ActiveEnergy_kWh_AllowedMinAbove":0.0,"ReactiveEnergy_kVARh_AllowedMinAbove":0.0,"CurrentImax_PercentAllowedMax":120.0,"VoltPercentAllowedMax":125.0,"PowerFactorAllowedMin":0.0,"ReactiveEnergy_kVARh_AllowedMax":15.0,"CurrentIb_PercentAllowedMax":399.0,"deploymentCurrentPercentValidation":true,"ApparentEnergy_kVAh_AllowedMinAbove":0.0,"IterationAllowedMin":1,"VoltPercentAllowedMin":40.0,"CurrentPercentAllowedMinAbove":0.0,"PowerFactorAllowedMax":1.0,"ApparentEnergy_kVAh_AllowedMax":12.0},"database":{"password":"lscontrols","urlSample":"jdbc:mysql:\/\/topsmakproddb.c5nfso2sc2bd.ap-south-1.rds.amazonaws.com\/topsmak","url1":"jdbc:mysql:\/\/127.0.0.1:3306\/","db_name":"procal_v2_5_3_1","url2":"jdbc:mysql:\/\/192.168.0.108:3306\/","db_name1":"Procal_2_3_ram_pc_Dump20221213","urlTailOption":"?useSSL=false&allowPublicKeyRetrieval=true","DefaultBackupLocation":"C:\\","url":"jdbc:mysql:\/\/localhost:3306\/","DefaultMySQL_InstalledLocation":"C:\\Program Files\\MySQL\\MySQL Server 5.7\\bin","username":"root"},"UserAccessControl":{"UacProfileName2":"Production","UacProfileName1":"Read Only","UacProfileName4":"Quality","UacProfileName3":"Maintenance","NoOfUacProfiles":5,"UacDefaultProfileName":"Admin","UacProfileName5":"Admin"},"PF_MappingDefaultValues":{"PF7":"0.25C","PF6":"0.8L","PF1":"1.0","PF3":"0.8C","PF2":"0.5L","PF5":"0.25L","PF4":"0.5C"},"AcceptedErrorRange":{"ErrorMin":-13.0,"ErrorMax":13.0},"CoolOffTimeInMSec":1000,"DialTest":{"3P_NearingTarget1Percent":60.0,"3P_NearingTarget2Percent":90.0,"1P_NearingTarget2Percent":98.0,"3P_NearingTarget2CurrentReductionPercentage":2.0,"1P_NearingTarget1Percent":90.0,"3P_NearingTarget1CurrentReductionPercentage":10.0,"1P_NearingTarget1CurrentReductionPercentage":10.0,"1P_NearingTarget2CurrentReductionPercentage":5.0},"app":{"GenerateIndividualReportEnabled":false,"DUT":"DUT-01","HarmonicsSrc":"HRM-01","DeploymentReferenceNoLabelName":"Batch No","ScreenHeightThreshold":1000,"InstantMetricsDisplayAlwaysOnTop":true,"ScreenWidthThreshold":1500,"DefaultLidEnabled":true,"AppInstanceServerPort":8083,"DutDisplayKey":"MUT","LscsPowerSrcInit1":"3.60363","DutCommandInterfaceId":1,"InstantMetricsEnergyDisplayInKilloWattHour":true,"HoldLogFilesforX_NoOfPreviousDays":14,"LscsPowerSrcInit2":"3.50295","PowerSrc":"PS-01","LduInvalidDataSkip":true,"DutCommandProjectName":"FanTestingV2","ICT":"ICT-01","RefStd":"Ref-03","LDU":"LDU-05","DeploymentDbSearchMaxTimeLimitInDays":7,"LscsPowerSrcInit":"3.30306"},"DUT":{"CommFeatureEnabled":true,"CalibMeterSerialNoFixedLength":8},"ConfigFilePathLocation":{"ProPowerCalibrationFolderPath":"config\/calib\/","ReportProfileFolderPath":"config\/report\/","ReportConfigFolderPath":"config\/report\/","ConveyorProfileFolderPath":"\/resources\/conveyor\/","RefStdConstantConfigFolderPath":"config\/refstd\/"},"StablizationValidation":{"DefaultRefStandardValidationRetryCount":3,"PowerSrcValidationWaitTimeInSec":40,"DefaultRefStandardValidationWaitTimeInSec":30,"SkipTestPointTimeInSec":5,"PowerSrcAcceptedContinousFailure":5},"Report":{"ReportProfileDefaultActiveCustomerId":"2","DefaultReportProfileDisplay":"LecsMeterReportProfile","ConstantTestAcceptedDefaultLowerLimits":"-0.5","ConstantTestFilterValue3":"1","ConstantTestFilterValue4":"1","TotalConstantTestResultLimits":4,"ConstantTestAcceptedLowerLimits4":"-0.5","MeterProfileReportGenerationEnabled":false,"ConstantTestFilterValue1":"0.2","ConstantTestAcceptedLowerLimits1":"-0.5","ConstantTestFilterValue2":"0.1","ConstantTestAcceptedLowerLimits3":"-0.5","ReportTimeFormat":"HH:mm:ss","ConstantTestAcceptedLowerLimits2":"-0.5","AccuracyNumberOfSectionPerPage":3,"TotalReportProfile":2,"ConstantTestFilterUnit1":"kWh","ReportProfileDefaultActiveGroupName":["RPG1","RPG2","RPG3","RPG4","RPG5","RPG6","*.*"],"PythonExeLocation":"C:\\Users\\nana\\AppData\\Local\\Programs\\Python\\Python37\\python.exe","ExcelLastRow":99,"ReportDataReplace2":"1 phase","ReportDataReplace1":"3 phase","AccuracyNumberOfPages":2,"ExcelLastColumn":99,"TimeZoneList":"https:\/\/garygregory.wordpress.com\/2013\/06\/18\/what-are-the-java-timezone-ids\/","FontSize":6,"PythonScriptLocation":"C:\\TAS_Network\\Procal_Excel\\python\\ProCalSaveAsPDF_MergeV1_3.py","FontName":"Arial","ReportTotalNumberOfPages":"7","ConstantTestAcceptedUpperLimits3":"+0.5","ConstantTestAcceptedUpperLimits4":"+0.5","ConstantTestAcceptedUpperLimits1":"+0.5","ConstantTestAcceptedUpperLimits2":"+0.5","ReportDataFind2":"Single Phase Active","ReportDataFind1":"3 Phase Star Active","ReportDateFormat":"yyyy-MM-dd","FailColorHighLightEnabled":true,"ConfigFileNameReportProfile2":"LecsHealthyReport_V1_0.json","ConfigFileNameReportProfile3":"UnhealthyMeterReport.json","ConfigFileNameReportProfile1":"NoName.json","PrintStyle":[{"ReportPrintStyleId":1,"WrapText":true,"HorizontalAlignmentCentre":false,"FontSize":6,"ReportPrintStyleName":"DefaultStyle","FontName":"Arial","Bold":false,"VerticalAlignmentCentre":false,"Border":true},{"ReportPrintStyleId":2,"ResultPageStatusErrorBackGroundFailedColor":"YELLOW","ResultStatusErrorTextFailedColor":"BLACK","HorizontalAlignmentCentre":true,"ResultStatusPassBackGroundFailedColor":"DEFAULT","ResultValueErrorBackGroundFillPattern":"SQUARES","ReportPrintStyleName":"ResultStyle","ResultValueErrorTextFailedColor":"BLACK","ResultStatusErrorColorHighLightEnabled":true,"ResultOverAllStatusErrorTextFailedColor":"BLACK","FontSize":6,"FontName":"Arial","ResultOverAllStatusErrorColorHighLightEnabled":true,"ResultStatusFailBackGroundFailedColor":"RED","Bold":false,"ResultStatusPassColorHighLightEnabled":false,"Border":true,"ResultStatusErrorBackGroundFailedColor":"YELLOW","ResultStatusFailTextFailedColor":"WHITE","ResultOverAllStatusPassColorHighLightEnabled":false,"ResultPageStatusFailColorHighLightEnabled":true,"ResultValuePassColorHighLightEnabled":false,"ResultPageStatusFailBackGroundFillPattern":"SOLID_FOREGROUND","ResultOverAllStatusErrorBackGroundFailedColor":"YELLOW","ResultOverAllStatusPassTextFailedColor":"DEFAULT","ResultValueFailColorHighLightEnabled":true,"ResultStatusFailBackGroundFillPattern":"SOLID_FOREGROUND","ResultValueFailBackGroundFillPattern":"SOLID_FOREGROUND","ResultOverAllStatusFailColorHighLightEnabled":true,"ResultOverAllStatusFailBackGroundFillPattern":"SOLID_FOREGROUND","ResultValueFailBackGroundFailedColor":"RED","WrapText":true,"ResultStatusFailColorHighLightEnabled":true,"ResultPageStatusPassColorHighLightEnabled":false,"ResultPageStatusFailTextFailedColor":"WHITE","ResultOverAllStatusPassBackGroundFailedColor":"DEFAULT","ResultOverAllStatusErrorBackGroundFillPattern":"SQUARES","ResultPageStatusPassTextFailedColor":"DEFAULT","ResultOverAllStatusFailTextFailedColor":"WHITE","ResultPageStatusErrorTextFailedColor":"BLACK","ResultPageStatusFailBackGroundFailedColor":"RED","ResultPageStatusErrorColorHighLightEnabled":true,"ResultStatusErrorBackGroundFillPattern":"SQUARES","ResultValueErrorColorHighLightEnabled":true,"VerticalAlignmentCentre":true,"ResultStatusPassTextFailedColor":"DEFAULT","ResultValuePassTextFailedColor":"DEFAULT","ResultValueErrorBackGroundFailedColor":"YELLOW","ResultValueFailTextFailedColor":"WHITE","ResultPageStatusErrorBackGroundFillPattern":"SQUARES","ResultOverAllStatusFailBackGroundFailedColor":"RED","ResultValuePassBackGroundFailedColor":"DEFAULT","ResultPageStatusPassBackGroundFailedColor":"DEFAULT"},{"ReportPrintStyleId":3,"WrapText":true,"HorizontalAlignmentCentre":true,"FontSize":6,"ReportPrintStyleName":"GenericHeaderStyle","FontName":"Arial","Bold":true,"VerticalAlignmentCentre":true,"Border":true},{"ReportPrintStyleId":4,"WrapText":true,"HorizontalAlignmentCentre":true,"FontSize":8,"ReportPrintStyleName":"TableHeaderStyle","FontName":"Arial","Bold":true,"VerticalAlignmentCentre":true,"Border":true}],"ReportTimeZone":"Asia\/Calcutta","CustomReportExportAsPdf":false,"ConstantTestFilterUnit3":"kVAh","ConstantTestFilterUnit2":"kVARh","ConstantTestFilterUnit4":"kWh","MeterProfileReportPageNumber":"2","PassColorHighLightEnabled":false,"ReportProfile2":"LecsMeterReportProfile","ReportProfile1":"DefaultReportProfile","ReportProfile3":"UnhealthyMeterReport","ConstantTestAcceptedDefaultUpperLimits":"+0.5","ReportDataReplaceCount":2,"ReportDataReplaceEnabled":true},"AcceptedCreepTimeRange":{"TimeMax":99,"TimeMin":0},"LDU_Device":{"DialTestReadingWaitTimeInSec":120,"STA_ReadingWaitTimeInSec":600,"RepeatSelfHeatingReadingWaitTimeInSec":120,"CreepReadingWaitTimeInSec":120},"ConfigFileVersion":"2.1","TestPointInputDefaultValues":{"Error_Max_Default_Value":0.5,"Average_Default_Value":1,"Error_Min_Default_Value":-0.5,"Pulses_Default_Value":10,"Skip_Reading_Default_Value":0,"TimeInSec_Default_Value":20},"AcceptedDegreeRange":{"DegreeMax":360,"DegreeMin":-360},"AcceptedFrequencyRange":{"FrequencyMax":55,"FrequencyMin":45},"IMappingDefaultValues":{"I1":"1","I11":"120","I2":"2","I10":"100","I3":"5","I13":"200","I4":"10","I12":"150","I5":"20","I6":"30","I7":"50","I8":"60","I9":"80"},"RefStdFeedBackControl":{"RefStdFeedBackDegreeAllowedLowerLimitSinglePhase1":0.08,"RefStdFeedBackDegreeAllowedUpperLimitSinglePhase2":0.04,"RefStdFeedBackCurrentAllowedLowerLimitPercentage":0.05,"RefStdFeedBackDegreeAllowedUpperLimitSinglePhase1":0.09,"RefStdFeedBackControlSendDataToPowerSourceRefreshTimeInMsec":1700,"RefStdFeedBackVoltAllowedLowerLimitPercentage":0.05,"RefStdFeedBackDegreeAllowedLowerLimit":0.29,"RefStdFeedBackDegreeAllowedUpperLimitSinglePhase":0.07,"RefStdFeedBackVoltAllowedUpperLimitPercentage":0.05,"RefStdFeedBackCurrentAllowedUpperLimitPercentage":0.05,"RefStdFeedBackMultiplierEnabled":true,"RefStdFeedBackCurrentFineTuneAllowedPercentage_notused":0.25,"RefStdFeedBackDegreeAllowedLowerLimitSinglePhase":0.06,"RefStdFeedBackCurrentFineTuneConfirmationCount":3,"RefStdFeedBackDegreeRetryCountMax":10,"RefStdFeedBackCurrentFineTuneWaitTimeInSec":120,"RefStdFeedBackDegreeAllowedUpperLimit":0.29,"RefStdFeedBackDegreeAllowedLowerLimitSinglePhase2":0.03,"RefStdFeedBackControlEnabled":false},"DeviceSettings":{"dut45_Id":49,"dut26_Id":30,"dut03_Id":7,"dut22_Id":26,"dut07_Id":11,"dut41_Id":45,"RefStd_Id":2,"Ict_Id":4,"dut39_Id":43,"dut12_Id":16,"dut35_Id":39,"dut31_Id":35,"dut16_Id":20,"dut44_Id":48,"PowerSource_Id":1,"dut02_Id":6,"dut27_Id":31,"dut48_Id":52,"dut06_Id":10,"dut23_Id":27,"dut40_Id":44,"Ldu_Id":3,"dut38_Id":42,"dut17_Id":21,"dut30_Id":34,"dut13_Id":17,"dut34_Id":38,"dut20_Id":24,"dut47_Id":51,"dut01_Id":5,"dut05_Id":9,"dut28_Id":32,"dut43_Id":47,"dut08_Id":12,"dut24_Id":28,"dut10_Id":14,"dut14_Id":18,"dut37_Id":41,"dut18_Id":22,"dut33_Id":37,"dut19_Id":23,"dut21_Id":25,"dut46_Id":50,"dut29_Id":33,"dut42_Id":46,"dut04_Id":8,"dut09_Id":13,"dut25_Id":29,"dut11_Id":15,"dut36_Id":40,"dut15_Id":19,"dut32_Id":36},"PwrSrcDevice":{"ManualModeTimerInputDefaultValue":120,"ManualModeTimerInputMaxAccepted":3600,"VoltUnbalanceZeroVoltLessThan100V_InPercentage":16.0,"ManualModeTimerInputMinAccepted":10,"VoltUnbalanceZeroVoltGreaterThan100V_InPercentage":4.0,"ProPowerCalibrationFileName-delete":"lscs_lecs_dec2022_calibration.json","ProPowerCalibrationFolderPath-delete":"\/resources\/config\/calib\/","PowerSrcRebootUpWaitTimeInMsec":60},"RefStdDevice":{"EnableParsingLogs":false,"BNC_OutputPort":1,"RefStdConstantConfigFileName":"RefStd_Kre9xxx.json","ConstConfigDisplayEnable":false},"ConfigFileVersionComment1_1":"1.1-Added RSS_LTCT_CurrentThreshold and its corresponding levels for Active\/Reactive LTCT\/HTCT, ","ConfigFileVersionComment1_2":" added HoldLogFilesforX_NoOfPreviousDays"}
+2025-06-18 15:23:59.773 ERROR ApplicationLauncher:61 - getString : config file: section:IMappingDefaultValues
+2025-06-18 15:23:59.773 ERROR ApplicationLauncher:62 - getString : config file: key:I14
+2025-06-18 15:23:59.773 ERROR ApplicationLauncher:61 - getString : config file: section:IMappingDefaultValues
+2025-06-18 15:23:59.773 ERROR ApplicationLauncher:62 - getString : config file: key:I15
+2025-06-18 15:23:59.774 ERROR ApplicationLauncher:61 - getString : config file: section:PF_MappingDefaultValues
+2025-06-18 15:23:59.774 ERROR ApplicationLauncher:62 - getString : config file: key:PF8
+2025-06-18 15:23:59.774 ERROR ApplicationLauncher:61 - getString : config file: section:PF_MappingDefaultValues
+2025-06-18 15:23:59.774 ERROR ApplicationLauncher:62 - getString : config file: key:PF9
+2025-06-18 15:23:59.774 ERROR ApplicationLauncher:61 - getString : config file: section:PF_MappingDefaultValues
+2025-06-18 15:23:59.774 ERROR ApplicationLauncher:62 - getString : config file: key:PF10
+2025-06-18 15:23:59.784 DEBUG ApplicationLauncher:2340 - LoadConfigProperty: REF_STD_PHASE_180_FLAG:false
+2025-06-18 15:23:59.785 DEBUG ApplicationLauncher:2342 - LoadConfigProperty: REF_STD_CONSTANT_CONFIG_ENABLE:false
+2025-06-18 15:23:59.785 INFO  ApplicationLauncher:2603 - LoadConfigProperty :Loaded REPORT_PROFILE_DEFAULT_ACTIVE_GROUP_NAME_LIST: ["RPG1","RPG2","RPG3","RPG4","RPG5","RPG6","*.*"]
+2025-06-18 15:23:59.785 INFO  ApplicationLauncher:2604 - LoadConfigProperty :Loaded REPORT_PROFILE_DEFAULT_ACTIVE_GROUP_NAME_LIST.get(0): RPG1
+2025-06-18 15:23:59.785 INFO  ApplicationLauncher:2608 - LoadConfigProperty :Loaded REPORT_PROFILE_DEFAULT_ACTIVE_CUSTOMER_ID: 2
+2025-06-18 15:23:59.785 INFO  ApplicationLauncher:2615 - LoadConfigProperty :Loaded BNC_OutputPort: 1
+2025-06-18 15:23:59.786 INFO  ApplicationLauncher:2629 - LoadConfigProperty : UAC profileName1 : Read Only
+2025-06-18 15:23:59.786 INFO  ApplicationLauncher:2629 - LoadConfigProperty : UAC profileName2 : Production
+2025-06-18 15:23:59.786 INFO  ApplicationLauncher:2629 - LoadConfigProperty : UAC profileName3 : Maintenance
+2025-06-18 15:23:59.786 INFO  ApplicationLauncher:2629 - LoadConfigProperty : UAC profileName4 : Quality
+2025-06-18 15:23:59.786 INFO  ApplicationLauncher:2629 - LoadConfigProperty : UAC profileName5 : Admin
+2025-06-18 15:23:59.788 INFO  ApplicationLauncher:2634 - LoadConfigProperty :Configured config file version:1.3
+2025-06-18 15:23:59.788 INFO  ApplicationLauncher:2636 - LoadConfigProperty :Loaded config file version:2.1
+2025-06-18 15:23:59.789 INFO  ApplicationLauncher:2644 - LoadConfigProperty :Configured LSCS_POWER_SOURCE_CALIBRATION_FILE_PATH: config/calib/
+2025-06-18 15:23:59.789 INFO  ApplicationLauncher:2648 - LoadConfigProperty :Configured LSCS_POWER_SOURCE_CALIBRATION_FILE_NAME: lscs_neolink_dec2022_calibration.json
+2025-06-18 15:23:59.789 INFO  ApplicationLauncher:2653 - LoadConfigProperty :Configured REPORT_CONFIG_FILE_PATH: config/report/
+2025-06-18 15:23:59.789 INFO  ApplicationLauncher:2657 - LoadConfigProperty :Configured REPORT_CONFIG_FILE_NAME: report_config.json
+2025-06-18 15:23:59.789 INFO  ApplicationLauncher:2662 - LoadConfigProperty :Configured REPORT_PROFILE_PATH: config/report/
+2025-06-18 15:23:59.789 INFO  ApplicationLauncher:2668 - LoadConfigProperty :Configured CONVEYOR_CONFIG_FILE_PATH: /resources/conveyor/
+2025-06-18 15:23:59.789 INFO  ApplicationLauncher:2671 - LoadConfigProperty :Configured CONVEYOR_CONFIG_FILE_NAME: conveyor_config.json
+2025-06-18 15:23:59.790 INFO  ApplicationLauncher:2678 - LoadConfigProperty :Configured DUT_COMM_SETTINGS: true
+2025-06-18 15:23:59.790 INFO  ApplicationLauncher:2815 - LoadConfigProperty :Configured REF_STD_FEEDBACK_CONTROL_ENABLED not read from config: false
+2025-06-18 15:23:59.790 INFO  ApplicationLauncher:2819 - LoadConfigProperty :Configured REF_STD_FEEDBACK_CONTROL_DEGREE_ALLOWED_UPPER_LIMIT: 0.29
+2025-06-18 15:23:59.790 INFO  ApplicationLauncher:2822 - LoadConfigProperty :Configured REF_STD_FEEDBACK_CONTROL_DEGREE_ALLOWED_LOWER_LIMIT: 0.29
+2025-06-18 15:23:59.791 INFO  ApplicationLauncher:2825 - LoadConfigProperty :Configured REF_STD_FEEDBACK_CONTROL_DEGREE_RETRY_MAX_COUNT: 10
+2025-06-18 15:23:59.791 INFO  ApplicationLauncher:2828 - LoadConfigProperty :Configured REF_STD_FEEDBACK_CONTROL_VOLT_ALLOWED_UPPER_LIMIT: 0.05
+2025-06-18 15:23:59.791 INFO  ApplicationLauncher:2831 - LoadConfigProperty :Configured REF_STD_FEEDBACK_CONTROL_VOLT_ALLOWED_LOWER_LIMIT: 0.05
+2025-06-18 15:23:59.791 INFO  ApplicationLauncher:2835 - LoadConfigProperty :Configured REF_STD_FEEDBACK_CONTROL_CURRENT_ALLOWED_UPPER_LIMIT_PERCENT: 0.05
+2025-06-18 15:23:59.791 INFO  ApplicationLauncher:2838 - LoadConfigProperty :Configured REF_STD_FEEDBACK_CONTROL_CURRENT_ALLOWED_LOWER_LIMIT_PERCENT: 0.05
+2025-06-18 15:23:59.791 INFO  ApplicationLauncher:2841 - LoadConfigProperty :Configured REF_STD_FEEDBACK_CONTROL_DEGREE_ALLOWED_UPPER_LIMIT_SINGLE_PHASE: 0.07
+2025-06-18 15:23:59.791 INFO  ApplicationLauncher:2844 - LoadConfigProperty :Configured REF_STD_FEEDBACK_CONTROL_DEGREE_ALLOWED_LOWER_LIMIT_SINGLE_PHASE: 0.06
+2025-06-18 15:23:59.792 INFO  ApplicationLauncher:2854 - LoadConfigProperty :Configured REF_STD_FEEDBACK_CONTROL_FINETUNE_CURRENT_WAIT_TIME_IN_SEC: 120
+2025-06-18 15:23:59.792 INFO  ApplicationLauncher:2857 - LoadConfigProperty :Configured REF_STD_FEEDBACK_CONTROL_FINETUNE_CURRENT_CONFIRMATION_COUNT: 3
+2025-06-18 15:23:59.792 INFO  ApplicationLauncher:2860 - LoadConfigProperty :Configured REF_STD_FEEDBACK_CONTROL_SEND_DATA_TO_POWER_SRC_REFRESH_TIME_IN_MILLI_SEC: 1700
+2025-06-18 15:23:59.792 INFO  ApplicationLauncher:2869 - LoadConfigProperty :Configured REPORT_PROFILEV2_FILE_PATH: config/report/
+2025-06-18 15:23:59.792 INFO  ApplicationLauncher:2873 - LoadConfigProperty :Configured REPORT_PROFILEV2_FILE_NAME: ReportProfileV2_1.json
+2025-06-18 15:23:59.792 DEBUG ApplicationLauncher:2903 - LoadConfigProperty : printStyle: [{"ReportPrintStyleId":1,"WrapText":true,"HorizontalAlignmentCentre":false,"FontSize":6,"ReportPrintStyleName":"DefaultStyle","FontName":"Arial","Bold":false,"VerticalAlignmentCentre":false,"Border":true}, {"ReportPrintStyleId":2,"ResultPageStatusErrorBackGroundFailedColor":"YELLOW","ResultStatusErrorTextFailedColor":"BLACK","HorizontalAlignmentCentre":true,"ResultStatusPassBackGroundFailedColor":"DEFAULT","ResultValueErrorBackGroundFillPattern":"SQUARES","ReportPrintStyleName":"ResultStyle","ResultValueErrorTextFailedColor":"BLACK","ResultStatusErrorColorHighLightEnabled":true,"ResultOverAllStatusErrorTextFailedColor":"BLACK","FontSize":6,"FontName":"Arial","ResultOverAllStatusErrorColorHighLightEnabled":true,"ResultStatusFailBackGroundFailedColor":"RED","Bold":false,"ResultStatusPassColorHighLightEnabled":false,"Border":true,"ResultStatusErrorBackGroundFailedColor":"YELLOW","ResultStatusFailTextFailedColor":"WHITE","ResultOverAllStatusPassColorHighLightEnabled":false,"ResultPageStatusFailColorHighLightEnabled":true,"ResultValuePassColorHighLightEnabled":false,"ResultPageStatusFailBackGroundFillPattern":"SOLID_FOREGROUND","ResultOverAllStatusErrorBackGroundFailedColor":"YELLOW","ResultOverAllStatusPassTextFailedColor":"DEFAULT","ResultValueFailColorHighLightEnabled":true,"ResultStatusFailBackGroundFillPattern":"SOLID_FOREGROUND","ResultValueFailBackGroundFillPattern":"SOLID_FOREGROUND","ResultOverAllStatusFailColorHighLightEnabled":true,"ResultOverAllStatusFailBackGroundFillPattern":"SOLID_FOREGROUND","ResultValueFailBackGroundFailedColor":"RED","WrapText":true,"ResultStatusFailColorHighLightEnabled":true,"ResultPageStatusPassColorHighLightEnabled":false,"ResultPageStatusFailTextFailedColor":"WHITE","ResultOverAllStatusPassBackGroundFailedColor":"DEFAULT","ResultOverAllStatusErrorBackGroundFillPattern":"SQUARES","ResultPageStatusPassTextFailedColor":"DEFAULT","ResultOverAllStatusFailTextFailedColor":"WHITE","ResultPageStatusErrorTextFailedColor":"BLACK","ResultPageStatusFailBackGroundFailedColor":"RED","ResultPageStatusErrorColorHighLightEnabled":true,"ResultStatusErrorBackGroundFillPattern":"SQUARES","ResultValueErrorColorHighLightEnabled":true,"VerticalAlignmentCentre":true,"ResultStatusPassTextFailedColor":"DEFAULT","ResultValuePassTextFailedColor":"DEFAULT","ResultValueErrorBackGroundFailedColor":"YELLOW","ResultValueFailTextFailedColor":"WHITE","ResultPageStatusErrorBackGroundFillPattern":"SQUARES","ResultOverAllStatusFailBackGroundFailedColor":"RED","ResultValuePassBackGroundFailedColor":"DEFAULT","ResultPageStatusPassBackGroundFailedColor":"DEFAULT"}, {"ReportPrintStyleId":3,"WrapText":true,"HorizontalAlignmentCentre":true,"FontSize":6,"ReportPrintStyleName":"GenericHeaderStyle","FontName":"Arial","Bold":true,"VerticalAlignmentCentre":true,"Border":true}, {"ReportPrintStyleId":4,"WrapText":true,"HorizontalAlignmentCentre":true,"FontSize":8,"ReportPrintStyleName":"TableHeaderStyle","FontName":"Arial","Bold":true,"VerticalAlignmentCentre":true,"Border":true}]
+2025-06-18 15:23:59.820 DEBUG ApplicationLauncher:2911 - LoadConfigProperty : eachPrintStyle: DefaultStyle
+2025-06-18 15:23:59.822 DEBUG ApplicationLauncher:2911 - LoadConfigProperty : eachPrintStyle: ResultStyle
+2025-06-18 15:23:59.823 DEBUG ApplicationLauncher:2911 - LoadConfigProperty : eachPrintStyle: GenericHeaderStyle
+2025-06-18 15:23:59.825 DEBUG ApplicationLauncher:2911 - LoadConfigProperty : eachPrintStyle: TableHeaderStyle
+2025-06-18 15:23:59.825 DEBUG ApplicationLauncher:336 - ConstantReportV2: Init
+2025-06-18 15:23:59.828 DEBUG ApplicationLauncher:217 - ReportConfigLoader: setConfigFilePathName : CONFIG_FILE: config/report/report_config.json
+2025-06-18 15:23:59.828 DEBUG ApplicationLauncher:131 - ReportConfigLoader : Loaded config json CONFIG_FILE:config/report/report_config.json
+2025-06-18 15:23:59.829 DEBUG ApplicationLauncher:146 - ReportConfigLoader : Loaded config json obj:{"VoltageUnbalanceReportDisplay":{"displayReportSerialNo":false,"displayVoltage":true,"displayTesterName":false,"displayPageNumber":false,"displayCurrent":true},"RepeatabilityReportDisplay":{"displayReportSerialNo":false,"displayVoltage":true,"displayTesterName":false,"displayTestInterval":true,"displayTestDuration":true,"displayPageNumber":false,"displayCurrent":true},"ConfigFileVersion":"1.0","VoltageVariationReportDisplay":{"displayReportSerialNo":false,"displayVoltage":true,"displayTesterName":false,"displayPageNumber":false},"VoltageUnbalanceReportCellPosition":{"pageNumberCell":"D32","testerNameCell":"D31","currentCell":"I4","voltageCell":"D4","reportSerialNoCell":"A33"},"MeterProfileReportCellPosition":{"noOfPagesCell":"D32","maxCurrentCell":"D17","ctTypeCell":"D25","meterSerialNoCell":"G9","frequencyCell":"D23","ptRatioCell":"D29","executedTimeCell":"F35","basicCurrentCell":"D15","noOfImpulsesPerUnitCell":"D21","reportGeneratedDateCell":"D34","ctRatioCell":"D27","reportGeneratedTimeCell":"D36","pageNumberCell":"D31","meterTypeCell":"D11","ratedVoltageCell":"D19","meterClassCell":"D13","testerNameCell":"D31","customerNameCell":"D7","meterModelNameCell":"D9","executedDateCell":"E35","reportSerialNoCell":"A33"},"RepeatabilityReportCellPosition":{"pageNumberCell":"D32","testIntervalCell":"A36","testerNameCell":"D31","currentCell":"F5","voltageCell":"F4","testDurationCell":"A35","reportSerialNoCell":"A33"},"AccuracyReportCellPosition":{"pageNumberCell":"D32","testerNameCell":"D31","voltageCell":"T4","reportSerialNoCell":"A33"},"NoLoadReportCellPosition":{"pageNumberCell":"D32","testPeriodCell":"A34","testerNameCell":"D31","voltageCell":"D4","reportSerialNoCell":"A33"},"StartingCurrentReportDisplay":{"displayReportSerialNo":false,"displayVoltage":true,"displayTesterName":false,"displayPowerFactor":false,"displayPageNumber":false,"displayCurrent":true},"NoLoadReportDisplay":{"displayReportSerialNo":true,"displayVoltage":true,"displayTesterName":true,"displayTestPeriod":true,"displayPageNumber":false},"MeterProfileReportDisplay":{"displayReportSerialNo":false,"displayMeterModelName":true,"displayMeterSerialNo":false,"displayCtRatio":true,"displayNoOfImpulsesPerUnit":true,"displayTesterName":true,"displayNoOfPages":false,"displayReportGeneratedDate":false,"displayMeterType":true,"displayBasicCurrent":true,"displayCtType":true,"displayMeterClass":true,"displayPtRatio":true,"displayReportGeneratedTime":false,"displayExecutedTime":false,"displayCustomerName":true,"displayExecutedDate":false,"displayFrequency":true,"displayMaxCurrent":true,"displayRatedVoltage":true,"displayPageNumber":false},"VoltageVariationReportCellPosition":{"pageNumberCell":"D32","testerNameCell":"D31","voltageCell":"D4","reportSerialNoCell":"A33"},"AccuracyReportDisplay":{"displayReportSerialNo":false,"displayVoltage":true,"displayTesterName":false,"displayPageNumber":false},"StartingCurrentReportCellPosition":{"pageNumberCell":"D32","testerNameCell":"D31","currentCell":"G9","voltageCell":"C9","reportSerialNoCell":"A33","powerFactorCell":"A35"}}
+2025-06-18 15:23:59.905 DEBUG ApplicationLauncher:3913 - SerialDataManager: createObjects :Entry
+2025-06-18 15:23:59.908 DEBUG ApplicationLauncher:3935 - SerialDataManager: createObjects :Exit
+2025-06-18 15:24:00.177 INFO  ApplicationLauncher:130 - Existing ComPort ID:COM5
+2025-06-18 15:24:00.187 DEBUG ApplicationLauncher:53 - SerialPortManagerPwrSrc: createObjects :Entry
+2025-06-18 15:24:00.187 DEBUG ApplicationLauncher:63 - createObjects :Exit
+2025-06-18 15:24:00.322 INFO  ApplicationLauncher:130 - Existing ComPort ID:COM5
+2025-06-18 15:24:00.326 DEBUG ApplicationLauncher:52 - SerialPortManagerRefStd: createObjects :Entry
+2025-06-18 15:24:00.327 DEBUG ApplicationLauncher:67 - createObjects :Exit
+2025-06-18 15:24:00.449 INFO  ApplicationLauncher:130 - Existing ComPort ID:COM5
+2025-06-18 15:24:00.459 DEBUG ApplicationLauncher:55 - SerialPortManagerRefStd: createObjects :Entry
+2025-06-18 15:24:00.463 DEBUG ApplicationLauncher:70 - createObjects :Exit
+2025-06-18 15:24:00.495 DEBUG ApplicationLauncher:51 - SerialPortManagerPwrSrc_V2: createObjects :Entry
+2025-06-18 15:24:00.495 DEBUG ApplicationLauncher:66 - SerialPortManagerPwrSrc_V2: createObjects :Exit
+2025-06-18 15:24:00.508 DEBUG ApplicationLauncher:158 - ReportConfigLoader : Loaded config json getConfigFileVersion : 1.0
+2025-06-18 15:24:00.508 DEBUG ApplicationLauncher:159 - ReportConfigLoader : Loaded config json getDisplayFrequency : true
+2025-06-18 15:24:00.508 INFO  ApplicationLauncher:1512 - ApplicationLauncher : CONFIG_FILE_VERSION: 2.1
+2025-06-18 15:24:00.508 INFO  ApplicationLauncher:1513 - ApplicationLauncher : REF_STD_MAX_OUTPUT_FREQ_IN_MEGA_HERTZ: 1.905
+2025-06-18 15:24:00.515 DEBUG ApplicationLauncher:201 - assertLicenceVerification: Entry
+2025-06-18 15:24:00.515 DEBUG ApplicationLauncher:354 - isLicenceVerificationMatching: Entry
+2025-06-18 15:24:00.516 DEBUG ApplicationLauncher:355 - isLicenceVerificationMatching: epochTimeInSec: 1677133782
+2025-06-18 15:24:00.516 DEBUG ApplicationLauncher:356 - isLicenceVerificationMatching: userInputSaltedKey : -- -- 
+2025-06-18 15:24:00.516 DEBUG ApplicationLauncher:370 - isLicenceVerificationMatching: userInputSaltedKey with only numbers: 
+2025-06-18 15:24:00.516 DEBUG ApplicationLauncher:392 - isLicenceVerificationMatching: dateFormattedData : 230223
+2025-06-18 15:24:00.517 DEBUG ApplicationLauncher:393 - isLicenceVerificationMatching: timeFormattedData : 115942
+2025-06-18 15:24:00.517 DEBUG ApplicationLauncher:412 - isLicenceVerificationMatching: sumOfEpochFormattedData : 546165
+2025-06-18 15:24:00.521 DEBUG ApplicationLauncher:418 - isLicenceVerificationMatching: sumOfEachDigitOfEpochFormattedData : 27
+2025-06-18 15:24:00.521 DEBUG ApplicationLauncher:430 - isLicenceVerificationMatching: sumOfEachDigitInputEpochTimeInSec : 45
+2025-06-18 15:24:00.521 DEBUG ApplicationLauncher:435 - isLicenceVerificationMatching: diffOfEachDigitOfEpochFormattedAndInputEpochTimeInSec : -18
+2025-06-18 15:24:00.521 DEBUG ApplicationLauncher:439 - isLicenceVerificationMatching: expectedSaltedValue : 546147
+2025-06-18 15:24:00.521 DEBUG ApplicationLauncher:440 - isLicenceVerificationMatching: userInputSaltedKey : 
+2025-06-18 15:24:00.522 DEBUG ApplicationLauncher:447 - isLicenceVerificationMatching: salted key not matching
+2025-06-18 15:24:00.522 DEBUG ApplicationLauncher:452 - isLicenceVerificationMatching: errorCode: 0x85563BADC240C
+2025-06-18 15:24:00.522 DEBUG ApplicationLauncher:354 - isLicenceVerificationMatching: Entry
+2025-06-18 15:24:00.522 DEBUG ApplicationLauncher:355 - isLicenceVerificationMatching: epochTimeInSec: 1677133782
+2025-06-18 15:24:00.522 DEBUG ApplicationLauncher:356 - isLicenceVerificationMatching: userInputSaltedKey : 1
+2025-06-18 15:24:00.522 DEBUG ApplicationLauncher:370 - isLicenceVerificationMatching: userInputSaltedKey with only numbers: 1
+2025-06-18 15:24:00.523 DEBUG ApplicationLauncher:392 - isLicenceVerificationMatching: dateFormattedData : 230223
+2025-06-18 15:24:00.523 DEBUG ApplicationLauncher:393 - isLicenceVerificationMatching: timeFormattedData : 115942
+2025-06-18 15:24:00.523 DEBUG ApplicationLauncher:412 - isLicenceVerificationMatching: sumOfEpochFormattedData : 546165
+2025-06-18 15:24:00.523 DEBUG ApplicationLauncher:418 - isLicenceVerificationMatching: sumOfEachDigitOfEpochFormattedData : 27
+2025-06-18 15:24:00.523 DEBUG ApplicationLauncher:430 - isLicenceVerificationMatching: sumOfEachDigitInputEpochTimeInSec : 45
+2025-06-18 15:24:00.523 DEBUG ApplicationLauncher:435 - isLicenceVerificationMatching: diffOfEachDigitOfEpochFormattedAndInputEpochTimeInSec : -18
+2025-06-18 15:24:00.523 DEBUG ApplicationLauncher:439 - isLicenceVerificationMatching: expectedSaltedValue : 546147
+2025-06-18 15:24:00.523 DEBUG ApplicationLauncher:440 - isLicenceVerificationMatching: userInputSaltedKey : 1
+2025-06-18 15:24:00.523 DEBUG ApplicationLauncher:447 - isLicenceVerificationMatching: salted key not matching
+2025-06-18 15:24:00.523 DEBUG ApplicationLauncher:452 - isLicenceVerificationMatching: errorCode: 0x85563BADC2342
+2025-06-18 15:24:00.524 DEBUG ApplicationLauncher:323 - getTestPointFilterData: testCasePreview: REP_XX-100U-1.0-1.0Ib-1-2
+2025-06-18 15:24:00.524 DEBUG ApplicationLauncher:333 - getTestPointFilterData: splittedData[0]:REP_
+2025-06-18 15:24:00.524 DEBUG ApplicationLauncher:334 - getTestPointFilterData: splittedData[1]:-100U-1.0-1.0Ib-1-2
+2025-06-18 15:24:00.524 DEBUG ApplicationLauncher:338 - getTestPointFilterData: testCaseFilterName:-100U-1.0-1.0I
+2025-06-18 15:24:00.527 INFO  ApplicationLauncher:69 - FormatPulseRate : InputData: 2500000000
+2025-06-18 15:24:00.527 INFO  ApplicationLauncher:101 - GUIUtils: isNumber: Entry:
+2025-06-18 15:24:00.527 DEBUG ApplicationLauncher:76 - FormatPulseRate : ExponentialValue: 6
+2025-06-18 15:24:00.527 DEBUG ApplicationLauncher:79 - FormatPulseRate : BeginningValue: 2500
+2025-06-18 15:24:00.527 DEBUG ApplicationLauncher:81 - FormatPulseRate : OutputData: 2500E06
+2025-06-18 15:24:00.527 INFO  ApplicationLauncher:96 - FormatPulseRate : Impulses/Unit: OutputData: 2500E06
+2025-06-18 15:24:00.528 INFO  ApplicationLauncher:69 - FormatPulseRate : InputData: 125
+2025-06-18 15:24:00.528 INFO  ApplicationLauncher:101 - GUIUtils: isNumber: Entry:
+2025-06-18 15:24:00.528 INFO  ApplicationLauncher:96 - FormatPulseRate : Impulses/Unit: OutputData: 0125E00
+2025-06-18 15:24:00.539 ERROR ApplicationLauncher:50 - isDbConnected: Exception:null
+2025-06-18 15:24:00.539 INFO  ApplicationLauncher:66 - Loading jdbc library..
+2025-06-18 15:24:00.539 INFO  ApplicationLauncher:77 - Connecting to jdbc...
+2025-06-18 15:24:00.539 INFO  ApplicationLauncher:78 - ConnectMySQL: mSQL_URL: jdbc:mysql://localhost:3306/procal_v2_5_3_1?useSSL=false&allowPublicKeyRetrieval=true
+2025-06-18 15:24:00.556 INFO  ApplicationLauncher:87 - Connected to the database
+2025-06-18 15:24:00.556 DEBUG ApplicationLauncher:2953 - LoadPropertiesFromDB :Entry
+2025-06-18 15:24:00.570 DEBUG ApplicationLauncher:2967 - LoadPropertiesFromDB :properties_arr9
+2025-06-18 15:24:00.570 DEBUG ApplicationLauncher:2975 - LoadPropertiesFromDB :property_name:RefStandardValidationWaitTimeInSec
+2025-06-18 15:24:00.570 DEBUG ApplicationLauncher:2976 - LoadPropertiesFromDB :property_value:80
+2025-06-18 15:24:00.570 DEBUG ApplicationLauncher:2975 - LoadPropertiesFromDB :property_name:RefStandardValidationRetryCount
+2025-06-18 15:24:00.570 DEBUG ApplicationLauncher:2976 - LoadPropertiesFromDB :property_value:8
+2025-06-18 15:24:00.570 DEBUG ApplicationLauncher:2975 - LoadPropertiesFromDB :property_name:DefaultVoltAcceptedPercentage
+2025-06-18 15:24:00.570 DEBUG ApplicationLauncher:2976 - LoadPropertiesFromDB :property_value:10
+2025-06-18 15:24:00.570 DEBUG ApplicationLauncher:2975 - LoadPropertiesFromDB :property_name:DefaultCurrentAcceptedPercentage
+2025-06-18 15:24:00.570 DEBUG ApplicationLauncher:2976 - LoadPropertiesFromDB :property_value:10
+2025-06-18 15:24:00.570 INFO  ApplicationLauncher:3003 - setCorrespondingProperty : DEGREE_ACCEPTED_PERCENTAGE:10
+2025-06-18 15:24:00.570 DEBUG ApplicationLauncher:2975 - LoadPropertiesFromDB :property_name:DefaultPhaseAcceptedPercentage
+2025-06-18 15:24:00.571 DEBUG ApplicationLauncher:2976 - LoadPropertiesFromDB :property_value:10
+2025-06-18 15:24:00.571 DEBUG ApplicationLauncher:2975 - LoadPropertiesFromDB :property_name:DefaultFrequencyAcceptedPercentage
+2025-06-18 15:24:00.571 DEBUG ApplicationLauncher:2976 - LoadPropertiesFromDB :property_value:0.5
+2025-06-18 15:24:00.571 DEBUG ApplicationLauncher:2975 - LoadPropertiesFromDB :property_name:DefaultHarVoltAcceptedPercentage
+2025-06-18 15:24:00.571 DEBUG ApplicationLauncher:2976 - LoadPropertiesFromDB :property_value:30
+2025-06-18 15:24:00.571 DEBUG ApplicationLauncher:2975 - LoadPropertiesFromDB :property_name:DefaultHarCurrentAcceptedPercentage
+2025-06-18 15:24:00.571 DEBUG ApplicationLauncher:2976 - LoadPropertiesFromDB :property_value:30
+2025-06-18 15:24:00.571 DEBUG ApplicationLauncher:2975 - LoadPropertiesFromDB :property_name:System_Config
+2025-06-18 15:24:00.571 DEBUG ApplicationLauncher:2976 - LoadPropertiesFromDB :property_value:1709530361
+2025-06-18 15:24:02.575 DEBUG ApplicationLauncher:54 - ProCalCustomerConfiguration: init
+2025-06-18 15:24:02.575 DEBUG ApplicationLauncher:1638 - lecsInitcalibration: Entry
+2025-06-18 15:24:02.583 DEBUG ApplicationLauncher:311 - ConstReportInit: Entry1
+2025-06-18 15:24:02.584 DEBUG ApplicationLauncher:313 - ConstReportInit: Entry2
+2025-06-18 15:24:02.585 INFO  ApplicationLauncher:3123 - LoadSavedData : test_types_list: [UnbalancedLoad]
+2025-06-18 15:24:02.595 DEBUG ApplicationLauncher:3177 - LoadSavedData : report_header_arr: [{"header_value":"R:100U","header_type":"Voltage"},{"header_value":"Y:100U","header_type":"Voltage"},{"header_value":"B:100U","header_type":"Voltage"},{"header_value":"0.5Ib","header_type":"Current"},{"header_value":"1.0Ib","header_type":"Current"},{"header_value":"1.0Imax","header_type":"Current"},{"header_value":"1.0","header_type":"PF"},{"header_value":"0.5L","header_type":"PF"}]
+2025-06-18 15:24:02.596 INFO  ApplicationLauncher:3450 - LoadUnbalanceLoadToReportProperty : Mismatch
+2025-06-18 15:24:02.596 INFO  ApplicationLauncher:3450 - LoadUnbalanceLoadToReportProperty : Mismatch
+2025-06-18 15:24:02.596 INFO  ApplicationLauncher:3450 - LoadUnbalanceLoadToReportProperty : Mismatch
+2025-06-18 15:24:02.601 INFO  ApplicationLauncher:3509 - LoadSavedData : report_excel_arr: [{"cell_value":"A11","cell_type":"Alpha"},{"cell_value":"A40","cell_type":"Alpha"},{"cell_value":"B11","cell_type":"Beta"},{"cell_value":"C11","cell_type":"Beta"},{"cell_value":"G11","cell_type":"Beta"},{"cell_value":"K11","cell_type":"Beta"}]
+2025-06-18 15:24:02.607 DEBUG ApplicationLauncher:151 - setLscsCalibrationFileName : lscsCalibrationFileName: config/calib/lscs_neolink_dec2022_calibration.json
+2025-06-18 15:24:02.610 DEBUG ApplicationLauncher:199 - ReportProfileOperationConfigLoader: setConfigFilePathName : configFilePathName: config/report/ReportProfileV2_1.json
+2025-06-18 15:24:02.610 DEBUG ApplicationLauncher:125 - ConstantRefStdConfigLoader : Loaded config json CONFIG_FILE:config/refstd/RefStd_Kre9xxx.json
+2025-06-18 15:24:02.610 DEBUG ApplicationLauncher:131 - ConstantRefStdConfigLoader : jarPath: D:\tasworkspace\ProFAN\ProFAN-Maven-s0.0.0.7
+2025-06-18 15:24:02.610 DEBUG ApplicationLauncher:134 - ConstantRefStdConfigLoader : externalFilePath: D:\tasworkspace\ProFAN\ProFAN-Maven-s0.0.0.7\config\refstd\RefStd_Kre9xxx.json
+2025-06-18 15:24:02.610 DEBUG ApplicationLauncher:144 - ConstantRefStdConfigLoader : External file not found. Loading from JAR resources...
+2025-06-18 15:24:02.612 DEBUG ApplicationLauncher:156 - ConstantRefStdConfigLoader : Loaded config json obj:{"RefStdDeviceConstant":{"RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_4_CurrentBelowLevel_12":"2500000","RSS_HTCT_ReactivePulseConstantInImpPerWh_BelowLevel_12":"3600000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltBelowOrEqualLevel_4_CurrentBelowLevel_12":"25000","RSS_HTCT_CurrentThresholdInAmpsLevel_6":1.0,"RSS_HTCT_CurrentThresholdInAmpsLevel_7":0.5,"RSS_HTCT_CurrentThresholdInAmpsLevel_8":0.4,"RSS_HTCT_CurrentThresholdInAmpsLevel_9":0.25,"RSS_HTCT_ActivePulseConstantInImpPerWh_BelowLevel_12":"10000000","RSS_HTCT_CurrentThresholdInAmpsLevel_1":10.0,"RSS_HTCT_CurrentThresholdInAmpsLevel_2":7.5,"RSS_HTCT_CurrentThresholdInAmpsLevel_3":5.0,"RSS_HTCT_CurrentThresholdInAmpsLevel_4":4.0,"RSS_HTCT_CurrentThresholdInAmpsLevel_5":2.5,"RSS_LTCT_CurrentThresholdInAmpsLevel_9":0.25,"RSS_LTCT_CurrentThresholdInAmpsLevel_8":0.4,"RSS_LTCT_CurrentThresholdInAmpsLevel_7":0.5,"RSS_LTCT_CurrentThresholdInAmpsLevel_6":1.0,"RSS_LTCT_CurrentThresholdInAmpsLevel_5":2.5,"RSS_LTCT_CurrentThresholdInAmpsLevel_4":4.0,"RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_3_CurrentAboveOrEqualLevel_9":"25000","RSS_LTCT_CurrentThresholdInAmpsLevel_3":5.0,"RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_3_CurrentAboveOrEqualLevel_8":"25000","RSS_LTCT_CurrentThresholdInAmpsLevel_2":7.5,"RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_3_CurrentAboveOrEqualLevel_7":"25000","RSS_LTCT_CurrentThresholdInAmpsLevel_1":10.0,"RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_3_CurrentAboveOrEqualLevel_6":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_3_CurrentAboveOrEqualLevel_5":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_3_CurrentAboveOrEqualLevel_4":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_3_CurrentAboveOrEqualLevel_3":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_3_CurrentAboveOrEqualLevel_2":"25000","RSS_LTCT_ReactivePulseConstantInImpPerWh_BelowLevel_12":"100000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_3_CurrentAboveOrEqualLevel_1":"25000","RSS_HTCT_ActivePulseConstantInImpPerWh_AboveOrEqualLevel_7":"200000","RSS_LTCT_CurrentThresholdInAmpsLevel_10":0.1,"RSS_HTCT_ActivePulseConstantInImpPerWh_AboveOrEqualLevel_8":"250000","RSS_HTCT_ReactivePulseConstantInImpPerWh_AboveOrEqualLevel_10":"360000","RSS_LTCT_CurrentThresholdInAmpsLevel_11":0.05,"RSS_LTCT_ActivePulseConstantInImpPerWh_VoltBelowOrEqualLevel_4_CurrentAboveOrEqualLevel_1":"25000","RSS_HTCT_ActivePulseConstantInImpPerWh_AboveOrEqualLevel_5":"40000","RSS_LTCT_CurrentThresholdInAmpsLevel_12":0.01,"RSS_LTCT_ActivePulseConstantInImpPerWh_VoltBelowOrEqualLevel_4_CurrentAboveOrEqualLevel_2":"25000","RSS_HTCT_ActivePulseConstantInImpPerWh_AboveOrEqualLevel_6":"100000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltBelowOrEqualLevel_4_CurrentAboveOrEqualLevel_3":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltBelowOrEqualLevel_4_CurrentAboveOrEqualLevel_4":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_4_CurrentAboveOrEqualLevel_10":"2500000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltBelowOrEqualLevel_4_CurrentAboveOrEqualLevel_5":"25000","RSS_HTCT_ActivePulseConstantInImpPerWh_AboveOrEqualLevel_9":"400000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltBelowOrEqualLevel_4_CurrentAboveOrEqualLevel_6":"25000","RSS_HTCT_ReactivePulseConstantInImpPerWh_AboveOrEqualLevel_11":"720000","RSS_HTCT_ReactivePulseConstantInImpPerWh_AboveOrEqualLevel_12":"3600000","RSS_LTCT_VoltageThresholdInVoltLevel_3":120.0,"RSS_LTCT_ActivePulseConstantInImpPerWh_VoltBelowOrEqualLevel_4_CurrentAboveOrEqualLevel_7":"25000","RSS_HTCT_ReactivePulseConstantInImpPerWh_AboveOrEqualLevel_1":"3600","RSS_LTCT_VoltageThresholdInVoltLevel_4":60.0,"RSS_LTCT_ActivePulseConstantInImpPerWh_VoltBelowOrEqualLevel_4_CurrentAboveOrEqualLevel_8":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltBelowOrEqualLevel_4_CurrentAboveOrEqualLevel_9":"25000","RSS_HTCT_ReactivePulseConstantInImpPerWh_AboveOrEqualLevel_3":"7200","RSS_HTCT_ReactivePulseConstantInImpPerWh_AboveOrEqualLevel_2":"4800","RSS_HTCT_ActivePulseConstantInImpPerWh_AboveOrEqualLevel_3":"20000","RSS_HTCT_ReactivePulseConstantInImpPerWh_AboveOrEqualLevel_5":"14400","RSS_HTCT_ActivePulseConstantInImpPerWh_AboveOrEqualLevel_4":"25000","RSS_HTCT_ReactivePulseConstantInImpPerWh_AboveOrEqualLevel_4":"9000","RSS_LTCT_VoltageThresholdInVoltLevel_1":480.0,"RSS_HTCT_ActivePulseConstantInImpPerWh_AboveOrEqualLevel_1":"10000","RSS_HTCT_ReactivePulseConstantInImpPerWh_AboveOrEqualLevel_7":"72000","RSS_LTCT_VoltageThresholdInVoltLevel_2":240.0,"RSS_HTCT_ActivePulseConstantInImpPerWh_AboveOrEqualLevel_2":"13333","RSS_HTCT_ReactivePulseConstantInImpPerWh_AboveOrEqualLevel_6":"36000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_2_CurrentAboveOrEqualLevel_8":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_2_CurrentAboveOrEqualLevel_9":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_2_CurrentAboveOrEqualLevel_6":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_2_CurrentAboveOrEqualLevel_7":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_2_CurrentAboveOrEqualLevel_4":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_2_CurrentAboveOrEqualLevel_5":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_2_CurrentAboveOrEqualLevel_2":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_2_CurrentAboveOrEqualLevel_3":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_2_CurrentAboveOrEqualLevel_1":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_4_CurrentAboveOrEqualLevel_1":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_4_CurrentAboveOrEqualLevel_2":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_4_CurrentAboveOrEqualLevel_3":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_4_CurrentAboveOrEqualLevel_4":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_4_CurrentAboveOrEqualLevel_5":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_4_CurrentAboveOrEqualLevel_6":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_4_CurrentAboveOrEqualLevel_7":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_4_CurrentAboveOrEqualLevel_8":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_4_CurrentAboveOrEqualLevel_9":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_4_CurrentAboveOrEqualLevel_11":"2500000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_4_CurrentAboveOrEqualLevel_12":"2500000","RSS_LTCT_ReactivePulseConstantInImpPerWh_AboveOrEqualLevel_7":"10000","RSS_LTCT_ReactivePulseConstantInImpPerWh_AboveOrEqualLevel_6":"10000","RSS_LTCT_ReactivePulseConstantInImpPerWh_AboveOrEqualLevel_5":"1005","RSS_LTCT_ReactivePulseConstantInImpPerWh_AboveOrEqualLevel_4":"1004","RSS_LTCT_ReactivePulseConstantInImpPerWh_AboveOrEqualLevel_9":"10000","RSS_LTCT_ReactivePulseConstantInImpPerWh_AboveOrEqualLevel_8":"10000","RSS_LTCT_ReactivePulseConstantInImpPerWh_AboveOrEqualLevel_3":"1003","RSS_LTCT_ReactivePulseConstantInImpPerWh_AboveOrEqualLevel_2":"1002","RSS_LTCT_ReactivePulseConstantInImpPerWh_AboveOrEqualLevel_1":"1001","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_3_CurrentAboveOrEqualLevel_10":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_3_CurrentAboveOrEqualLevel_11":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_2_CurrentBelowLevel_12":"2500000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltBelowOrEqualLevel_4_CurrentAboveOrEqualLevel_12":"25000","RSS_HTCT_CurrentThresholdInAmpsLevel_10":0.1,"RSS_HTCT_ReactivePulseConstantInImpPerWh_AboveOrEqualLevel_9":"144000","RSS_HTCT_ReactivePulseConstantInImpPerWh_AboveOrEqualLevel_8":"90000","RSS_HTCT_CurrentThresholdInAmpsLevel_12":0.01,"RSS_HTCT_CurrentThresholdInAmpsLevel_11":0.05,"RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_2_CurrentAboveOrEqualLevel_11":"2500000","RSS_HTCT_ActivePulseConstantInImpPerWh_AboveOrEqualLevel_11":"2000000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_2_CurrentAboveOrEqualLevel_12":"2500000","RSS_HTCT_ActivePulseConstantInImpPerWh_AboveOrEqualLevel_10":"1000000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_2_CurrentAboveOrEqualLevel_10":"2500000","RSS_HTCT_ActivePulseConstantInImpPerWh_AboveOrEqualLevel_12":"10000000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_3_CurrentAboveOrEqualLevel_12":"2500000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltBelowOrEqualLevel_4_CurrentAboveOrEqualLevel_10":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltBelowOrEqualLevel_4_CurrentAboveOrEqualLevel_11":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_3_CurrentBelowLevel_12":"2500000","RSS_LTCT_ReactivePulseConstantInImpPerWh_AboveOrEqualLevel_11":"100000","RSS_LTCT_ReactivePulseConstantInImpPerWh_AboveOrEqualLevel_12":"100000","RSS_LTCT_ReactivePulseConstantInImpPerWh_AboveOrEqualLevel_10":"100000"}}
+2025-06-18 15:24:02.615 DEBUG ApplicationLauncher:159 - ConstantRefStdConfigLoader : Loaded config json property:{"RefStdDeviceConstant":{"RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_4_CurrentBelowLevel_12":"2500000","RSS_HTCT_ReactivePulseConstantInImpPerWh_BelowLevel_12":"3600000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltBelowOrEqualLevel_4_CurrentBelowLevel_12":"25000","RSS_HTCT_CurrentThresholdInAmpsLevel_6":1.0,"RSS_HTCT_CurrentThresholdInAmpsLevel_7":0.5,"RSS_HTCT_CurrentThresholdInAmpsLevel_8":0.4,"RSS_HTCT_CurrentThresholdInAmpsLevel_9":0.25,"RSS_HTCT_ActivePulseConstantInImpPerWh_BelowLevel_12":"10000000","RSS_HTCT_CurrentThresholdInAmpsLevel_1":10.0,"RSS_HTCT_CurrentThresholdInAmpsLevel_2":7.5,"RSS_HTCT_CurrentThresholdInAmpsLevel_3":5.0,"RSS_HTCT_CurrentThresholdInAmpsLevel_4":4.0,"RSS_HTCT_CurrentThresholdInAmpsLevel_5":2.5,"RSS_LTCT_CurrentThresholdInAmpsLevel_9":0.25,"RSS_LTCT_CurrentThresholdInAmpsLevel_8":0.4,"RSS_LTCT_CurrentThresholdInAmpsLevel_7":0.5,"RSS_LTCT_CurrentThresholdInAmpsLevel_6":1.0,"RSS_LTCT_CurrentThresholdInAmpsLevel_5":2.5,"RSS_LTCT_CurrentThresholdInAmpsLevel_4":4.0,"RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_3_CurrentAboveOrEqualLevel_9":"25000","RSS_LTCT_CurrentThresholdInAmpsLevel_3":5.0,"RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_3_CurrentAboveOrEqualLevel_8":"25000","RSS_LTCT_CurrentThresholdInAmpsLevel_2":7.5,"RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_3_CurrentAboveOrEqualLevel_7":"25000","RSS_LTCT_CurrentThresholdInAmpsLevel_1":10.0,"RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_3_CurrentAboveOrEqualLevel_6":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_3_CurrentAboveOrEqualLevel_5":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_3_CurrentAboveOrEqualLevel_4":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_3_CurrentAboveOrEqualLevel_3":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_3_CurrentAboveOrEqualLevel_2":"25000","RSS_LTCT_ReactivePulseConstantInImpPerWh_BelowLevel_12":"100000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_3_CurrentAboveOrEqualLevel_1":"25000","RSS_HTCT_ActivePulseConstantInImpPerWh_AboveOrEqualLevel_7":"200000","RSS_LTCT_CurrentThresholdInAmpsLevel_10":0.1,"RSS_HTCT_ActivePulseConstantInImpPerWh_AboveOrEqualLevel_8":"250000","RSS_HTCT_ReactivePulseConstantInImpPerWh_AboveOrEqualLevel_10":"360000","RSS_LTCT_CurrentThresholdInAmpsLevel_11":0.05,"RSS_LTCT_ActivePulseConstantInImpPerWh_VoltBelowOrEqualLevel_4_CurrentAboveOrEqualLevel_1":"25000","RSS_HTCT_ActivePulseConstantInImpPerWh_AboveOrEqualLevel_5":"40000","RSS_LTCT_CurrentThresholdInAmpsLevel_12":0.01,"RSS_LTCT_ActivePulseConstantInImpPerWh_VoltBelowOrEqualLevel_4_CurrentAboveOrEqualLevel_2":"25000","RSS_HTCT_ActivePulseConstantInImpPerWh_AboveOrEqualLevel_6":"100000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltBelowOrEqualLevel_4_CurrentAboveOrEqualLevel_3":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltBelowOrEqualLevel_4_CurrentAboveOrEqualLevel_4":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_4_CurrentAboveOrEqualLevel_10":"2500000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltBelowOrEqualLevel_4_CurrentAboveOrEqualLevel_5":"25000","RSS_HTCT_ActivePulseConstantInImpPerWh_AboveOrEqualLevel_9":"400000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltBelowOrEqualLevel_4_CurrentAboveOrEqualLevel_6":"25000","RSS_HTCT_ReactivePulseConstantInImpPerWh_AboveOrEqualLevel_11":"720000","RSS_HTCT_ReactivePulseConstantInImpPerWh_AboveOrEqualLevel_12":"3600000","RSS_LTCT_VoltageThresholdInVoltLevel_3":120.0,"RSS_LTCT_ActivePulseConstantInImpPerWh_VoltBelowOrEqualLevel_4_CurrentAboveOrEqualLevel_7":"25000","RSS_HTCT_ReactivePulseConstantInImpPerWh_AboveOrEqualLevel_1":"3600","RSS_LTCT_VoltageThresholdInVoltLevel_4":60.0,"RSS_LTCT_ActivePulseConstantInImpPerWh_VoltBelowOrEqualLevel_4_CurrentAboveOrEqualLevel_8":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltBelowOrEqualLevel_4_CurrentAboveOrEqualLevel_9":"25000","RSS_HTCT_ReactivePulseConstantInImpPerWh_AboveOrEqualLevel_3":"7200","RSS_HTCT_ReactivePulseConstantInImpPerWh_AboveOrEqualLevel_2":"4800","RSS_HTCT_ActivePulseConstantInImpPerWh_AboveOrEqualLevel_3":"20000","RSS_HTCT_ReactivePulseConstantInImpPerWh_AboveOrEqualLevel_5":"14400","RSS_HTCT_ActivePulseConstantInImpPerWh_AboveOrEqualLevel_4":"25000","RSS_HTCT_ReactivePulseConstantInImpPerWh_AboveOrEqualLevel_4":"9000","RSS_LTCT_VoltageThresholdInVoltLevel_1":480.0,"RSS_HTCT_ActivePulseConstantInImpPerWh_AboveOrEqualLevel_1":"10000","RSS_HTCT_ReactivePulseConstantInImpPerWh_AboveOrEqualLevel_7":"72000","RSS_LTCT_VoltageThresholdInVoltLevel_2":240.0,"RSS_HTCT_ActivePulseConstantInImpPerWh_AboveOrEqualLevel_2":"13333","RSS_HTCT_ReactivePulseConstantInImpPerWh_AboveOrEqualLevel_6":"36000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_2_CurrentAboveOrEqualLevel_8":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_2_CurrentAboveOrEqualLevel_9":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_2_CurrentAboveOrEqualLevel_6":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_2_CurrentAboveOrEqualLevel_7":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_2_CurrentAboveOrEqualLevel_4":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_2_CurrentAboveOrEqualLevel_5":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_2_CurrentAboveOrEqualLevel_2":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_2_CurrentAboveOrEqualLevel_3":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_2_CurrentAboveOrEqualLevel_1":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_4_CurrentAboveOrEqualLevel_1":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_4_CurrentAboveOrEqualLevel_2":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_4_CurrentAboveOrEqualLevel_3":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_4_CurrentAboveOrEqualLevel_4":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_4_CurrentAboveOrEqualLevel_5":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_4_CurrentAboveOrEqualLevel_6":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_4_CurrentAboveOrEqualLevel_7":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_4_CurrentAboveOrEqualLevel_8":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_4_CurrentAboveOrEqualLevel_9":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_4_CurrentAboveOrEqualLevel_11":"2500000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_4_CurrentAboveOrEqualLevel_12":"2500000","RSS_LTCT_ReactivePulseConstantInImpPerWh_AboveOrEqualLevel_7":"10000","RSS_LTCT_ReactivePulseConstantInImpPerWh_AboveOrEqualLevel_6":"10000","RSS_LTCT_ReactivePulseConstantInImpPerWh_AboveOrEqualLevel_5":"1005","RSS_LTCT_ReactivePulseConstantInImpPerWh_AboveOrEqualLevel_4":"1004","RSS_LTCT_ReactivePulseConstantInImpPerWh_AboveOrEqualLevel_9":"10000","RSS_LTCT_ReactivePulseConstantInImpPerWh_AboveOrEqualLevel_8":"10000","RSS_LTCT_ReactivePulseConstantInImpPerWh_AboveOrEqualLevel_3":"1003","RSS_LTCT_ReactivePulseConstantInImpPerWh_AboveOrEqualLevel_2":"1002","RSS_LTCT_ReactivePulseConstantInImpPerWh_AboveOrEqualLevel_1":"1001","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_3_CurrentAboveOrEqualLevel_10":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_3_CurrentAboveOrEqualLevel_11":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_2_CurrentBelowLevel_12":"2500000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltBelowOrEqualLevel_4_CurrentAboveOrEqualLevel_12":"25000","RSS_HTCT_CurrentThresholdInAmpsLevel_10":0.1,"RSS_HTCT_ReactivePulseConstantInImpPerWh_AboveOrEqualLevel_9":"144000","RSS_HTCT_ReactivePulseConstantInImpPerWh_AboveOrEqualLevel_8":"90000","RSS_HTCT_CurrentThresholdInAmpsLevel_12":0.01,"RSS_HTCT_CurrentThresholdInAmpsLevel_11":0.05,"RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_2_CurrentAboveOrEqualLevel_11":"2500000","RSS_HTCT_ActivePulseConstantInImpPerWh_AboveOrEqualLevel_11":"2000000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_2_CurrentAboveOrEqualLevel_12":"2500000","RSS_HTCT_ActivePulseConstantInImpPerWh_AboveOrEqualLevel_10":"1000000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_2_CurrentAboveOrEqualLevel_10":"2500000","RSS_HTCT_ActivePulseConstantInImpPerWh_AboveOrEqualLevel_12":"10000000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_3_CurrentAboveOrEqualLevel_12":"2500000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltBelowOrEqualLevel_4_CurrentAboveOrEqualLevel_10":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltBelowOrEqualLevel_4_CurrentAboveOrEqualLevel_11":"25000","RSS_LTCT_ActivePulseConstantInImpPerWh_VoltAboveLevel_3_CurrentBelowLevel_12":"2500000","RSS_LTCT_ReactivePulseConstantInImpPerWh_AboveOrEqualLevel_11":"100000","RSS_LTCT_ReactivePulseConstantInImpPerWh_AboveOrEqualLevel_12":"100000","RSS_LTCT_ReactivePulseConstantInImpPerWh_AboveOrEqualLevel_10":"100000"}}
+2025-06-18 15:24:02.615 DEBUG ApplicationLauncher:169 - ConstantRefStdConfigLoader : Loaded ConstantRefStdConfigLoader json 
+2025-06-18 15:24:02.617 DEBUG ApplicationLauncher:101 - LscsCalibrationConfigLoader : Loaded config json CONFIG_FILE: config/calib/lscs_neolink_dec2022_calibration.json
+2025-06-18 15:24:02.623 DEBUG ApplicationLauncher:115 - LscsCalibrationConfigLoader : Loaded config json obj:{"CurrentCalibration":[{"CurrentPhase":"R","CurrentTap":[{"CurrentTapId":1,"CurrentRelayId":"210","NoOfCalibrationPoints":4,"CalibPoints":[{"CalibPointValue":0.001,"gainValue":12.01,"offsetValue":-2578.125,"CalibPointName":"1mA","CalibPointId":1,"rmsValue":6407},{"CalibPointValue":0.01,"gainValue":6441889.0,"offsetValue":-6439.89,"CalibPointName":"10mA","CalibPointId":2,"rmsValue":61186},{"CalibPointValue":0.025,"gainValue":5900333.0,"offsetValue":-1024.33,"CalibPointName":"25mA","CalibPointId":3,"rmsValue":155129},{"CalibPointValue":0.05,"gainValue":5887160.0,"offsetValue":-695.0,"CalibPointName":"50mA","CalibPointId":4,"rmsValue":311633}],"CurrentTapMax":0.05},{"CurrentTapId":2,"CurrentRelayId":"211","NoOfCalibrationPoints":4,"CalibPoints":[{"CalibPointValue":0.05,"gainValue":12.01,"offsetValue":-2578.125,"CalibPointName":"50mA","CalibPointId":1,"rmsValue":152289},{"CalibPointValue":0.075,"gainValue":2816119.75,"offsetValue":8377.01,"CalibPointName":"75mA","CalibPointId":2,"rmsValue":234219},{"CalibPointValue":0.1,"gainValue":2943120.25,"offsetValue":-1148.03,"CalibPointName":"100mA","CalibPointId":3,"rmsValue":312720},{"CalibPointValue":0.12,"gainValue":3001850.75,"offsetValue":-7021.08,"CalibPointName":"120mA","CalibPointId":4,"rmsValue":373163}],"CurrentTapMax":0.12},{"CurrentTapId":3,"CurrentRelayId":"212","NoOfCalibrationPoints":6,"CalibPoints":[{"CalibPointValue":0.12,"gainValue":47619.05,"offsetValue":28926.09,"CalibPointName":"120mA","CalibPointId":1,"rmsValue":36827},{"CalibPointValue":0.25,"gainValue":290715.41,"offsetValue":-197.85,"CalibPointName":"250mA","CalibPointId":2,"rmsValue":77136},{"CalibPointValue":0.5,"gainValue":294540.0,"offsetValue":-1154.0,"CalibPointName":"500mA","CalibPointId":3,"rmsValue":155619},{"CalibPointValue":0.75,"gainValue":294888.0,"offsetValue":-1328.0,"CalibPointName":"750mA","CalibPointId":4,"rmsValue":233909},{"CalibPointValue":0.85,"gainValue":290959.94,"offsetValue":1618.04,"CalibPointName":"850mA","CalibPointId":5,"rmsValue":265151},{"CalibPointValue":1.0,"gainValue":294593.38,"offsetValue":-1470.38,"CalibPointName":"1A","CalibPointId":6,"rmsValue":312212}],"CurrentTapMax":1.0},{"CurrentTapId":4,"CurrentRelayId":"213","NoOfCalibrationPoints":5,"CalibPoints":[{"CalibPointValue":1.0,"gainValue":12.01,"offsetValue":-2578.125,"CalibPointName":"1.0A","CalibPointId":1,"rmsValue":26958},{"CalibPointValue":2.5,"gainValue":27461.33,"offsetValue":3633.67,"CalibPointName":"2.5A","CalibPointId":2,"rmsValue":77164},{"CalibPointValue":5.0,"gainValue":29511.6,"offsetValue":-1492.0,"CalibPointName":"5A","CalibPointId":3,"rmsValue":155416},{"CalibPointValue":7.5,"gainValue":29466.4,"offsetValue":-1266.0,"CalibPointName":"7.5A","CalibPointId":4,"rmsValue":233926},{"CalibPointValue":10.0,"gainValue":29386.4,"offsetValue":-666.0,"CalibPointName":"10A","CalibPointId":5,"rmsValue":312160}],"CurrentTapMax":10.0},{"CurrentTapId":5,"CurrentRelayId":"214","NoOfCalibrationPoints":5,"CalibPoints":[{"CalibPointValue":10.0,"gainValue":12.01,"offsetValue":-2578.125,"CalibPointName":"10.0A","CalibPointId":1,"rmsValue":60837},{"CalibPointValue":25.0,"gainValue":5863.13,"offsetValue":-324.3,"CalibPointName":"25A","CalibPointId":2,"rmsValue":155460},{"CalibPointValue":35.0,"gainValue":5874.1,"offsetValue":-598.5,"CalibPointName":"35A","CalibPointId":3,"rmsValue":217959},{"CalibPointValue":40.0,"gainValue":5847.2,"offsetValue":343.0,"CalibPointName":"40A","CalibPointId":4,"rmsValue":249512},{"CalibPointValue":60.0,"gainValue":5877.1,"offsetValue":-853.0,"CalibPointName":"60A","CalibPointId":5,"rmsValue":374803}],"CurrentTapMax":60.0},{"CurrentTapId":6,"CurrentRelayId":"215","NoOfCalibrationPoints":4,"CalibPoints":[{"CalibPointValue":60.0,"gainValue":12.01,"offsetValue":-2578.125,"CalibPointName":"60.0A","CalibPointId":1,"rmsValue":186836},{"CalibPointValue":75.0,"gainValue":2917.73,"offsetValue":1008.2,"CalibPointName":"75A","CalibPointId":2,"rmsValue":234002},{"CalibPointValue":100.0,"gainValue":2943.2,"offsetValue":-902.0,"CalibPointName":"100A","CalibPointId":3,"rmsValue":312430},{"CalibPointValue":120.0,"gainValue":2938.65,"offsetValue":-447.0,"CalibPointName":"120A","CalibPointId":4,"rmsValue":374654}],"CurrentTapMax":120.0}],"NoOfCurrentTaps":6},{"CurrentPhase":"Y","CurrentTap":[{"CurrentTapId":1,"CurrentRelayId":"210","NoOfCalibrationPoints":4,"CalibPoints":[{"CalibPointValue":0.001,"gainValue":12.01,"offsetValue":-2578.125,"CalibPointName":"1mA","CalibPointId":1,"rmsValue":6369},{"CalibPointValue":0.01,"gainValue":6475333.5,"offsetValue":-6473.33,"CalibPointName":"10mA","CalibPointId":2,"rmsValue":61260},{"CalibPointValue":0.025,"gainValue":5924933.0,"offsetValue":-969.33,"CalibPointName":"25mA","CalibPointId":3,"rmsValue":155339},{"CalibPointValue":0.05,"gainValue":5921280.0,"offsetValue":-878.0,"CalibPointName":"50mA","CalibPointId":4,"rmsValue":311484}],"CurrentTapMax":0.05},{"CurrentTapId":2,"CurrentRelayId":"211","NoOfCalibrationPoints":4,"CalibPoints":[{"CalibPointValue":0.05,"gainValue":12.01,"offsetValue":-2578.125,"CalibPointName":"50mA","CalibPointId":1,"rmsValue":152163},{"CalibPointValue":0.075,"gainValue":2837079.75,"offsetValue":8165.01,"CalibPointName":"75mA","CalibPointId":2,"rmsValue":233635},{"CalibPointValue":0.1,"gainValue":2965880.25,"offsetValue":-1495.03,"CalibPointName":"100mA","CalibPointId":3,"rmsValue":311689},{"CalibPointValue":0.12,"gainValue":3010950.75,"offsetValue":-6002.08,"CalibPointName":"120mA","CalibPointId":4,"rmsValue":377321}],"CurrentTapMax":0.12},{"CurrentTapId":3,"CurrentRelayId":"212","NoOfCalibrationPoints":6,"CalibPoints":[{"CalibPointValue":0.12,"gainValue":47619.05,"offsetValue":28926.09,"CalibPointName":"120mA","CalibPointId":1,"rmsValue":36603},{"CalibPointValue":0.25,"gainValue":292676.94,"offsetValue":-433.23,"CalibPointName":"250mA","CalibPointId":2,"rmsValue":77122},{"CalibPointValue":0.5,"gainValue":295564.0,"offsetValue":-1155.0,"CalibPointName":"500mA","CalibPointId":3,"rmsValue":155148},{"CalibPointValue":0.75,"gainValue":295688.0,"offsetValue":-1217.0,"CalibPointName":"750mA","CalibPointId":4,"rmsValue":233400},{"CalibPointValue":0.85,"gainValue":296069.94,"offsetValue":-1503.46,"CalibPointName":"850mA","CalibPointId":5,"rmsValue":264877},{"CalibPointValue":1.0,"gainValue":293820.03,"offsetValue":408.97,"CalibPointName":"1A","CalibPointId":6,"rmsValue":311788}],"CurrentTapMax":1.0},{"CurrentTapId":4,"CurrentRelayId":"213","NoOfCalibrationPoints":5,"CalibPoints":[{"CalibPointValue":1.0,"gainValue":12.01,"offsetValue":-2578.125,"CalibPointName":"1.0A","CalibPointId":1,"rmsValue":26766},{"CalibPointValue":2.5,"gainValue":27478.67,"offsetValue":3892.33,"CalibPointName":"2.5A","CalibPointId":2,"rmsValue":77110},{"CalibPointValue":5.0,"gainValue":29553.6,"offsetValue":-1295.0,"CalibPointName":"5A","CalibPointId":3,"rmsValue":155474},{"CalibPointValue":7.5,"gainValue":29469.2,"offsetValue":-873.0,"CalibPointName":"7.5A","CalibPointId":4,"rmsValue":233761},{"CalibPointValue":10.0,"gainValue":29634.4,"offsetValue":-2112.0,"CalibPointName":"10A","CalibPointId":5,"rmsValue":312156}],"CurrentTapMax":10.0},{"CurrentTapId":5,"CurrentRelayId":"214","NoOfCalibrationPoints":5,"CalibPoints":[{"CalibPointValue":10.0,"gainValue":12.01,"offsetValue":-2578.125,"CalibPointName":"10.0A","CalibPointId":1,"rmsValue":60864},{"CalibPointValue":25.0,"gainValue":5866.33,"offsetValue":-165.3,"CalibPointName":"25A","CalibPointId":2,"rmsValue":155482},{"CalibPointValue":35.0,"gainValue":5898.8,"offsetValue":-977.0,"CalibPointName":"35A","CalibPointId":3,"rmsValue":217893},{"CalibPointValue":40.0,"gainValue":5883.2,"offsetValue":-431.0,"CalibPointName":"40A","CalibPointId":4,"rmsValue":249225},{"CalibPointValue":60.0,"gainValue":5900.35,"offsetValue":-1117.0,"CalibPointName":"60A","CalibPointId":5,"rmsValue":374351}],"CurrentTapMax":60.0},{"CurrentTapId":6,"CurrentRelayId":"215","NoOfCalibrationPoints":4,"CalibPoints":[{"CalibPointValue":60.0,"gainValue":12.01,"offsetValue":-2578.125,"CalibPointName":"60.0A","CalibPointId":1,"rmsValue":186914},{"CalibPointValue":75.0,"gainValue":2948.87,"offsetValue":-625.2,"CalibPointName":"75A","CalibPointId":2,"rmsValue":233687},{"CalibPointValue":100.0,"gainValue":2954.84,"offsetValue":-1073.0,"CalibPointName":"100A","CalibPointId":3,"rmsValue":312074},{"CalibPointValue":120.0,"gainValue":2958.2,"offsetValue":-1409.0,"CalibPointName":"120A","CalibPointId":4,"rmsValue":374429}],"CurrentTapMax":120.0}],"NoOfCurrentTaps":6},{"CurrentPhase":"B","CurrentTap":[{"CurrentTapId":1,"CurrentRelayId":"210","NoOfCalibrationPoints":4,"CalibPoints":[{"CalibPointValue":0.001,"gainValue":12.01,"offsetValue":-2578.125,"CalibPointName":"1mA","CalibPointId":1,"rmsValue":6399},{"CalibPointValue":0.01,"gainValue":6448333.5,"offsetValue":-6446.33,"CalibPointName":"10mA","CalibPointId":2,"rmsValue":61859},{"CalibPointValue":0.025,"gainValue":5889200.0,"offsetValue":-855.0,"CalibPointName":"25mA","CalibPointId":3,"rmsValue":156090},{"CalibPointValue":0.05,"gainValue":5878280.0,"offsetValue":-582.0,"CalibPointName":"50mA","CalibPointId":4,"rmsValue":311532}],"CurrentTapMax":0.05},{"CurrentTapId":2,"CurrentRelayId":"211","NoOfCalibrationPoints":4,"CalibPoints":[{"CalibPointValue":0.05,"gainValue":12.01,"offsetValue":-2578.125,"CalibPointName":"50mA","CalibPointId":1,"rmsValue":152206},{"CalibPointValue":0.075,"gainValue":2817159.75,"offsetValue":8154.01,"CalibPointName":"75mA","CalibPointId":2,"rmsValue":233579},{"CalibPointValue":0.1,"gainValue":2947600.25,"offsetValue":-1629.03,"CalibPointName":"100mA","CalibPointId":3,"rmsValue":312415},{"CalibPointValue":0.12,"gainValue":2991300.5,"offsetValue":-5999.05,"CalibPointName":"120mA","CalibPointId":3,"rmsValue":373548}],"CurrentTapMax":0.12},{"CurrentTapId":3,"CurrentRelayId":"212","NoOfCalibrationPoints":6,"CalibPoints":[{"CalibPointValue":0.12,"gainValue":47619.05,"offsetValue":28624.09,"CalibPointName":"120mA","CalibPointId":1,"rmsValue":36391},{"CalibPointValue":0.25,"gainValue":291192.31,"offsetValue":-557.08,"CalibPointName":"250mA","CalibPointId":2,"rmsValue":76802},{"CalibPointValue":0.5,"gainValue":293444.0,"offsetValue":-1120.0,"CalibPointName":"500mA","CalibPointId":3,"rmsValue":154554},{"CalibPointValue":0.75,"gainValue":293688.0,"offsetValue":-1242.0,"CalibPointName":"750mA","CalibPointId":4,"rmsValue":233239},{"CalibPointValue":0.85,"gainValue":292409.94,"offsetValue":-283.46,"CalibPointName":"850mA","CalibPointId":5,"rmsValue":264852},{"CalibPointValue":1.0,"gainValue":292953.38,"offsetValue":-745.38,"CalibPointName":"1A","CalibPointId":6,"rmsValue":311883}],"CurrentTapMax":1.0},{"CurrentTapId":4,"CurrentRelayId":"213","NoOfCalibrationPoints":5,"CalibPoints":[{"CalibPointValue":1.0,"gainValue":12.01,"offsetValue":-2578.125,"CalibPointName":"1.0A","CalibPointId":1,"rmsValue":26913},{"CalibPointValue":2.5,"gainValue":27454.67,"offsetValue":3997.33,"CalibPointName":"2.5A","CalibPointId":2,"rmsValue":76977},{"CalibPointValue":5.0,"gainValue":29435.2,"offsetValue":-954.0,"CalibPointName":"5A","CalibPointId":3,"rmsValue":155282},{"CalibPointValue":7.5,"gainValue":29422.8,"offsetValue":-892.0,"CalibPointName":"7.5A","CalibPointId":4,"rmsValue":233477},{"CalibPointValue":10.0,"gainValue":29317.6,"offsetValue":-103.0,"CalibPointName":"10A","CalibPointId":5,"rmsValue":311987}],"CurrentTapMax":10.0},{"CurrentTapId":5,"CurrentRelayId":"214","NoOfCalibrationPoints":5,"CalibPoints":[{"CalibPointValue":10.0,"gainValue":12.01,"offsetValue":-2578.125,"CalibPointName":"10.0A","CalibPointId":1,"rmsValue":60990},{"CalibPointValue":25.0,"gainValue":5850.8,"offsetValue":119.0,"CalibPointName":"25A","CalibPointId":2,"rmsValue":155412},{"CalibPointValue":35.0,"gainValue":5882.6,"offsetValue":-676.0,"CalibPointName":"35A","CalibPointId":3,"rmsValue":217973},{"CalibPointValue":40.0,"gainValue":5870.4,"offsetValue":-249.0,"CalibPointName":"40A","CalibPointId":4,"rmsValue":249441},{"CalibPointValue":60.0,"gainValue":5879.1,"offsetValue":-597.0,"CalibPointName":"60A","CalibPointId":5,"rmsValue":374561}],"CurrentTapMax":60.0},{"CurrentTapId":6,"CurrentRelayId":"215","NoOfCalibrationPoints":4,"CalibPoints":[{"CalibPointValue":60.0,"gainValue":12.01,"offsetValue":-2578.125,"CalibPointName":"60.0A","CalibPointId":1,"rmsValue":186467},{"CalibPointValue":75.0,"gainValue":2916.67,"offsetValue":720.8,"CalibPointName":"75A","CalibPointId":2,"rmsValue":233700},{"CalibPointValue":100.0,"gainValue":2945.52,"offsetValue":-1443.0,"CalibPointName":"100A","CalibPointId":3,"rmsValue":312094},{"CalibPointValue":120.0,"gainValue":2862.95,"offsetValue":6814.0,"CalibPointName":"120A","CalibPointId":4,"rmsValue":374317}],"CurrentTapMax":120.0}],"NoOfCurrentTaps":6}],"VoltageCalibration":[{"NoOfVoltageTaps":1,"VoltagePhase":"R","VoltageTap":[{"VoltageRelayId":"199","VoltageTapMax":330.0,"NoOfCalibrationPoints":5,"CalibPoints":[{"CalibPointValue":30.0,"gainValue":12.01,"offsetValue":-2578.125,"CalibPointName":"30V","CalibPointId":1,"rmsValue":30591},{"CalibPointValue":64.0,"gainValue":988.85,"offsetValue":-989.5,"CalibPointName":"64V","CalibPointId":2,"rmsValue":66306},{"CalibPointValue":110.0,"gainValue":987.41,"offsetValue":-897.24,"CalibPointName":"110V","CalibPointId":3,"rmsValue":114848},{"CalibPointValue":160.0,"gainValue":988.78,"offsetValue":-1047.8,"CalibPointName":"160V","CalibPointId":4,"rmsValue":167494},{"CalibPointValue":200.0,"gainValue":990.28,"offsetValue":-1287.8,"CalibPointName":"200V","CalibPointId":5,"rmsValue":209683},{"CalibPointValue":240.0,"gainValue":990.8,"offsetValue":-1392.0,"CalibPointName":"240V","CalibPointId":6,"rmsValue":251828},{"CalibPointValue":300.0,"gainValue":985.83,"offsetValue":-199.2,"CalibPointName":"300V","CalibPointId":7,"rmsValue":315099},{"CalibPointValue":330.0,"gainValue":1008.27,"offsetValue":-6931.0,"CalibPointName":"330V","CalibPointId":8,"rmsValue":346820}],"VoltageTapId":1}]},{"NoOfVoltageTaps":1,"VoltagePhase":"Y","VoltageTap":[{"VoltageRelayId":"199","VoltageTapMax":330.0,"NoOfCalibrationPoints":5,"CalibPoints":[{"CalibPointValue":30.0,"gainValue":12.01,"offsetValue":-2578.125,"CalibPointName":"30V","CalibPointId":1,"rmsValue":30505},{"CalibPointValue":64.0,"gainValue":989.82,"offsetValue":-1030.6,"CalibPointName":"64V","CalibPointId":2,"rmsValue":66293},{"CalibPointValue":110.0,"gainValue":988.24,"offsetValue":-929.36,"CalibPointName":"110V","CalibPointId":3,"rmsValue":114867},{"CalibPointValue":160.0,"gainValue":989.12,"offsetValue":-1026.2,"CalibPointName":"160V","CalibPointId":4,"rmsValue":167521},{"CalibPointValue":200.0,"gainValue":987.05,"offsetValue":-695.0,"CalibPointName":"200V","CalibPointId":5,"rmsValue":209709},{"CalibPointValue":240.0,"gainValue":994.28,"offsetValue":-2141.0,"CalibPointName":"240V","CalibPointId":6,"rmsValue":251782},{"CalibPointValue":300.0,"gainValue":985.4,"offsetValue":-10.0,"CalibPointName":"300V","CalibPointId":7,"rmsValue":315136},{"CalibPointValue":330.0,"gainValue":1009.7,"offsetValue":-7300.0,"CalibPointName":"330V","CalibPointId":8,"rmsValue":346741}],"VoltageTapId":1}]},{"NoOfVoltageTaps":1,"VoltagePhase":"B","VoltageTap":[{"VoltageRelayId":"100","VoltageTapMax":330.0,"NoOfCalibrationPoints":5,"CalibPoints":[{"CalibPointValue":30.0,"gainValue":12.01,"offsetValue":-2578.125,"CalibPointName":"30V","CalibPointId":1,"rmsValue":30509},{"CalibPointValue":64.0,"gainValue":990.38,"offsetValue":-1057.4,"CalibPointName":"64V","CalibPointId":2,"rmsValue":66324},{"CalibPointValue":110.0,"gainValue":988.13,"offsetValue":-913.32,"CalibPointName":"110V","CalibPointId":3,"rmsValue":114903},{"CalibPointValue":160.0,"gainValue":988.76,"offsetValue":-982.6,"CalibPointName":"160V","CalibPointId":4,"rmsValue":167514},{"CalibPointValue":200.0,"gainValue":988.85,"offsetValue":-997.0,"CalibPointName":"200V","CalibPointId":5,"rmsValue":209748},{"CalibPointValue":240.0,"gainValue":992.1,"offsetValue":-1647.0,"CalibPointName":"240V","CalibPointId":6,"rmsValue":251830},{"CalibPointValue":300.0,"gainValue":986.27,"offsetValue":-247.8,"CalibPointName":"300V","CalibPointId":7,"rmsValue":315111},{"CalibPointValue":330.0,"gainValue":1008.7,"offsetValue":-6977.0,"CalibPointName":"330V","CalibPointId":7,"rmsValue":346757}],"VoltageTapId":1}]}]}
+2025-06-18 15:24:02.638 DEBUG ApplicationLauncher:127 - LscsCalibrationConfigLoader : Loaded config json getConfigFileVersion : R
+2025-06-18 15:24:02.638 DEBUG ApplicationLauncher:108 - ReportProfileOperationConfigLoader : Loaded config json CONFIG_FILE:config/report/ReportProfileV2_1.json
+2025-06-18 15:24:02.639 DEBUG ApplicationLauncher:123 - ReportProfileOperationConfigLoader : Loaded config json obj:{"ConfigFileVersionComment":"For Report profileV2 input and output data name config ","MasterOutputDataSet":[{"OperationProcessKey":"MasterOutputHdr","PopulateOnlyHeaders":true,"DataType":"MasterOutput"},{"OperationProcessKey":"MasterOutputDataSet01","PopulateOnlyHeaders":false,"DataType":"MasterOutput"},{"OperationProcessKey":"MasterOutputDataSet02","PopulateOnlyHeaders":false,"DataType":"MasterOutput"},{"OperationProcessKey":"MasterOutputDataSet03","PopulateOnlyHeaders":false,"DataType":"MasterOutput"},{"OperationProcessKey":"MasterOutputDataSet04","PopulateOnlyHeaders":false,"DataType":"MasterOutput"},{"OperationProcessKey":"MasterOutputDataSet05","PopulateOnlyHeaders":false,"DataType":"MasterOutput"},{"OperationProcessKey":"MasterOutputDataSet06","PopulateOnlyHeaders":false,"DataType":"MasterOutput"},{"OperationProcessKey":"MasterOutputDataSet07","PopulateOnlyHeaders":false,"DataType":"MasterOutput"},{"OperationProcessKey":"MasterOutputConstErrorPercent","PopulateOnlyHeaders":false,"DataType":"MasterOutput"},{"OperationProcessKey":"MasterOutputDataSet09","PopulateOnlyHeaders":false,"DataType":"MasterOutput"},{"OperationProcessKey":"MasterOutputDataSet10","PopulateOnlyHeaders":false,"DataType":"MasterOutput"}],"ConfigFileVersion":"1.0","LocalInputDataSet":[{"OperationProcessKey":"LocalInputRsmInitialHdr","PopulateOnlyHeaders":true,"DataType":"LocalInput"},{"OperationProcessKey":"LocalInputRsmFinalHdr","PopulateOnlyHeaders":true,"DataType":"LocalInput"},{"OperationProcessKey":"LocalInputConstDutInitial","PopulateOnlyHeaders":false,"DataType":"LocalInput"},{"OperationProcessKey":"LocalInputConstDutFinal","PopulateOnlyHeaders":false,"DataType":"LocalInput"},{"OperationProcessKey":"LocalInputConstDutDiff","PopulateOnlyHeaders":false,"DataType":"LocalInput"},{"OperationProcessKey":"LocalInputDataRep01","PopulateOnlyHeaders":false,"DataType":"LocalInput"},{"OperationProcessKey":"LocalInputDataRep02","PopulateOnlyHeaders":false,"DataType":"LocalInput"},{"OperationProcessKey":"LocalInputDataSet05","PopulateOnlyHeaders":false,"DataType":"LocalInput"},{"OperationProcessKey":"LocalInputDataSet06","PopulateOnlyHeaders":false,"DataType":"LocalInput"},{"OperationProcessKey":"LocalInputDataSet07","PopulateOnlyHeaders":false,"DataType":"LocalInput"},{"OperationProcessKey":"LocalInputDataSet08","PopulateOnlyHeaders":false,"DataType":"LocalInput"},{"OperationProcessKey":"LocalInputDataSet09","PopulateOnlyHeaders":false,"DataType":"LocalInput"},{"OperationProcessKey":"LocalInputConstPulseCnt","PopulateOnlyHeaders":false,"DataType":"LocalInput"}],"LocalOutputDataSet":[{"OperationProcessKey":"LocalOutputRsmEnergyDiffHdr","PopulateOnlyHeaders":true,"DataType":"LocalOutput"},{"OperationProcessKey":"LocalOutputDataRepAvg","PopulateOnlyHeaders":false,"DataType":"LocalOutput"},{"OperationProcessKey":"LocalOutputDataSet02","PopulateOnlyHeaders":false,"DataType":"LocalOutput"},{"OperationProcessKey":"LocalOutputDataSet03","PopulateOnlyHeaders":false,"DataType":"LocalOutput"},{"OperationProcessKey":"LocalOutputDataSet04","PopulateOnlyHeaders":false,"DataType":"LocalOutput"},{"OperationProcessKey":"LocalOutputDataSet05","PopulateOnlyHeaders":false,"DataType":"LocalOutput"},{"OperationProcessKey":"LocalOutputDataSet06","PopulateOnlyHeaders":false,"DataType":"LocalOutput"},{"OperationProcessKey":"LocalOutputDataSet07","PopulateOnlyHeaders":false,"DataType":"LocalOutput"},{"OperationProcessKey":"LocalOutputConstDutDiff","PopulateOnlyHeaders":false,"DataType":"LocalOutput"},{"OperationProcessKey":"LocalOutputConstErrorPercent","PopulateOnlyHeaders":false,"DataType":"LocalOutput"},{"OperationProcessKey":"LocalOutputConstPulseCntResult","PopulateOnlyHeaders":false,"DataType":"LocalOutput"}]}
+2025-06-18 15:24:02.642 DEBUG ApplicationLauncher:135 - ReportProfileOperationConfigLoader : Loaded config json getConfigFileVersion : 1.0
+2025-06-18 15:24:02.642 INFO  ApplicationLauncher:492 - springDataInit : Entry
+2025-06-18 15:24:02.646 DEBUG ApplicationLauncher:161 - Custom1ReportConfigLoader: setConfigFilePathName : configFilePathName: config/report/LecsHealthyReport_V1_0.json
+2025-06-18 15:24:02.646 DEBUG ApplicationLauncher:102 - Custom1ReportConfigLoader : Loading config json CONFIG_FILE:config/report/LecsHealthyReport_V1_0.json
+2025-06-18 15:24:02.648 DEBUG ApplicationLauncher:121 - Custom1ReportConfigLoader : Loaded config json obj:{"ConfigFileVersionComment":" derived from Template V1_6.  Result splitted into Multiple page","ExcelReportMeterDataDisplay":{"ExcelReportMeterDataDisplayPage":[{"PopulatePtRatio":false,"PopulateMeterConstant":false,"PopulateMeterSerialNo":true,"PopulateSerialNo":true,"PopulateCustomerRefNo":true,"PopulateMakeForEach":true,"PopulateCapacityForEach":true,"PopulateMake":false,"PopulateCtRatioForEach":false,"PopulateMeterType":true,"PopulateDutOverAllStatus":true,"AppendMeterSerialNoAndRackPosition":false,"PopulateCustomerRefNoForEach":true,"PopulatePtRatioForEach":false,"PageNumber":1,"PopulateMeterTypeForEach":false,"PopulateCapacity":false,"PopulateCtRatio":false,"PopulateMeterConstantForEach":false},{"PopulatePtRatio":true,"PopulateMeterConstant":true,"PopulateMeterSerialNo":true,"PopulateSerialNo":true,"PopulateCustomerRefNo":true,"PopulateMakeForEach":true,"PopulateCapacityForEach":true,"PopulateMake":true,"PopulateCtRatioForEach":true,"PopulateMeterType":false,"PopulateDutOverAllStatus":true,"AppendMeterSerialNoAndRackPosition":true,"PopulateCustomerRefNoForEach":true,"PopulatePtRatioForEach":true,"PageNumber":2,"PopulateMeterTypeForEach":true,"PopulateCapacity":true,"PopulateCtRatio":true,"PopulateMeterConstantForEach":true}]},"ExcelReportMeterDataCellPosition":{"ExcelReportMeterDataCellPositionPage":[{"CellStartPositionSerialNo":"B8","CellStartPositionCapacity":"E8","CellStartPositionMeterConstant":"O3","CellStartPositionCtRatio":"Q3","PageNumber":1,"CellStartPositionMeterSerialNo":"C8","CellStartPositionMeterType":"L3","CellStartPositionMake":"D8","CellStartPositionCustomerRefNo":"F8","CellStartPositionPtRatio":"P3","CellStartPositionDutOverAllStatus":"Q8"},{"CellStartPositionSerialNo":"B48","CellStartPositionCapacity":"E48","CellStartPositionMeterConstant":"D48","CellStartPositionCtRatio":"G48","PageNumber":2,"CellStartPositionMeterSerialNo":"C48","CellStartPositionMeterType":"D48","CellStartPositionMake":"E48","CellStartPositionCustomerRefNo":"G48","CellStartPositionPtRatio":"F48","CellStartPositionDutOverAllStatus":"Q48"}]},"ConfigFileVersion":"1.6","TemplateFileLocationPath":"C:\\Reports\\lecs\\template\\LecsHealthyMeterReport-V0_9.xlsx","MaxNoOfPageInReport":2,"MaxDutDisplayPerPage":20,"ExcelReportTestTypeFilter":{"TestTypeFilter":[{"PopulateResult":true,"VoltageFilter":"100U","PrefixType":"STA","CellStartResultStatusPosition":"I48","PopulateResultValue":true,"PageNumber":2,"PopulateResultStatus":true,"CurrentFilter":"0.004Ib","CellStartResultValuePosition":"H48","PopulateType":"Vertical"},{"PopulateResult":true,"VoltageFilter":"115U","PrefixType":"NLD","CellStartResultStatusPosition":"K48","PopulateResultValue":true,"PageNumber":2,"PopulateResultStatus":true,"CellStartResultValuePosition":"J48","PopulateType":"Vertical"},{"PopulateResult":true,"VoltageFilter":"100U","PrefixType":"LOE","CellStartResultStatusPosition":"F6","PopulateResultValue":true,"PageNumber":1,"PopulateResultStatus":false,"CurrentFilter":"1.0Imax","PfFilter":"1.0","CellStartResultValuePosition":"G8","PopulateType":"Vertical"},{"PopulateResult":true,"VoltageFilter":"80U","PrefixType":"VV","CellStartResultStatusPosition":"F6","PopulateResultValue":true,"PageNumber":1,"PopulateResultStatus":false,"CurrentFilter":"1.0Ib","PfFilter":"1.0","CellStartResultValuePosition":"D8","PopulateType":"Vertical"},{"PopulateResult":true,"VoltageFilter":"100U","PrefixType":"LOE","CellStartResultStatusPosition":"F6","PopulateResultValue":true,"PageNumber":1,"PopulateResultStatus":false,"CurrentFilter":"1.0Ib","PfFilter":"1.0","CellStartResultValuePosition":"H8","PopulateType":"Vertical"},{"PopulateResult":true,"VoltageFilter":"100U","PrefixType":"LOE","CellStartResultStatusPosition":"F6","PopulateResultValue":true,"PageNumber":1,"PopulateResultStatus":false,"CurrentFilter":"1.0Ib","PfFilter":"0.5L","CellStartResultValuePosition":"I8","PopulateType":"Vertical"},{"PopulateResult":true,"VoltageFilter":"100U","PrefixType":"LOE","CellStartResultStatusPosition":"F6","PopulateResultValue":true,"PageNumber":1,"PopulateResultStatus":false,"CurrentFilter":"1.0Ib","PfFilter":"0.8C","CellStartResultValuePosition":"J8","PopulateType":"Vertical"},{"PopulateResult":true,"VoltageFilter":"100U","PrefixType":"LOE","CellStartResultStatusPosition":"F6","PopulateResultValue":true,"PageNumber":1,"PopulateResultStatus":false,"CurrentFilter":"0.5Ib","PfFilter":"1.0","CellStartResultValuePosition":"K8","PopulateType":"Vertical"},{"PopulateResult":true,"VoltageFilter":"100U","PrefixType":"RPSNORM","CellStartResultStatusPosition":"F6","PopulateResultValue":true,"PageNumber":1,"PopulateResultStatus":false,"CurrentFilter":"1.0Ib","PfFilter":"1.0","CellStartResultValuePosition":"E8","PopulateType":"Vertical"},{"PopulateResult":true,"VoltageFilter":"100U","PrefixType":"RPSREV","CellStartResultStatusPosition":"F6","PopulateResultValue":true,"PageNumber":1,"PopulateResultStatus":false,"CurrentFilter":"1.0Ib","PfFilter":"1.0","CellStartResultValuePosition":"F8","PopulateType":"Vertical"},{"PopulateResult":true,"VoltageFilter":"100U","PrefixType":"FV","FreqFilter":"52.5","CellStartResultStatusPosition":"F6","PopulateResultValue":true,"PageNumber":1,"PopulateResultStatus":false,"CurrentFilter":"1.0Ib","PfFilter":"1.0","CellStartResultValuePosition":"S8","PopulateType":"Vertical"},{"PopulateResult":true,"VoltageFilter":"RY:100U","PrefixType":"VU","CellStartResultStatusPosition":"F6","PopulateResultValue":true,"PageNumber":1,"PopulateResultStatus":false,"CurrentFilter":"1.0Ib","PfFilter":"1.0","CellStartResultValuePosition":"T8","PopulateType":"Vertical"},{"PopulateResult":true,"VoltageFilter":"Y:100U","PrefixType":"VU","CellStartResultStatusPosition":"F6","PopulateResultValue":true,"PageNumber":1,"PopulateResultStatus":false,"CurrentFilter":"1.0Ib","PfFilter":"1.0","CellStartResultValuePosition":"U8","PopulateType":"Vertical"},{"PopulateResult":true,"VoltageFilter":"100U","PrefixType":"LOE","CellStartResultStatusPosition":"F6","PopulateResultValue":true,"PageNumber":1,"PopulateResultStatus":false,"CurrentFilter":"0.5Ib","PfFilter":"0.5L","CellStartResultValuePosition":"L8","PopulateType":"Vertical"},{"PopulateResult":true,"VoltageFilter":"100U","PrefixType":"LOE","CellStartResultStatusPosition":"F6","PopulateResultValue":true,"PageNumber":1,"PopulateResultStatus":false,"CurrentFilter":"0.5Ib","PfFilter":"0.8C","CellStartResultValuePosition":"M8","PopulateType":"Vertical"},{"PopulateResult":true,"VoltageFilter":"100U","PrefixType":"REP","CellStartResultStatusPosition":"F6","PopulateResultValue":true,"PageNumber":1,"PopulateResultStatus":false,"CurrentFilter":"1.0Ib","PfFilter":"1.0","ResultIterationId":"1","CellStartResultValuePosition":"N8","PopulateType":"Vertical"},{"PopulateResult":true,"VoltageFilter":"100U","PrefixType":"REP","CellStartResultStatusPosition":"F6","PopulateResultValue":true,"PageNumber":1,"PopulateResultStatus":false,"CurrentFilter":"1.0Ib","PfFilter":"1.0","ResultIterationId":"2","CellStartResultValuePosition":"O8","PopulateType":"Vertical"},{"PopulateResult":false,"VoltageFilter":"100U","PrefixType":"REP","CellStartResultStatusPosition":"F6","PopulateResultValue":true,"PageNumber":1,"PopulateResultStatus":false,"CurrentFilter":"0.5Ib","PfFilter":"1.0","ResultIterationId":"3","CellStartResultValuePosition":"P8","PopulateType":"Vertical"},{"VoltageFilter":"100U","PrefixType":"CONST","PopulateResultValue":true,"PopulateResultFilterDutPulseCountReading":true,"PopulateResultStatus":false,"PfFilter":"1.0","CellStartResultValuePosition":"O48","PopulateResult":true,"EnergyFilter":"0.1","CellStartResultStatusPosition":"F6","PageNumber":2,"CurrentFilter":"1.0Ib","PopulateType":"Vertical"},{"VoltageFilter":"100U","PrefixType":"CONST","PopulateResultValue":true,"PopulateResultStatus":false,"PfFilter":"1.0","CellStartResultValuePosition":"L48","PopulateResult":true,"EnergyFilter":"0.1","CellStartResultStatusPosition":"F6","PageNumber":2,"PopulateResultFilterDutInitialReading":true,"CurrentFilter":"1.0Ib","PopulateType":"Vertical"},{"VoltageFilter":"100U","PrefixType":"CONST","PopulateResultValue":true,"PopulateResultStatus":false,"PfFilter":"1.0","CellStartResultValuePosition":"M48","PopulateResult":true,"EnergyFilter":"0.1","PopulateResultFilterDutFinalReading":true,"CellStartResultStatusPosition":"F6","PageNumber":2,"CurrentFilter":"1.0Ib","PopulateType":"Vertical"},{"VoltageFilter":"100U","PrefixType":"CONST","PopulateResultValue":true,"PopulateResultStatus":false,"PfFilter":"1.0","PopulateResultFilterRefStdInitialReading":true,"CellStartResultValuePosition":"J43","PopulateResult":true,"EnergyFilter":"0.1","CellStartResultStatusPosition":"F6","PageNumber":2,"CurrentFilter":"1.0Ib","PopulateType":"Vertical"},{"VoltageFilter":"100U","PrefixType":"CONST","PopulateResultValue":true,"PopulateResultFilterRefStdFinalReading":true,"PopulateResultStatus":false,"PfFilter":"1.0","CellStartResultValuePosition":"N43","PopulateResult":true,"EnergyFilter":"0.1","CellStartResultStatusPosition":"F6","PageNumber":2,"CurrentFilter":"1.0Ib","PopulateType":"Vertical"}]},"ParentReportProfile":"LecsMeterReportProfile","ReportOutputPath1":"C:\\TAS_Network\\Procal_Excel\\Output\\","TemplateFileLocationPath1":"C:\\TAS_Network\\Procal_Excel\\ReportTemplate\\LecsHealthyMeterReport-V0_9.xlsx","ReportOutputPath":"C:\\Reports\\lecs\\output\\","SplitDutDisplayIntoMultiplePage":false}
+2025-06-18 15:24:02.661 DEBUG ApplicationLauncher:136 - Custom1ReportConfigLoader : Loaded config json getConfigFileVersion : 1.6
+2025-06-18 15:24:02.668 INFO  ApplicationLauncher:3934 - ce: 1750240442
+2025-06-18 15:24:06.051 INFO  ApplicationLauncher:1400 - ApplicationLauncher : showSplash Entry0
+2025-06-18 15:24:06.052 INFO  ApplicationLauncher:1407 - ApplicationLauncher : showSplash Entry2
+2025-06-18 15:24:08.052 INFO  ApplicationLauncher:1412 - ApplicationLauncher : showSplash Entry3
+2025-06-18 15:24:11.059 INFO  ApplicationLauncher:1400 - ApplicationLauncher : showSplash Entry0
+2025-06-18 15:24:11.060 INFO  ApplicationLauncher:1402 - ApplicationLauncher : showSplash Entry1
+2025-06-18 15:24:11.126 WARN  javafx:61 - Loading FXML document with JavaFX API of version 20.0.1 by JavaFX runtime of version 8.0.161
+2025-06-18 15:24:11.205 DEBUG ApplicationLauncher:78 - updateProfileDisplay : Entry
+2025-06-18 15:24:13.184 INFO  ApplicationLauncher:110 - LoginOnClick : selectedUserProfileType: Admin
+2025-06-18 15:24:13.184 INFO  ApplicationLauncher:111 - LoginOnClick : access_level: Admin
+2025-06-18 15:24:13.184 INFO  ApplicationLauncher:113 - LoginOnClick : selectedUserProfileType matched: 
+2025-06-18 15:24:13.184 DEBUG ApplicationLauncher:231 - loadUacProfileData : Entry
+2025-06-18 15:24:13.184 DEBUG ApplicationLauncher:240 - FetchUacProfileFromDB: Entry
+2025-06-18 15:24:13.194 DEBUG ApplicationLauncher:272 - FetchUacProfileFromDB: screenName: Login
+2025-06-18 15:24:13.194 DEBUG ApplicationLauncher:273 - FetchUacProfileFromDB: sectionName: 
+2025-06-18 15:24:13.194 DEBUG ApplicationLauncher:274 - FetchUacProfileFromDB: subSectionName: 
+2025-06-18 15:24:13.196 DEBUG ApplicationLauncher:272 - FetchUacProfileFromDB: screenName: Project
+2025-06-18 15:24:13.196 DEBUG ApplicationLauncher:273 - FetchUacProfileFromDB: sectionName: 
+2025-06-18 15:24:13.196 DEBUG ApplicationLauncher:274 - FetchUacProfileFromDB: subSectionName: 
+2025-06-18 15:24:13.196 DEBUG ApplicationLauncher:272 - FetchUacProfileFromDB: screenName: Deploy
+2025-06-18 15:24:13.197 DEBUG ApplicationLauncher:273 - FetchUacProfileFromDB: sectionName: 
+2025-06-18 15:24:13.197 DEBUG ApplicationLauncher:274 - FetchUacProfileFromDB: subSectionName: 
+2025-06-18 15:24:13.197 DEBUG ApplicationLauncher:272 - FetchUacProfileFromDB: screenName: TestRun
+2025-06-18 15:24:13.197 DEBUG ApplicationLauncher:273 - FetchUacProfileFromDB: sectionName: 
+2025-06-18 15:24:13.197 DEBUG ApplicationLauncher:274 - FetchUacProfileFromDB: subSectionName: 
+2025-06-18 15:24:13.197 DEBUG ApplicationLauncher:272 - FetchUacProfileFromDB: screenName: Report
+2025-06-18 15:24:13.197 DEBUG ApplicationLauncher:273 - FetchUacProfileFromDB: sectionName: 
+2025-06-18 15:24:13.197 DEBUG ApplicationLauncher:274 - FetchUacProfileFromDB: subSectionName: 
+2025-06-18 15:24:13.197 DEBUG ApplicationLauncher:272 - FetchUacProfileFromDB: screenName: MeterProfile
+2025-06-18 15:24:13.198 DEBUG ApplicationLauncher:273 - FetchUacProfileFromDB: sectionName: 
+2025-06-18 15:24:13.198 DEBUG ApplicationLauncher:274 - FetchUacProfileFromDB: subSectionName: 
+2025-06-18 15:24:13.198 DEBUG ApplicationLauncher:272 - FetchUacProfileFromDB: screenName: Settings
+2025-06-18 15:24:13.198 DEBUG ApplicationLauncher:273 - FetchUacProfileFromDB: sectionName: 
+2025-06-18 15:24:13.198 DEBUG ApplicationLauncher:274 - FetchUacProfileFromDB: subSectionName: 
+2025-06-18 15:24:13.198 DEBUG ApplicationLauncher:272 - FetchUacProfileFromDB: screenName: Admin
+2025-06-18 15:24:13.199 DEBUG ApplicationLauncher:273 - FetchUacProfileFromDB: sectionName: 
+2025-06-18 15:24:13.199 DEBUG ApplicationLauncher:274 - FetchUacProfileFromDB: subSectionName: 
+2025-06-18 15:24:13.199 DEBUG ApplicationLauncher:272 - FetchUacProfileFromDB: screenName: DeviceSettings
+2025-06-18 15:24:13.199 DEBUG ApplicationLauncher:273 - FetchUacProfileFromDB: sectionName: 
+2025-06-18 15:24:13.199 DEBUG ApplicationLauncher:274 - FetchUacProfileFromDB: subSectionName: 
+2025-06-18 15:24:13.199 DEBUG ApplicationLauncher:272 - FetchUacProfileFromDB: screenName: StabilitySettings
+2025-06-18 15:24:13.199 DEBUG ApplicationLauncher:273 - FetchUacProfileFromDB: sectionName: 
+2025-06-18 15:24:13.199 DEBUG ApplicationLauncher:274 - FetchUacProfileFromDB: subSectionName: 
+2025-06-18 15:24:13.199 DEBUG ApplicationLauncher:272 - FetchUacProfileFromDB: screenName: ReportConfiguration
+2025-06-18 15:24:13.200 DEBUG ApplicationLauncher:273 - FetchUacProfileFromDB: sectionName: 
+2025-06-18 15:24:13.200 DEBUG ApplicationLauncher:274 - FetchUacProfileFromDB: subSectionName: 
+2025-06-18 15:24:13.200 DEBUG ApplicationLauncher:272 - FetchUacProfileFromDB: screenName: BackupSettings
+2025-06-18 15:24:13.200 DEBUG ApplicationLauncher:273 - FetchUacProfileFromDB: sectionName: 
+2025-06-18 15:24:13.200 DEBUG ApplicationLauncher:274 - FetchUacProfileFromDB: subSectionName: 
+2025-06-18 15:24:13.200 DEBUG ApplicationLauncher:272 - FetchUacProfileFromDB: screenName: ReportProfileConfig
+2025-06-18 15:24:13.200 DEBUG ApplicationLauncher:273 - FetchUacProfileFromDB: sectionName: 
+2025-06-18 15:24:13.201 DEBUG ApplicationLauncher:274 - FetchUacProfileFromDB: subSectionName: 
+2025-06-18 15:24:13.201 INFO  ApplicationLauncher:142 - loadInHouseMode : username: admin
+2025-06-18 15:24:13.206 WARN  javafx:61 - Loading FXML document with JavaFX API of version 20.0.1 by JavaFX runtime of version 8.0.161
+2025-06-18 15:24:13.253 INFO  ApplicationLauncher:767 - ApplicationHomeController : applyUacSettings :  Entry
+2025-06-18 15:24:13.347 WARN  javafx:61 - Loading FXML document with JavaFX API of version 20.0.1 by JavaFX runtime of version 8.0.161
+2025-06-18 15:24:13.406 INFO  ApplicationLauncher:274 - Test script layout controller
+2025-06-18 15:24:13.408 WARN  javafx:61 - Loading FXML document with JavaFX API of version 20.0.1 by JavaFX runtime of version 8.0.161
+2025-06-18 15:24:13.419 DEBUG ApplicationLauncher:294 - ProjectController: DragIconType: Length :16
+2025-06-18 15:24:13.420 WARN  javafx:61 - Loading FXML document with JavaFX API of version 20.0.1 by JavaFX runtime of version 8.0.161
+2025-06-18 15:24:13.427 INFO  ApplicationLauncher:330 - setType: type: Warmup
+2025-06-18 15:24:13.428 DEBUG ApplicationLauncher:305 - ProjectController: initialize: DragIconType.values()[i]):Warmup
+2025-06-18 15:24:13.429 WARN  javafx:61 - Loading FXML document with JavaFX API of version 20.0.1 by JavaFX runtime of version 8.0.161
+2025-06-18 15:24:13.434 INFO  ApplicationLauncher:330 - setType: type: NoLoad
+2025-06-18 15:24:13.434 DEBUG ApplicationLauncher:305 - ProjectController: initialize: DragIconType.values()[i]):NoLoad
+2025-06-18 15:24:13.435 WARN  javafx:61 - Loading FXML document with JavaFX API of version 20.0.1 by JavaFX runtime of version 8.0.161
+2025-06-18 15:24:13.440 INFO  ApplicationLauncher:330 - setType: type: STA
+2025-06-18 15:24:13.440 DEBUG ApplicationLauncher:305 - ProjectController: initialize: DragIconType.values()[i]):STA
+2025-06-18 15:24:13.441 WARN  javafx:61 - Loading FXML document with JavaFX API of version 20.0.1 by JavaFX runtime of version 8.0.161
+2025-06-18 15:24:13.446 INFO  ApplicationLauncher:330 - setType: type: ConstantTest
+2025-06-18 15:24:13.446 DEBUG ApplicationLauncher:305 - ProjectController: initialize: DragIconType.values()[i]):ConstantTest
+2025-06-18 15:24:13.447 WARN  javafx:61 - Loading FXML document with JavaFX API of version 20.0.1 by JavaFX runtime of version 8.0.161
+2025-06-18 15:24:13.451 INFO  ApplicationLauncher:330 - setType: type: Accuracy
+2025-06-18 15:24:13.452 DEBUG ApplicationLauncher:305 - ProjectController: initialize: DragIconType.values()[i]):Accuracy
+2025-06-18 15:24:13.453 WARN  javafx:61 - Loading FXML document with JavaFX API of version 20.0.1 by JavaFX runtime of version 8.0.161
+2025-06-18 15:24:13.460 INFO  ApplicationLauncher:330 - setType: type: InfluenceVolt
+2025-06-18 15:24:13.460 DEBUG ApplicationLauncher:305 - ProjectController: initialize: DragIconType.values()[i]):InfluenceVolt
+2025-06-18 15:24:13.462 WARN  javafx:61 - Loading FXML document with JavaFX API of version 20.0.1 by JavaFX runtime of version 8.0.161
+2025-06-18 15:24:13.465 INFO  ApplicationLauncher:330 - setType: type: InfluenceFreq
+2025-06-18 15:24:13.466 DEBUG ApplicationLauncher:305 - ProjectController: initialize: DragIconType.values()[i]):InfluenceFreq
+2025-06-18 15:24:13.467 WARN  javafx:61 - Loading FXML document with JavaFX API of version 20.0.1 by JavaFX runtime of version 8.0.161
+2025-06-18 15:24:13.472 INFO  ApplicationLauncher:330 - setType: type: InfluenceHarmonic
+2025-06-18 15:24:13.472 DEBUG ApplicationLauncher:305 - ProjectController: initialize: DragIconType.values()[i]):InfluenceHarmonic
+2025-06-18 15:24:13.474 WARN  javafx:61 - Loading FXML document with JavaFX API of version 20.0.1 by JavaFX runtime of version 8.0.161
+2025-06-18 15:24:13.481 INFO  ApplicationLauncher:330 - setType: type: CuttingNuetral
+2025-06-18 15:24:13.482 DEBUG ApplicationLauncher:305 - ProjectController: initialize: DragIconType.values()[i]):CuttingNuetral
+2025-06-18 15:24:13.483 WARN  javafx:61 - Loading FXML document with JavaFX API of version 20.0.1 by JavaFX runtime of version 8.0.161
+2025-06-18 15:24:13.488 INFO  ApplicationLauncher:330 - setType: type: VoltageUnbalance
+2025-06-18 15:24:13.488 DEBUG ApplicationLauncher:305 - ProjectController: initialize: DragIconType.values()[i]):VoltageUnbalance
+2025-06-18 15:24:13.490 WARN  javafx:61 - Loading FXML document with JavaFX API of version 20.0.1 by JavaFX runtime of version 8.0.161
+2025-06-18 15:24:13.495 INFO  ApplicationLauncher:330 - setType: type: PhaseReversal
+2025-06-18 15:24:13.495 DEBUG ApplicationLauncher:305 - ProjectController: initialize: DragIconType.values()[i]):PhaseReversal
+2025-06-18 15:24:13.497 WARN  javafx:61 - Loading FXML document with JavaFX API of version 20.0.1 by JavaFX runtime of version 8.0.161
+2025-06-18 15:24:13.503 INFO  ApplicationLauncher:330 - setType: type: CustomTest
+2025-06-18 15:24:13.503 DEBUG ApplicationLauncher:305 - ProjectController: initialize: DragIconType.values()[i]):CustomTest
+2025-06-18 15:24:13.504 WARN  javafx:61 - Loading FXML document with JavaFX API of version 20.0.1 by JavaFX runtime of version 8.0.161
+2025-06-18 15:24:13.513 INFO  ApplicationLauncher:330 - setType: type: Repeatability
+2025-06-18 15:24:13.513 DEBUG ApplicationLauncher:305 - ProjectController: initialize: DragIconType.values()[i]):Repeatability
+2025-06-18 15:24:13.515 WARN  javafx:61 - Loading FXML document with JavaFX API of version 20.0.1 by JavaFX runtime of version 8.0.161
+2025-06-18 15:24:13.521 INFO  ApplicationLauncher:330 - setType: type: SelfHeating
+2025-06-18 15:24:13.521 DEBUG ApplicationLauncher:305 - ProjectController: initialize: DragIconType.values()[i]):SelfHeating
+2025-06-18 15:24:13.522 WARN  javafx:61 - Loading FXML document with JavaFX API of version 20.0.1 by JavaFX runtime of version 8.0.161
+2025-06-18 15:24:13.528 INFO  ApplicationLauncher:330 - setType: type: DutCommand
+2025-06-18 15:24:13.528 DEBUG ApplicationLauncher:305 - ProjectController: initialize: DragIconType.values()[i]):DutCommand
+2025-06-18 15:24:13.528 WARN  javafx:61 - Loading FXML document with JavaFX API of version 20.0.1 by JavaFX runtime of version 8.0.161
+2025-06-18 15:24:13.533 INFO  ApplicationLauncher:330 - setType: type: DefaultType
+2025-06-18 15:24:13.534 DEBUG ApplicationLauncher:305 - ProjectController: initialize: DragIconType.values()[i]):DefaultType
+2025-06-18 15:24:13.576 INFO  ApplicationLauncher:471 - Energy Meter model list: [3P4W 5A/10A reactive, LTCT, Reactive,5-10A, 2500imp, 3P4W2 - 5A/10A Active, HTCT, Active, 5-10A, 10000imp, HTCT, Reactive, 1-2A, 50000imp, LTCT Active, 1-2A, 2500 imp, LTCT Reactive, 1-2A, 2500imp, 3P4W, LTCT,1P2W, Active, 5A, 3P4W 5/60A, LTCT,1P2W, Reactive, 5A, 3  phase calibration, Sands-LT-3P 10/60, Sands-LT-1P 10/60, Sands Reactive -LT-1P 10/60, Sands 3p Reactive -LT-1P 10/60, CTPT 3P, DHBVN 10/60A, DHBVN single phase 10/60A, LSCS Calibration, Certification, Elmeasure/Inesh 10/60A, EAPL 240 / 5A, enercent12345, Inesh 10/60A, INESH 10-60A, INESH 10A-60A reactive, INESH Test 10-60A, ER300P 10-60A, ER1, 5-30A, ModelA LTCT, Active, 5-60A, 3200imp, DevSys 1P2W 10/60A 3200 imp]
+2025-06-18 15:24:13.576 INFO  ApplicationLauncher:400 - ProjectAdjustScreen : ScreenWidthThreshold:1500
+2025-06-18 15:24:13.576 INFO  ApplicationLauncher:401 - ProjectAdjustScreen : ScreenHeight:1032.0
+2025-06-18 15:24:13.577 INFO  ApplicationLauncher:402 - ProjectAdjustScreen : ScreenWidth:1920.0
+2025-06-18 15:24:13.577 INFO  ApplicationLauncher:2111 - ProjectController : applyUacSettings :  Entry
+2025-06-18 15:24:14.584 INFO  ApplicationLauncher:369 - You clicked Running Status Icon!
+2025-06-18 15:24:14.590 INFO  ApplicationLauncher:397 - Loading ProjectExecution
+2025-06-18 15:24:14.720 WARN  javafx:61 - Loading FXML document with JavaFX API of version 23.0.1 by JavaFX runtime of version 8.0.161
+2025-06-18 15:24:14.913 DEBUG ApplicationLauncher:562 - FanProjectExecuteController: initialize: 
+2025-06-18 15:24:20.312 WARN  javafx:61 - Loading FXML document with JavaFX API of version 23.0.1 by JavaFX runtime of version 8.0.161
+2025-06-18 15:24:20.362 DEBUG ApplicationLauncher:101 - ThreePhaseController : initialize: 
+2025-06-18 15:24:23.258 INFO  ApplicationLauncher:2831 - btnVoltageMainsOnOnClick: Entry
+2025-06-18 15:24:23.323 INFO  ApplicationLauncher:3036 - MainsOnTask: Entry
+2025-06-18 15:24:23.326 INFO  ApplicationLauncher:4159 - MainsOnTask: Entry
+2025-06-18 15:24:23.346 INFO  ApplicationLauncher:4699 - dutCommandExecuteStart : ENTRY
+2025-06-18 15:24:23.359 DEBUG ApplicationLauncher:198 - DutSerialDataManager: createObjects :Entry
+2025-06-18 15:24:23.488 INFO  ApplicationLauncher:130 - Existing ComPort ID:COM5
+2025-06-18 15:24:23.489 DEBUG ApplicationLauncher:4001 - dutExecuteCommand: positionId:1
+2025-06-18 15:24:23.616 INFO  ApplicationLauncher:130 - Existing ComPort ID:COM5
+2025-06-18 15:24:23.633 DEBUG ApplicationLauncher:3571 - serialConnectDutX : portMap : {COM5=gnu.io.CommPortIdentifier@39be2243}
+2025-06-18 15:24:23.633 DEBUG ApplicationLauncher:3600 - serialConnectDutX : serial port not found : positionId: 1 -> COM3
+2025-06-18 15:24:23.633 DEBUG ApplicationLauncher:4032 - dutExecuteCommand: responseData: COM3 not found
+2025-06-18 15:24:25.849 INFO  ApplicationLauncher:2831 - btnVoltageMainsOnOnClick: Entry
+2025-06-18 15:24:25.900 INFO  ApplicationLauncher:3036 - MainsOnTask: Entry
+2025-06-18 15:24:25.901 INFO  ApplicationLauncher:4159 - MainsOnTask: Entry
+2025-06-18 15:24:25.911 INFO  ApplicationLauncher:4699 - dutCommandExecuteStart : ENTRY
+2025-06-18 15:24:25.911 DEBUG ApplicationLauncher:4001 - dutExecuteCommand: positionId:1
+2025-06-18 15:24:26.047 INFO  ApplicationLauncher:130 - Existing ComPort ID:COM5
+2025-06-18 15:24:26.056 DEBUG ApplicationLauncher:3571 - serialConnectDutX : portMap : {COM5=gnu.io.CommPortIdentifier@39be2243}
+2025-06-18 15:24:26.056 DEBUG ApplicationLauncher:3600 - serialConnectDutX : serial port not found : positionId: 1 -> COM3
+2025-06-18 15:24:26.057 DEBUG ApplicationLauncher:4032 - dutExecuteCommand: responseData: COM3 not found
+2025-06-18 15:24:28.043 INFO  ApplicationLauncher:2831 - btnVoltageMainsOnOnClick: Entry
+2025-06-18 15:24:28.094 INFO  ApplicationLauncher:3036 - MainsOnTask: Entry
+2025-06-18 15:24:28.095 INFO  ApplicationLauncher:4159 - MainsOnTask: Entry
+2025-06-18 15:24:28.105 INFO  ApplicationLauncher:4699 - dutCommandExecuteStart : ENTRY
+2025-06-18 15:24:28.105 DEBUG ApplicationLauncher:4001 - dutExecuteCommand: positionId:1
+2025-06-18 15:24:28.238 INFO  ApplicationLauncher:130 - Existing ComPort ID:COM5
+2025-06-18 15:24:28.246 DEBUG ApplicationLauncher:3571 - serialConnectDutX : portMap : {COM5=gnu.io.CommPortIdentifier@39be2243}
+2025-06-18 15:24:28.246 DEBUG ApplicationLauncher:3600 - serialConnectDutX : serial port not found : positionId: 1 -> COM3
+2025-06-18 15:24:28.246 DEBUG ApplicationLauncher:4032 - dutExecuteCommand: responseData: COM3 not found
+2025-06-18 15:24:41.494 INFO  ApplicationLauncher:2831 - btnVoltageMainsOnOnClick: Entry
+2025-06-18 15:24:41.555 INFO  ApplicationLauncher:3036 - MainsOnTask: Entry
+2025-06-18 15:24:41.555 INFO  ApplicationLauncher:4159 - MainsOnTask: Entry
+2025-06-18 15:24:41.563 INFO  ApplicationLauncher:4699 - dutCommandExecuteStart : ENTRY
+2025-06-18 15:24:41.563 DEBUG ApplicationLauncher:4001 - dutExecuteCommand: positionId:1
+2025-06-18 15:24:47.244 INFO  ApplicationLauncher:130 - Existing ComPort ID:COM5
+2025-06-18 15:24:48.835 DEBUG ApplicationLauncher:3571 - serialConnectDutX : portMap : {COM5=gnu.io.CommPortIdentifier@39be2243}
+2025-06-18 15:24:48.838 DEBUG ApplicationLauncher:3600 - serialConnectDutX : serial port not found : positionId: 1 -> COM3
+2025-06-18 15:24:59.505 DEBUG ApplicationLauncher:4032 - dutExecuteCommand: responseData: COM3 not found
+2025-06-18 15:25:02.895 INFO  ApplicationLauncher:2831 - btnVoltageMainsOnOnClick: Entry
+2025-06-18 15:25:02.954 INFO  ApplicationLauncher:3036 - MainsOnTask: Entry
+2025-06-18 15:25:02.954 INFO  ApplicationLauncher:4159 - MainsOnTask: Entry
+2025-06-18 15:25:02.961 INFO  ApplicationLauncher:4699 - dutCommandExecuteStart : ENTRY
+2025-06-18 15:25:02.961 DEBUG ApplicationLauncher:4001 - dutExecuteCommand: positionId:1
+2025-06-18 15:25:10.975 INFO  ApplicationLauncher:130 - Existing ComPort ID:COM5
+2025-06-18 15:25:23.465 DEBUG ApplicationLauncher:3571 - serialConnectDutX : portMap : {COM5=gnu.io.CommPortIdentifier@39be2243}
+2025-06-18 15:25:23.465 DEBUG ApplicationLauncher:3600 - serialConnectDutX : serial port not found : positionId: 1 -> COM3
+2025-06-18 15:25:23.465 DEBUG ApplicationLauncher:4032 - dutExecuteCommand: responseData: COM3 not found
+2025-06-18 15:25:27.185 INFO  ApplicationLauncher:2831 - btnVoltageMainsOnOnClick: Entry
+2025-06-18 15:25:27.244 INFO  ApplicationLauncher:3036 - MainsOnTask: Entry
+2025-06-18 15:25:27.244 INFO  ApplicationLauncher:4159 - MainsOnTask: Entry
+2025-06-18 15:25:27.254 INFO  ApplicationLauncher:4699 - dutCommandExecuteStart : ENTRY
+2025-06-18 15:25:27.254 DEBUG ApplicationLauncher:4001 - dutExecuteCommand: positionId:1
+2025-06-18 15:25:29.212 INFO  ApplicationLauncher:130 - Existing ComPort ID:COM5
+2025-06-18 15:25:38.545 INFO  ApplicationLauncher:170 - You clicked Devices Icon!
+2025-06-18 15:25:38.562 WARN  javafx:61 - Loading FXML document with JavaFX API of version 20.0.1 by JavaFX runtime of version 8.0.161
+2025-06-18 15:25:38.565 INFO  ApplicationLauncher:124 - SystemSettingController: initialize: REF_STD_CONSTANT_CONFIG_ENABLE: false
+2025-06-18 15:25:38.566 INFO  ApplicationLauncher:192 - SystemSettingController : applyUacSettings :  Entry
+2025-06-18 15:25:38.566 INFO  ApplicationLauncher:85 - LoadAllChild_FXML:Entry
+2025-06-18 15:25:38.567 WARN  javafx:61 - Loading FXML document with JavaFX API of version 20.0.1 by JavaFX runtime of version 8.0.161
+2025-06-18 15:25:38.783 INFO  ApplicationLauncher:1308 - DevicePortSetupController : applyUacSettings :  Entry
+2025-06-18 15:25:38.887 WARN  javafx:61 - Loading FXML document with JavaFX API of version 20.0.1 by JavaFX runtime of version 8.0.161
+2025-06-18 15:25:40.349 DEBUG ApplicationLauncher:3571 - serialConnectDutX : portMap : {COM5=gnu.io.CommPortIdentifier@39be2243}
+2025-06-18 15:25:40.349 DEBUG ApplicationLauncher:3600 - serialConnectDutX : serial port not found : positionId: 1 -> COM3
+2025-06-18 15:25:40.350 DEBUG ApplicationLauncher:4032 - dutExecuteCommand: responseData: COM3 not found
+2025-06-18 15:25:40.854 INFO  ApplicationLauncher:1038 - load_saved_device_settings: DUT6_PortSelection: Data not retrieved from DB
+2025-06-18 15:25:40.855 INFO  ApplicationLauncher:1056 - load_saved_device_settings: DUT7_PortSelection: Data not retrieved from DB
+2025-06-18 15:25:40.855 INFO  ApplicationLauncher:1074 - load_saved_device_settings: DUT8_PortSelection: Data not retrieved from DB
+2025-06-18 15:25:40.855 INFO  ApplicationLauncher:1092 - load_saved_device_settings: DUT9_PortSelection: Data not retrieved from DB
+2025-06-18 15:25:40.855 INFO  ApplicationLauncher:1110 - load_saved_device_settings: DUT10_PortSelection: Data not retrieved from DB
+2025-06-18 15:25:40.855 INFO  ApplicationLauncher:1130 - load_saved_device_settings: DUT11_PortSelection: Data not retrieved from DB
+2025-06-18 15:25:40.855 INFO  ApplicationLauncher:1150 - load_saved_device_settings: DUT12_PortSelection: Data not retrieved from DB
+2025-06-18 15:25:40.856 INFO  ApplicationLauncher:1168 - load_saved_device_settings: DUT13_PortSelection: Data not retrieved from DB
+2025-06-18 15:25:40.856 INFO  ApplicationLauncher:1186 - load_saved_device_settings: DUT14_PortSelection: Data not retrieved from DB
+2025-06-18 15:25:40.856 INFO  ApplicationLauncher:1204 - load_saved_device_settings: DUT15_PortSelection: Data not retrieved from DB
+2025-06-18 15:25:40.856 INFO  ApplicationLauncher:1222 - load_saved_device_settings: DUT16_PortSelection: Data not retrieved from DB
+2025-06-18 15:25:40.856 INFO  ApplicationLauncher:1240 - load_saved_device_settings: DUT17_PortSelection: Data not retrieved from DB
+2025-06-18 15:25:40.856 INFO  ApplicationLauncher:1258 - load_saved_device_settings: DUT18_PortSelection: Data not retrieved from DB
+2025-06-18 15:25:40.856 INFO  ApplicationLauncher:1276 - load_saved_device_settings: DUT19_PortSelection: Data not retrieved from DB
+2025-06-18 15:25:40.857 INFO  ApplicationLauncher:1294 - load_saved_device_settings: DUT20_PortSelection: Data not retrieved from DB
+2025-06-18 15:25:40.857 INFO  ApplicationLauncher:1313 - load_saved_device_settings: DUT21_PortSelection: Data not retrieved from DB
+2025-06-18 15:25:40.857 INFO  ApplicationLauncher:1333 - load_saved_device_settings: DUT22_PortSelection: Data not retrieved from DB
+2025-06-18 15:25:40.857 INFO  ApplicationLauncher:1351 - load_saved_device_settings: DUT23_PortSelection: Data not retrieved from DB
+2025-06-18 15:25:40.857 INFO  ApplicationLauncher:1369 - load_saved_device_settings: DUT24_PortSelection: Data not retrieved from DB
+2025-06-18 15:25:40.857 INFO  ApplicationLauncher:1387 - load_saved_device_settings: DUT25_PortSelection: Data not retrieved from DB
+2025-06-18 15:25:40.858 INFO  ApplicationLauncher:1405 - load_saved_device_settings: DUT26_PortSelection: Data not retrieved from DB
+2025-06-18 15:25:40.858 INFO  ApplicationLauncher:1423 - load_saved_device_settings: DUT27_PortSelection: Data not retrieved from DB
+2025-06-18 15:25:40.858 INFO  ApplicationLauncher:1441 - load_saved_device_settings: DUT28_PortSelection: Data not retrieved from DB
+2025-06-18 15:25:40.858 INFO  ApplicationLauncher:1459 - load_saved_device_settings: DUT29_PortSelection: Data not retrieved from DB
+2025-06-18 15:25:40.858 INFO  ApplicationLauncher:1477 - load_saved_device_settings: DUT30_PortSelection: Data not retrieved from DB
+2025-06-18 15:25:40.858 INFO  ApplicationLauncher:1496 - load_saved_device_settings: DUT31_PortSelection: Data not retrieved from DB
+2025-06-18 15:25:40.860 INFO  ApplicationLauncher:1516 - load_saved_device_settings: DUT32_PortSelection: Data not retrieved from DB
+2025-06-18 15:25:40.860 INFO  ApplicationLauncher:1534 - load_saved_device_settings: DUT33_PortSelection: Data not retrieved from DB
+2025-06-18 15:25:40.860 INFO  ApplicationLauncher:1552 - load_saved_device_settings: DUT34_PortSelection: Data not retrieved from DB
+2025-06-18 15:25:40.860 INFO  ApplicationLauncher:1570 - load_saved_device_settings: DUT35_PortSelection: Data not retrieved from DB
+2025-06-18 15:25:40.860 INFO  ApplicationLauncher:1588 - load_saved_device_settings: DUT36_PortSelection: Data not retrieved from DB
+2025-06-18 15:25:40.861 INFO  ApplicationLauncher:1606 - load_saved_device_settings: DUT37_PortSelection: Data not retrieved from DB
+2025-06-18 15:25:40.861 INFO  ApplicationLauncher:1624 - load_saved_device_settings: DUT38_PortSelection: Data not retrieved from DB
+2025-06-18 15:25:40.861 INFO  ApplicationLauncher:1642 - load_saved_device_settings: DUT39_PortSelection: Data not retrieved from DB
+2025-06-18 15:25:40.861 INFO  ApplicationLauncher:1660 - load_saved_device_settings: DUT40_PortSelection: Data not retrieved from DB
+2025-06-18 15:25:40.861 INFO  ApplicationLauncher:1916 - load_saved_device_settings: DUT6_BaudRate: Data not retrieved from DB
+2025-06-18 15:25:40.861 INFO  ApplicationLauncher:1933 - load_saved_device_settings: DUT7_BaudRate: Data not retrieved from DB
+2025-06-18 15:25:40.862 INFO  ApplicationLauncher:1950 - load_saved_device_settings: DUT8_BaudRate: Data not retrieved from DB
+2025-06-18 15:25:40.862 INFO  ApplicationLauncher:1967 - load_saved_device_settings: DUT9_BaudRate: Data not retrieved from DB
+2025-06-18 15:25:40.862 INFO  ApplicationLauncher:1984 - load_saved_device_settings: DUT10_BaudRate: Data not retrieved from DB
+2025-06-18 15:25:40.862 INFO  ApplicationLauncher:2001 - load_saved_device_settings: DUT11_BaudRate: Data not retrieved from DB
+2025-06-18 15:25:40.862 INFO  ApplicationLauncher:2018 - load_saved_device_settings: DUT12_BaudRate: Data not retrieved from DB
+2025-06-18 15:25:40.863 INFO  ApplicationLauncher:2035 - load_saved_device_settings: DUT13_BaudRate: Data not retrieved from DB
+2025-06-18 15:25:40.863 INFO  ApplicationLauncher:2052 - load_saved_device_settings: DUT14_BaudRate: Data not retrieved from DB
+2025-06-18 15:25:40.863 INFO  ApplicationLauncher:2069 - load_saved_device_settings: DUT15_BaudRate: Data not retrieved from DB
+2025-06-18 15:25:40.863 INFO  ApplicationLauncher:2086 - load_saved_device_settings: DUT16_BaudRate: Data not retrieved from DB
+2025-06-18 15:25:40.864 INFO  ApplicationLauncher:2103 - load_saved_device_settings: DUT17_BaudRate: Data not retrieved from DB
+2025-06-18 15:25:40.864 INFO  ApplicationLauncher:2120 - load_saved_device_settings: DUT18_BaudRate: Data not retrieved from DB
+2025-06-18 15:25:40.864 INFO  ApplicationLauncher:2137 - load_saved_device_settings: DUT19_BaudRate: Data not retrieved from DB
+2025-06-18 15:25:40.864 INFO  ApplicationLauncher:2154 - load_saved_device_settings: DUT20_BaudRate: Data not retrieved from DB
+2025-06-18 15:25:40.864 INFO  ApplicationLauncher:2171 - load_saved_device_settings: DUT21_BaudRate: Data not retrieved from DB
+2025-06-18 15:25:40.865 INFO  ApplicationLauncher:2188 - load_saved_device_settings: DUT22_BaudRate: Data not retrieved from DB
+2025-06-18 15:25:40.865 INFO  ApplicationLauncher:2205 - load_saved_device_settings: DUT23_BaudRate: Data not retrieved from DB
+2025-06-18 15:25:40.865 INFO  ApplicationLauncher:2222 - load_saved_device_settings: DUT24_BaudRate: Data not retrieved from DB
+2025-06-18 15:25:40.865 INFO  ApplicationLauncher:2239 - load_saved_device_settings: DUT25_BaudRate: Data not retrieved from DB
+2025-06-18 15:25:40.866 INFO  ApplicationLauncher:2256 - load_saved_device_settings: DUT26_BaudRate: Data not retrieved from DB
+2025-06-18 15:25:40.866 INFO  ApplicationLauncher:2273 - load_saved_device_settings: DUT27_BaudRate: Data not retrieved from DB
+2025-06-18 15:25:40.866 INFO  ApplicationLauncher:2290 - load_saved_device_settings: DUT28_BaudRate: Data not retrieved from DB
+2025-06-18 15:25:40.866 INFO  ApplicationLauncher:2307 - load_saved_device_settings: DUT29_BaudRate: Data not retrieved from DB
+2025-06-18 15:25:40.866 INFO  ApplicationLauncher:2324 - load_saved_device_settings: DUT30_BaudRate: Data not retrieved from DB
+2025-06-18 15:25:40.867 INFO  ApplicationLauncher:2341 - load_saved_device_settings: DUT31_BaudRate: Data not retrieved from DB
+2025-06-18 15:25:40.867 INFO  ApplicationLauncher:2358 - load_saved_device_settings: DUT32_BaudRate: Data not retrieved from DB
+2025-06-18 15:25:40.867 INFO  ApplicationLauncher:2375 - load_saved_device_settings: DUT33_BaudRate: Data not retrieved from DB
+2025-06-18 15:25:40.867 INFO  ApplicationLauncher:2392 - load_saved_device_settings: DUT34_BaudRate: Data not retrieved from DB
+2025-06-18 15:25:40.867 INFO  ApplicationLauncher:2409 - load_saved_device_settings: DUT35_BaudRate: Data not retrieved from DB
+2025-06-18 15:25:40.868 INFO  ApplicationLauncher:2426 - load_saved_device_settings: DUT36_BaudRate: Data not retrieved from DB
+2025-06-18 15:25:40.868 INFO  ApplicationLauncher:2443 - load_saved_device_settings: DUT37_BaudRate: Data not retrieved from DB
+2025-06-18 15:25:40.868 INFO  ApplicationLauncher:2460 - load_saved_device_settings: DUT38_BaudRate: Data not retrieved from DB
+2025-06-18 15:25:40.868 INFO  ApplicationLauncher:2477 - load_saved_device_settings: DUT39_BaudRate: Data not retrieved from DB
+2025-06-18 15:25:40.868 INFO  ApplicationLauncher:2494 - load_saved_device_settings: DUT40_BaudRate: Data not retrieved from DB
+2025-06-18 15:25:40.869 DEBUG ApplicationLauncher:1872 - setSkipCurrentTP_Execution :Entry:status:false
+2025-06-18 15:25:40.869 INFO  ApplicationLauncher:522 - DutPortSetupController : applyUacSettings :  Entry
+2025-06-18 15:25:40.875 WARN  javafx:61 - Loading FXML document with JavaFX API of version 20.0.1 by JavaFX runtime of version 8.0.161
+2025-06-18 15:25:40.932 INFO  ApplicationLauncher:73 - ConfigProperty.SECOND_VALIDATION_WAIT_TIME80
+2025-06-18 15:25:40.932 INFO  ApplicationLauncher:74 - ConfigProperty.SECOND_VALIDATION_RETRY_COUNT8
+2025-06-18 15:25:40.933 INFO  ApplicationLauncher:194 - StabilizationValidationController : applyUacSettings :  Entry
+2025-06-18 15:25:40.936 WARN  javafx:61 - Loading FXML document with JavaFX API of version 20.0.1 by JavaFX runtime of version 8.0.161
+2025-06-18 15:25:40.987 INFO  ApplicationLauncher:250 - UserList: {"No_of_users":6,"User_list":[{"access_level":"Tester","password":"Vikram","username":"Mohan"},{"access_level":"Admin","password":"admin","username":"admin"},{"access_level":"Read Only","password":"readonly","username":"Prasanth"},{"access_level":"Read Only","password":"12345","username":"ram"},{"access_level":"Maintenance","password":"lscs12345","username":"calib"},{"access_level":"Maintenance","password":"lscs12345","username":"selftest"}]}
+2025-06-18 15:25:40.989 WARN  javafx:61 - Loading FXML document with JavaFX API of version 20.0.1 by JavaFX runtime of version 8.0.161
+2025-06-18 15:25:41.010 WARN  javafx:61 - Loading FXML document with JavaFX API of version 20.0.1 by JavaFX runtime of version 8.0.161
+2025-06-18 15:25:41.023 INFO  ApplicationLauncher:123 - initialize
+2025-06-18 15:25:41.033 INFO  ApplicationLauncher:692 - BackupDBController : applyUacSettings :  Entry
+2025-06-18 15:25:41.036 WARN  javafx:61 - Loading FXML document with JavaFX API of version 20.0.1 by JavaFX runtime of version 8.0.161
+2025-06-18 15:25:41.037 INFO  ApplicationLauncher:48 - ReportSubMenuController: LoadAllChild_FXML:Entry
+2025-06-18 15:25:41.041 WARN  javafx:61 - Loading FXML document with JavaFX API of version 17 by JavaFX runtime of version 8.0.161
+2025-06-18 15:25:41.045 INFO  ApplicationLauncher:186 - LoadTestTypes : Entry
+2025-06-18 15:25:41.045 INFO  ApplicationLauncher:194 - LoadParameters : Entry
+2025-06-18 15:25:41.045 INFO  ApplicationLauncher:540 - LoadSavedData : test_type: UnbalancedLoad
+2025-06-18 15:25:41.050 INFO  ApplicationLauncher:544 - LoadSavedData : report_header_arr: []
+2025-06-18 15:25:41.050 INFO  ApplicationLauncher:255 - LoadExtensions : Entry
+2025-06-18 15:25:41.051 INFO  ApplicationLauncher:511 - extension_on_click : Entry 
+2025-06-18 15:25:41.051 INFO  ApplicationLauncher:122 - ReportHeaderConfigController : applyUacSettings :  Entry
+2025-06-18 15:25:41.055 WARN  javafx:61 - Loading FXML document with JavaFX API of version 17 by JavaFX runtime of version 8.0.161
+2025-06-18 15:25:41.064 INFO  ApplicationLauncher:408 - LoadSavedData : Entry: 
+2025-06-18 15:25:41.068 INFO  ApplicationLauncher:415 - LoadSavedData : report_excel_arr: []
+2025-06-18 15:25:41.068 INFO  ApplicationLauncher:436 - LoadSavedData : saved_values: [[], []]
+2025-06-18 15:25:41.068 INFO  ApplicationLauncher:388 - LoadTable : table: table_page_excel
+2025-06-18 15:25:41.068 INFO  ApplicationLauncher:389 - LoadTable : headers: [1.0, 0.5L]
+2025-06-18 15:25:41.069 INFO  ApplicationLauncher:390 - LoadTable : values: []
+2025-06-18 15:25:41.069 INFO  ApplicationLauncher:399 - LoadTable : Mismatch 
+2025-06-18 15:25:41.070 INFO  ApplicationLauncher:388 - LoadTable : table: table_sec_excel
+2025-06-18 15:25:41.070 INFO  ApplicationLauncher:389 - LoadTable : headers: [All Phase, R Phase, Y Phase, B Phase]
+2025-06-18 15:25:41.071 INFO  ApplicationLauncher:390 - LoadTable : values: []
+2025-06-18 15:25:41.071 INFO  ApplicationLauncher:399 - LoadTable : Mismatch 
+2025-06-18 15:25:41.071 INFO  ApplicationLauncher:128 - ReportExcelConfigController : applyUacSettings :  Entry
+2025-06-18 15:25:41.075 WARN  javafx:61 - Loading FXML document with JavaFX API of version 17 by JavaFX runtime of version 8.0.161
+2025-06-18 15:25:41.082 INFO  ApplicationLauncher:101 - ReportFileLocationController : applyUacSettings :  Entry
+2025-06-18 15:25:41.082 INFO  ApplicationLauncher:81 - ReportSubMenuController : applyUacSettings :  Entry
+2025-06-18 15:25:41.089 WARN  javafx:61 - Loading FXML document with JavaFX API of version 20.0.1 by JavaFX runtime of version 8.0.161
+2025-06-18 15:25:48.333 INFO  ApplicationLauncher:2122 - sp_ltadd_device_settings : count: 2
+2025-06-18 15:25:48.333 INFO  ApplicationLauncher:2130 - sp_ltadd_device_settings: DB failed: 
+2025-06-18 15:25:48.334 INFO  ApplicationLauncher:722 - Device Settings create: Failure
+2025-06-18 15:25:48.341 INFO  ApplicationLauncher:2122 - sp_ltadd_device_settings : count: 1
+2025-06-18 15:25:48.341 INFO  ApplicationLauncher:2125 - sp_ltadd_device_settings: DB Success: 
+2025-06-18 15:25:48.341 INFO  ApplicationLauncher:719 - Device Settings create: Success
+2025-06-18 15:25:48.347 INFO  ApplicationLauncher:2122 - sp_ltadd_device_settings : count: 1
+2025-06-18 15:25:48.347 INFO  ApplicationLauncher:2125 - sp_ltadd_device_settings: DB Success: 
+2025-06-18 15:25:48.347 INFO  ApplicationLauncher:719 - Device Settings create: Success
+2025-06-18 15:25:48.352 INFO  ApplicationLauncher:2122 - sp_ltadd_device_settings : count: 1
+2025-06-18 15:25:48.352 INFO  ApplicationLauncher:2125 - sp_ltadd_device_settings: DB Success: 
+2025-06-18 15:25:48.352 INFO  ApplicationLauncher:719 - Device Settings create: Success
+2025-06-18 15:25:48.356 INFO  ApplicationLauncher:2122 - sp_ltadd_device_settings : count: 1
+2025-06-18 15:25:48.356 INFO  ApplicationLauncher:2125 - sp_ltadd_device_settings: DB Success: 
+2025-06-18 15:25:48.356 INFO  ApplicationLauncher:719 - Device Settings create: Success
+2025-06-18 15:25:48.359 INFO  ApplicationLauncher:93 - TriggerUserInfoPlatFormLater :Exit
+2025-06-18 15:25:48.359 INFO  ApplicationLauncher:178 - UserInfoPlatFormRunnable entry
+2025-06-18 15:25:49.361 INFO  ApplicationLauncher:194 - UserInfoPlatFormRunnable exit
+2025-06-18 15:25:51.022 INFO  ApplicationLauncher:369 - You clicked Running Status Icon!
+2025-06-18 15:25:51.062 INFO  ApplicationLauncher:397 - Loading ProjectExecution
+2025-06-18 15:25:51.062 WARN  javafx:61 - Loading FXML document with JavaFX API of version 23.0.1 by JavaFX runtime of version 8.0.161
+2025-06-18 15:25:51.208 DEBUG ApplicationLauncher:562 - FanProjectExecuteController: initialize: 
+2025-06-18 15:25:56.442 WARN  javafx:61 - Loading FXML document with JavaFX API of version 23.0.1 by JavaFX runtime of version 8.0.161
+2025-06-18 15:25:56.477 DEBUG ApplicationLauncher:101 - ThreePhaseController : initialize: 
+2025-06-18 15:25:58.425 INFO  ApplicationLauncher:2831 - btnVoltageMainsOnOnClick: Entry
+2025-06-18 15:25:58.475 INFO  ApplicationLauncher:3036 - MainsOnTask: Entry
+2025-06-18 15:25:58.475 INFO  ApplicationLauncher:4159 - MainsOnTask: Entry
+2025-06-18 15:25:58.482 INFO  ApplicationLauncher:4699 - dutCommandExecuteStart : ENTRY
+2025-06-18 15:25:58.482 DEBUG ApplicationLauncher:4001 - dutExecuteCommand: positionId:1
+2025-06-18 15:26:10.209 INFO  ApplicationLauncher:130 - Existing ComPort ID:COM5
+2025-06-18 15:26:10.307 DEBUG ApplicationLauncher:3571 - serialConnectDutX : portMap : {COM5=gnu.io.CommPortIdentifier@39be2243}
+2025-06-18 15:26:10.310 DEBUG ApplicationLauncher:3574 - serialConnectDutX : serial port DUTCommBaudRate : 9600
+2025-06-18 15:26:10.310 DEBUG ApplicationLauncher:305 - DutX_Init :Entry
+2025-06-18 15:26:10.310 DEBUG ApplicationLauncher:5764 - DutX_CommInit :Entry
+2025-06-18 15:26:10.310 DEBUG ApplicationLauncher:6117 - DutSerialDataManager: SetSerialCommV2 :Entry
+2025-06-18 15:26:10.310 DEBUG ApplicationLauncher:6118 - DutSerialDataManager: SerialPort_ID : COM5
+2025-06-18 15:26:10.338 INFO  ApplicationLauncher:177 - SerialCom:COM5 opened successfully.
+2025-06-18 15:26:10.338 INFO  ApplicationLauncher:211 - SerialCom:initIOStream
+2025-06-18 15:26:10.339 INFO  ApplicationLauncher:6128 - DutSerialDataManager: PortDeviceMapping:SerialCommDUT:true
+2025-06-18 15:26:10.340 INFO  ApplicationLauncher:325 - DutX_Init : Exit
+2025-06-18 15:26:10.340 DEBUG ApplicationLauncher:3584 - serialConnectDutX : serial port connected : positionId: 1 -> COM5
+2025-06-18 15:26:10.340 DEBUG ApplicationLauncher:3735 - dutSendCmd :Entry : positionId : 1
+2025-06-18 15:26:10.340 DEBUG ApplicationLauncher:90 - ClearSerialData :Entry
+2025-06-18 15:26:10.341 DEBUG ApplicationLauncher:3795 - dutSendCmd : absoluteCommandInAscii : MAINS_ON
+ : position id : 1
+2025-06-18 15:26:10.341 DEBUG ApplicationLauncher:3796 - dutSendCmd : expectedResponseInHex length: 20 : position id : 1
+2025-06-18 15:26:10.341 DEBUG ApplicationLauncher:6141 - calibrationSendCommand :Entry
+2025-06-18 15:26:10.341 DEBUG ApplicationLauncher:6143 - calibrationSendCommand : data: MAINS_ON
+
+2025-06-18 15:26:10.341 DEBUG ApplicationLauncher:3060 - WriteToSerialCommDUT1 :Data:MAINS_ON
+
+2025-06-18 15:26:10.543 DEBUG ApplicationLauncher:3853 - dutReadDataV2 :Entry  : position id : 1
+2025-06-18 15:26:10.543 DEBUG ApplicationLauncher:3862 - dutReadDataV2: setExpectedResult: Hex   :4D41494E535F4F4E5F53 : position id : 1
+2025-06-18 15:26:10.544 DEBUG ApplicationLauncher:3863 - dutReadDataV2: setExpectedResult: Ascii :MAINS_ON_S : position id : 1
+2025-06-18 15:26:10.544 DEBUG ApplicationLauncher:3864 - dutReadDataV2: setExpectedLength:34 : position id : 1
+2025-06-18 15:26:10.552 INFO  ApplicationLauncher:82 - setNumberOfReadingRequired: numberOfReadings: 1
+2025-06-18 15:26:10.552 INFO  ApplicationLauncher:66 - DUT SerialReponseTimerStart :DUT_Task Triggered:
+2025-06-18 15:26:10.754 INFO  ApplicationLauncher:109 - calibrationMenuTaskV2: CurrentSerialData: 
+2025-06-18 15:26:10.755 INFO  ApplicationLauncher:111 - getExpectedLength():34
+2025-06-18 15:26:10.840 INFO  ApplicationLauncher:213 - renewTaskV2 : dut :
+2025-06-18 15:26:11.051 INFO  ApplicationLauncher:109 - calibrationMenuTaskV2: CurrentSerialData: 
+2025-06-18 15:26:11.051 INFO  ApplicationLauncher:111 - getExpectedLength():34
+2025-06-18 15:26:11.051 INFO  ApplicationLauncher:213 - renewTaskV2 : dut :
+2025-06-18 15:26:11.254 INFO  ApplicationLauncher:109 - calibrationMenuTaskV2: CurrentSerialData: 
+2025-06-18 15:26:11.254 INFO  ApplicationLauncher:111 - getExpectedLength():34
+2025-06-18 15:26:11.255 INFO  ApplicationLauncher:213 - renewTaskV2 : dut :
+2025-06-18 15:26:11.455 INFO  ApplicationLauncher:109 - calibrationMenuTaskV2: CurrentSerialData: 
+2025-06-18 15:26:11.455 INFO  ApplicationLauncher:111 - getExpectedLength():34
+2025-06-18 15:26:11.455 INFO  ApplicationLauncher:213 - renewTaskV2 : dut :
+2025-06-18 15:26:11.660 INFO  ApplicationLauncher:109 - calibrationMenuTaskV2: CurrentSerialData: 
+2025-06-18 15:26:11.660 INFO  ApplicationLauncher:111 - getExpectedLength():34
+2025-06-18 15:26:11.660 INFO  ApplicationLauncher:213 - renewTaskV2 : dut :
+2025-06-18 15:26:11.862 INFO  ApplicationLauncher:109 - calibrationMenuTaskV2: CurrentSerialData: 
+2025-06-18 15:26:11.862 INFO  ApplicationLauncher:111 - getExpectedLength():34
+2025-06-18 15:26:11.862 INFO  ApplicationLauncher:213 - renewTaskV2 : dut :
+2025-06-18 15:26:12.063 INFO  ApplicationLauncher:109 - calibrationMenuTaskV2: CurrentSerialData: 
+2025-06-18 15:26:12.063 INFO  ApplicationLauncher:111 - getExpectedLength():34
+2025-06-18 15:26:12.063 INFO  ApplicationLauncher:213 - renewTaskV2 : dut :
+2025-06-18 15:26:12.265 INFO  ApplicationLauncher:109 - calibrationMenuTaskV2: CurrentSerialData: 
+2025-06-18 15:26:12.265 INFO  ApplicationLauncher:111 - getExpectedLength():34
+2025-06-18 15:26:12.266 INFO  ApplicationLauncher:213 - renewTaskV2 : dut :
+2025-06-18 15:26:12.467 INFO  ApplicationLauncher:109 - calibrationMenuTaskV2: CurrentSerialData: 
+2025-06-18 15:26:12.467 INFO  ApplicationLauncher:111 - getExpectedLength():34
+2025-06-18 15:26:12.467 INFO  ApplicationLauncher:213 - renewTaskV2 : dut :
+2025-06-18 15:26:12.670 INFO  ApplicationLauncher:109 - calibrationMenuTaskV2: CurrentSerialData: 
+2025-06-18 15:26:12.670 INFO  ApplicationLauncher:111 - getExpectedLength():34
+2025-06-18 15:26:12.670 INFO  ApplicationLauncher:213 - renewTaskV2 : dut :
+2025-06-18 15:26:12.885 INFO  ApplicationLauncher:109 - calibrationMenuTaskV2: CurrentSerialData: 
+2025-06-18 15:26:12.886 INFO  ApplicationLauncher:111 - getExpectedLength():34
+2025-06-18 15:26:12.886 INFO  ApplicationLauncher:213 - renewTaskV2 : dut :
+2025-06-18 15:26:13.091 INFO  ApplicationLauncher:109 - calibrationMenuTaskV2: CurrentSerialData: 
+2025-06-18 15:26:13.091 INFO  ApplicationLauncher:111 - getExpectedLength():34
+2025-06-18 15:26:13.091 INFO  ApplicationLauncher:213 - renewTaskV2 : dut :
+2025-06-18 15:26:13.306 INFO  ApplicationLauncher:109 - calibrationMenuTaskV2: CurrentSerialData: 
+2025-06-18 15:26:13.308 INFO  ApplicationLauncher:111 - getExpectedLength():34
+2025-06-18 15:26:13.311 INFO  ApplicationLauncher:213 - renewTaskV2 : dut :
+2025-06-18 15:26:13.523 INFO  ApplicationLauncher:109 - calibrationMenuTaskV2: CurrentSerialData: 
+2025-06-18 15:26:13.524 INFO  ApplicationLauncher:111 - getExpectedLength():34
+2025-06-18 15:26:13.524 INFO  ApplicationLauncher:213 - renewTaskV2 : dut :
+2025-06-18 15:26:13.726 INFO  ApplicationLauncher:109 - calibrationMenuTaskV2: CurrentSerialData: 
+2025-06-18 15:26:13.726 INFO  ApplicationLauncher:111 - getExpectedLength():34
+2025-06-18 15:26:13.727 INFO  ApplicationLauncher:213 - renewTaskV2 : dut :
+2025-06-18 15:26:13.928 INFO  ApplicationLauncher:109 - calibrationMenuTaskV2: CurrentSerialData: 
+2025-06-18 15:26:13.928 INFO  ApplicationLauncher:111 - getExpectedLength():34
+2025-06-18 15:26:13.928 INFO  ApplicationLauncher:213 - renewTaskV2 : dut :
+2025-06-18 15:26:14.132 INFO  ApplicationLauncher:109 - calibrationMenuTaskV2: CurrentSerialData: 
+2025-06-18 15:26:14.132 INFO  ApplicationLauncher:111 - getExpectedLength():34
+2025-06-18 15:26:14.132 INFO  ApplicationLauncher:213 - renewTaskV2 : dut :
+2025-06-18 15:26:14.335 INFO  ApplicationLauncher:109 - calibrationMenuTaskV2: CurrentSerialData: 
+2025-06-18 15:26:14.335 INFO  ApplicationLauncher:111 - getExpectedLength():34
+2025-06-18 15:26:14.336 INFO  ApplicationLauncher:213 - renewTaskV2 : dut :
+2025-06-18 15:26:14.539 INFO  ApplicationLauncher:109 - calibrationMenuTaskV2: CurrentSerialData: 
+2025-06-18 15:26:14.540 INFO  ApplicationLauncher:111 - getExpectedLength():34
+2025-06-18 15:26:14.542 INFO  ApplicationLauncher:213 - renewTaskV2 : dut :
+2025-06-18 15:26:14.757 INFO  ApplicationLauncher:109 - calibrationMenuTaskV2: CurrentSerialData: 
+2025-06-18 15:26:14.758 INFO  ApplicationLauncher:111 - getExpectedLength():34
+2025-06-18 15:26:14.758 INFO  ApplicationLauncher:213 - renewTaskV2 : dut :
+2025-06-18 15:26:14.959 INFO  ApplicationLauncher:109 - calibrationMenuTaskV2: CurrentSerialData: 
+2025-06-18 15:26:14.961 INFO  ApplicationLauncher:111 - getExpectedLength():34
+2025-06-18 15:26:14.961 INFO  ApplicationLauncher:213 - renewTaskV2 : dut :
+2025-06-18 15:26:15.175 INFO  ApplicationLauncher:109 - calibrationMenuTaskV2: CurrentSerialData: 
+2025-06-18 15:26:15.175 INFO  ApplicationLauncher:111 - getExpectedLength():34
+2025-06-18 15:26:15.175 INFO  ApplicationLauncher:213 - renewTaskV2 : dut :
+2025-06-18 15:26:15.377 INFO  ApplicationLauncher:109 - calibrationMenuTaskV2: CurrentSerialData: 
+2025-06-18 15:26:15.377 INFO  ApplicationLauncher:111 - getExpectedLength():34
+2025-06-18 15:26:15.377 INFO  ApplicationLauncher:213 - renewTaskV2 : dut :
+2025-06-18 15:26:15.579 INFO  ApplicationLauncher:109 - calibrationMenuTaskV2: CurrentSerialData: 
+2025-06-18 15:26:15.579 INFO  ApplicationLauncher:111 - getExpectedLength():34
+2025-06-18 15:26:15.579 INFO  ApplicationLauncher:213 - renewTaskV2 : dut :
+2025-06-18 15:26:15.782 INFO  ApplicationLauncher:109 - calibrationMenuTaskV2: CurrentSerialData: 
+2025-06-18 15:26:15.783 INFO  ApplicationLauncher:111 - getExpectedLength():34
+2025-06-18 15:26:15.783 INFO  ApplicationLauncher:213 - renewTaskV2 : dut :
+2025-06-18 15:26:15.984 INFO  ApplicationLauncher:109 - calibrationMenuTaskV2: CurrentSerialData: 
+2025-06-18 15:26:15.984 INFO  ApplicationLauncher:111 - getExpectedLength():34
+2025-06-18 15:26:15.984 INFO  ApplicationLauncher:213 - renewTaskV2 : dut :
+2025-06-18 15:26:16.189 INFO  ApplicationLauncher:109 - calibrationMenuTaskV2: CurrentSerialData: 
+2025-06-18 15:26:16.190 INFO  ApplicationLauncher:111 - getExpectedLength():34
+2025-06-18 15:26:16.191 INFO  ApplicationLauncher:213 - renewTaskV2 : dut :
+2025-06-18 15:26:16.395 INFO  ApplicationLauncher:109 - calibrationMenuTaskV2: CurrentSerialData: 
+2025-06-18 15:26:16.395 INFO  ApplicationLauncher:111 - getExpectedLength():34
+2025-06-18 15:26:16.395 INFO  ApplicationLauncher:213 - renewTaskV2 : dut :
+2025-06-18 15:26:16.598 INFO  ApplicationLauncher:109 - calibrationMenuTaskV2: CurrentSerialData: 
+2025-06-18 15:26:16.598 INFO  ApplicationLauncher:111 - getExpectedLength():34
+2025-06-18 15:26:16.598 INFO  ApplicationLauncher:213 - renewTaskV2 : dut :
+2025-06-18 15:26:16.799 INFO  ApplicationLauncher:109 - calibrationMenuTaskV2: CurrentSerialData: 
+2025-06-18 15:26:16.799 INFO  ApplicationLauncher:111 - getExpectedLength():34
+2025-06-18 15:26:16.799 INFO  ApplicationLauncher:213 - renewTaskV2 : dut :
+2025-06-18 15:26:17.002 INFO  ApplicationLauncher:109 - calibrationMenuTaskV2: CurrentSerialData: 
+2025-06-18 15:26:17.002 INFO  ApplicationLauncher:111 - getExpectedLength():34
+2025-06-18 15:26:17.002 INFO  ApplicationLauncher:213 - renewTaskV2 : dut :
+2025-06-18 15:26:17.205 INFO  ApplicationLauncher:109 - calibrationMenuTaskV2: CurrentSerialData: 
+2025-06-18 15:26:17.205 INFO  ApplicationLauncher:111 - getExpectedLength():34
+2025-06-18 15:26:17.205 INFO  ApplicationLauncher:213 - renewTaskV2 : dut :
+2025-06-18 15:26:17.420 INFO  ApplicationLauncher:109 - calibrationMenuTaskV2: CurrentSerialData: 
+2025-06-18 15:26:17.420 INFO  ApplicationLauncher:111 - getExpectedLength():34
+2025-06-18 15:26:17.420 INFO  ApplicationLauncher:213 - renewTaskV2 : dut :
+2025-06-18 15:26:17.622 INFO  ApplicationLauncher:109 - calibrationMenuTaskV2: CurrentSerialData: 
+2025-06-18 15:26:17.622 INFO  ApplicationLauncher:111 - getExpectedLength():34
+2025-06-18 15:26:17.622 INFO  ApplicationLauncher:213 - renewTaskV2 : dut :
+2025-06-18 15:26:17.828 INFO  ApplicationLauncher:109 - calibrationMenuTaskV2: CurrentSerialData: 
+2025-06-18 15:26:17.829 INFO  ApplicationLauncher:111 - getExpectedLength():34
+2025-06-18 15:26:17.829 INFO  ApplicationLauncher:213 - renewTaskV2 : dut :
+2025-06-18 15:26:18.043 INFO  ApplicationLauncher:109 - calibrationMenuTaskV2: CurrentSerialData: 
+2025-06-18 15:26:18.043 INFO  ApplicationLauncher:111 - getExpectedLength():34
+2025-06-18 15:26:18.044 INFO  ApplicationLauncher:213 - renewTaskV2 : dut :
+2025-06-18 15:26:18.246 INFO  ApplicationLauncher:109 - calibrationMenuTaskV2: CurrentSerialData: 
+2025-06-18 15:26:18.247 INFO  ApplicationLauncher:111 - getExpectedLength():34
+2025-06-18 15:26:18.247 INFO  ApplicationLauncher:213 - renewTaskV2 : dut :
+2025-06-18 15:26:18.463 INFO  ApplicationLauncher:109 - calibrationMenuTaskV2: CurrentSerialData: 
+2025-06-18 15:26:18.463 INFO  ApplicationLauncher:111 - getExpectedLength():34
+2025-06-18 15:26:18.463 INFO  ApplicationLauncher:213 - renewTaskV2 : dut :
+2025-06-18 15:26:18.666 INFO  ApplicationLauncher:109 - calibrationMenuTaskV2: CurrentSerialData: 
+2025-06-18 15:26:18.667 INFO  ApplicationLauncher:111 - getExpectedLength():34
+2025-06-18 15:26:18.667 INFO  ApplicationLauncher:213 - renewTaskV2 : dut :
+2025-06-18 15:26:18.868 INFO  ApplicationLauncher:109 - calibrationMenuTaskV2: CurrentSerialData: 
+2025-06-18 15:26:18.868 INFO  ApplicationLauncher:111 - getExpectedLength():34
+2025-06-18 15:26:18.868 INFO  ApplicationLauncher:194 - calibrationMenuTaskV2 : Timer Exit:
+2025-06-18 15:26:19.009 INFO  ApplicationLauncher:3827 - dutSendCmd: Failed: Unexpected Data: CurrentDUT_Data2:  : position id : 1
+2025-06-18 15:26:19.009 INFO  ApplicationLauncher:3836 - dutSendCmd: timeOut Entry:  : position id : 1
+2025-06-18 15:26:19.010 INFO  ApplicationLauncher:3838 - dutSendCmd: timeOut countDown: 1 : position id : 1
+2025-06-18 15:26:20.022 INFO  ApplicationLauncher:3842 - dutSendCmd: timeOut Exit:  : position id : 1
+2025-06-18 15:26:20.022 DEBUG ApplicationLauncher:4014 - dutExecuteCommand: resultValue1:
+2025-06-18 15:26:20.022 DEBUG ApplicationLauncher:4027 - dutExecuteCommand: resultStatus2: F 
+2025-06-18 15:26:20.022 DEBUG ApplicationLauncher:4028 - dutExecuteCommand: resultValue2: Fail
+2025-06-18 15:26:36.859 INFO  ApplicationLauncher:2812 - btnFanRpmOnClick: Entry
+2025-06-18 15:26:36.929 DEBUG ApplicationLauncher:4001 - dutExecuteCommand: positionId:1
+2025-06-18 15:26:36.929 DEBUG ApplicationLauncher:3735 - dutSendCmd :Entry : positionId : 1
+2025-06-18 15:26:36.929 DEBUG ApplicationLauncher:90 - ClearSerialData :Entry
+2025-06-18 15:26:36.929 DEBUG ApplicationLauncher:3795 - dutSendCmd : absoluteCommandInAscii : READ_RPM
+ : position id : 1
+2025-06-18 15:26:36.930 DEBUG ApplicationLauncher:3796 - dutSendCmd : expectedResponseInHex length: 8 : position id : 1
+2025-06-18 15:26:36.930 DEBUG ApplicationLauncher:6141 - calibrationSendCommand :Entry
+2025-06-18 15:26:36.930 DEBUG ApplicationLauncher:6143 - calibrationSendCommand : data: READ_RPM
+
+2025-06-18 15:26:36.930 DEBUG ApplicationLauncher:3060 - WriteToSerialCommDUT1 :Data:READ_RPM
+
+2025-06-18 15:26:37.134 DEBUG ApplicationLauncher:3853 - dutReadDataV2 :Entry  : position id : 1
+2025-06-18 15:26:37.134 DEBUG ApplicationLauncher:3862 - dutReadDataV2: setExpectedResult: Hex   :72706D2C : position id : 1
+2025-06-18 15:26:37.134 DEBUG ApplicationLauncher:3863 - dutReadDataV2: setExpectedResult: Ascii :rpm, : position id : 1
+2025-06-18 15:26:37.134 DEBUG ApplicationLauncher:3864 - dutReadDataV2: setExpectedLength:22 : position id : 1
+2025-06-18 15:26:37.134 INFO  ApplicationLauncher:82 - setNumberOfReadingRequired: numberOfReadings: 1
+2025-06-18 15:26:37.134 INFO  ApplicationLauncher:66 - DUT SerialReponseTimerStart :DUT_Task Triggered:
+2025-06-18 15:26:37.336 INFO  ApplicationLauncher:109 - calibrationMenuTaskV2: CurrentSerialData: 72706D2C38312E30300D0A
+2025-06-18 15:26:37.336 INFO  ApplicationLauncher:111 - getExpectedLength():22
+2025-06-18 15:26:37.336 INFO  ApplicationLauncher:114 - calibrationMenuTaskV2: ExpectedData:72706D2C
+2025-06-18 15:26:37.336 DEBUG ApplicationLauncher:1020 - setLDU_ReadSerialData: Entry
+2025-06-18 15:26:37.336 DEBUG ApplicationLauncher:128 - calibrationMenuTaskV2 Expected Data received:Length2:22:CurrentData:72706D2C38312E30300D0A
+2025-06-18 15:26:37.336 INFO  ApplicationLauncher:194 - calibrationMenuTaskV2 : Timer Exit:
+2025-06-18 15:26:37.399 INFO  ApplicationLauncher:3814 - dutSendCmd: Expected recieved:72706D2C38312E30300D0A : position id : 1
+2025-06-18 15:26:37.399 DEBUG ApplicationLauncher:6791 - StripLDU_SerialData :Entry
+2025-06-18 15:26:37.399 DEBUG ApplicationLauncher:542 - StripLength:  LengthTobeDeleted: 22
+2025-06-18 15:26:37.399 DEBUG ApplicationLauncher:6795 - StripLDU_SerialData : getSerialData :
+2025-06-18 15:26:37.399 INFO  ApplicationLauncher:3821 - dutSendCmd: Expected recieved: readSerialNoInAscii:<81.00> : position id : 1
+2025-06-18 15:26:37.400 INFO  ApplicationLauncher:3836 - dutSendCmd: timeOut Entry:  : position id : 1
+2025-06-18 15:26:37.400 INFO  ApplicationLauncher:3838 - dutSendCmd: timeOut countDown: 1 : position id : 1
+2025-06-18 15:26:38.400 INFO  ApplicationLauncher:3842 - dutSendCmd: timeOut Exit:  : position id : 1
+2025-06-18 15:26:38.401 DEBUG ApplicationLauncher:4014 - dutExecuteCommand: resultValue1:81.00
+2025-06-18 15:26:38.401 DEBUG ApplicationLauncher:4027 - dutExecuteCommand: resultStatus2: P 
+2025-06-18 15:26:38.401 DEBUG ApplicationLauncher:4028 - dutExecuteCommand: resultValue2: 81.00
+2025-06-18 15:26:41.766 INFO  ApplicationLauncher:2831 - btnVoltageMainsOnOnClick: Entry
+2025-06-18 15:26:41.817 INFO  ApplicationLauncher:3036 - MainsOnTask: Entry
+2025-06-18 15:26:41.817 INFO  ApplicationLauncher:4159 - MainsOnTask: Entry
+2025-06-18 15:26:41.825 INFO  ApplicationLauncher:4699 - dutCommandExecuteStart : ENTRY
+2025-06-18 15:26:41.826 DEBUG ApplicationLauncher:4001 - dutExecuteCommand: positionId:1
+2025-06-18 15:26:41.826 DEBUG ApplicationLauncher:3735 - dutSendCmd :Entry : positionId : 1
+2025-06-18 15:26:41.826 DEBUG ApplicationLauncher:90 - ClearSerialData :Entry
+2025-06-18 15:26:41.826 DEBUG ApplicationLauncher:3795 - dutSendCmd : absoluteCommandInAscii : MAINS_ON
+ : position id : 1
+2025-06-18 15:26:41.826 DEBUG ApplicationLauncher:3796 - dutSendCmd : expectedResponseInHex length: 20 : position id : 1
+2025-06-18 15:26:41.826 DEBUG ApplicationLauncher:6141 - calibrationSendCommand :Entry
+2025-06-18 15:26:41.826 DEBUG ApplicationLauncher:6143 - calibrationSendCommand : data: MAINS_ON
+
+2025-06-18 15:26:41.826 DEBUG ApplicationLauncher:3060 - WriteToSerialCommDUT1 :Data:MAINS_ON
+
+2025-06-18 15:26:42.028 DEBUG ApplicationLauncher:3853 - dutReadDataV2 :Entry  : position id : 1
+2025-06-18 15:26:42.028 DEBUG ApplicationLauncher:3862 - dutReadDataV2: setExpectedResult: Hex   :4D41494E535F4F4E5F53 : position id : 1
+2025-06-18 15:26:42.028 DEBUG ApplicationLauncher:3863 - dutReadDataV2: setExpectedResult: Ascii :MAINS_ON_S : position id : 1
+2025-06-18 15:26:42.029 DEBUG ApplicationLauncher:3864 - dutReadDataV2: setExpectedLength:34 : position id : 1
+2025-06-18 15:26:42.030 INFO  ApplicationLauncher:82 - setNumberOfReadingRequired: numberOfReadings: 1
+2025-06-18 15:26:42.030 INFO  ApplicationLauncher:66 - DUT SerialReponseTimerStart :DUT_Task Triggered:
+2025-06-18 15:26:42.230 INFO  ApplicationLauncher:109 - calibrationMenuTaskV2: CurrentSerialData: 4D41494E535F4F4E5F530D0A
+2025-06-18 15:26:42.230 INFO  ApplicationLauncher:111 - getExpectedLength():34
+2025-06-18 15:26:42.230 DEBUG ApplicationLauncher:152 - calibrationMenuTaskV2 Expected Data received:Length4:24:CurrentData:4D41494E535F4F4E5F530D0A
+2025-06-18 15:26:42.230 DEBUG ApplicationLauncher:153 - calibrationMenuTaskV2 Expected Data received:Length4a:24:CurrentData:MAINS_ON_S
+
+2025-06-18 15:26:42.256 DEBUG ApplicationLauncher:156 - calibrationMenuTaskV2 : lastPatternMatchingCount : 0
+2025-06-18 15:26:42.256 DEBUG ApplicationLauncher:162 - calibrationMenuTaskV2 : adding messageTimeStampList : currentTimeEpoch: 1750240602
+2025-06-18 15:26:42.256 DEBUG ApplicationLauncher:168 - calibrationMenuTaskV2 : patternMatchingCount : 1
+2025-06-18 15:26:42.256 DEBUG ApplicationLauncher:171 - calibrationMenuTaskV2 : patternMatchingCount matched
+2025-06-18 15:26:42.256 DEBUG ApplicationLauncher:173 - calibrationMenuTaskV2 : terminatorCount :1
+2025-06-18 15:26:42.256 DEBUG ApplicationLauncher:180 - calibrationMenuTaskV2 : terminatorCount matched
+2025-06-18 15:26:42.256 DEBUG ApplicationLauncher:1020 - setLDU_ReadSerialData: Entry
+2025-06-18 15:26:42.256 DEBUG ApplicationLauncher:185 - calibrationMenuTaskV2 Expected Data received:Length5:24:CurrentData:4D41494E535F4F4E5F530D0A
+2025-06-18 15:26:42.256 DEBUG ApplicationLauncher:186 - calibrationMenuTaskV2 Expected Data received:Length5a:24:CurrentData:MAINS_ON_S
+
+2025-06-18 15:26:42.256 INFO  ApplicationLauncher:194 - calibrationMenuTaskV2 : Timer Exit:
+2025-06-18 15:26:42.280 INFO  ApplicationLauncher:3814 - dutSendCmd: Expected recieved:4D41494E535F4F4E5F530D0A : position id : 1
+2025-06-18 15:26:42.280 DEBUG ApplicationLauncher:6791 - StripLDU_SerialData :Entry
+2025-06-18 15:26:42.280 DEBUG ApplicationLauncher:542 - StripLength:  LengthTobeDeleted: 24
+2025-06-18 15:26:42.280 DEBUG ApplicationLauncher:6795 - StripLDU_SerialData : getSerialData :
+2025-06-18 15:26:42.280 INFO  ApplicationLauncher:3836 - dutSendCmd: timeOut Entry:  : position id : 1
+2025-06-18 15:26:42.280 INFO  ApplicationLauncher:3838 - dutSendCmd: timeOut countDown: 1 : position id : 1
+2025-06-18 15:26:43.281 INFO  ApplicationLauncher:3842 - dutSendCmd: timeOut Exit:  : position id : 1
+2025-06-18 15:26:43.281 DEBUG ApplicationLauncher:4014 - dutExecuteCommand: resultValue1:
+2025-06-18 15:26:43.281 DEBUG ApplicationLauncher:4027 - dutExecuteCommand: resultStatus2: P 
+2025-06-18 15:26:43.281 DEBUG ApplicationLauncher:4028 - dutExecuteCommand: resultValue2: Pass
+2025-06-18 15:26:44.481 INFO  ApplicationLauncher:2839 - btnVoltageMainsOffOnClick: Entry
+2025-06-18 15:26:44.545 INFO  ApplicationLauncher:4699 - dutCommandExecuteStart : ENTRY
+2025-06-18 15:26:44.545 DEBUG ApplicationLauncher:4001 - dutExecuteCommand: positionId:1
+2025-06-18 15:26:44.545 DEBUG ApplicationLauncher:3735 - dutSendCmd :Entry : positionId : 1
+2025-06-18 15:26:44.545 DEBUG ApplicationLauncher:90 - ClearSerialData :Entry
+2025-06-18 15:26:44.545 DEBUG ApplicationLauncher:3795 - dutSendCmd : absoluteCommandInAscii : MAINS_OFF
+ : position id : 1
+2025-06-18 15:26:44.545 DEBUG ApplicationLauncher:3796 - dutSendCmd : expectedResponseInHex length: 22 : position id : 1
+2025-06-18 15:26:44.545 DEBUG ApplicationLauncher:6141 - calibrationSendCommand :Entry
+2025-06-18 15:26:44.545 DEBUG ApplicationLauncher:6143 - calibrationSendCommand : data: MAINS_OFF
+
+2025-06-18 15:26:44.545 DEBUG ApplicationLauncher:3060 - WriteToSerialCommDUT1 :Data:MAINS_OFF
+
+2025-06-18 15:26:44.746 DEBUG ApplicationLauncher:3853 - dutReadDataV2 :Entry  : position id : 1
+2025-06-18 15:26:44.746 DEBUG ApplicationLauncher:3862 - dutReadDataV2: setExpectedResult: Hex   :4D41494E535F4F46465F53 : position id : 1
+2025-06-18 15:26:44.746 DEBUG ApplicationLauncher:3863 - dutReadDataV2: setExpectedResult: Ascii :MAINS_OFF_S : position id : 1
+2025-06-18 15:26:44.746 DEBUG ApplicationLauncher:3864 - dutReadDataV2: setExpectedLength:36 : position id : 1
+2025-06-18 15:26:44.748 INFO  ApplicationLauncher:82 - setNumberOfReadingRequired: numberOfReadings: 1
+2025-06-18 15:26:44.748 INFO  ApplicationLauncher:66 - DUT SerialReponseTimerStart :DUT_Task Triggered:
+2025-06-18 15:26:44.948 INFO  ApplicationLauncher:109 - calibrationMenuTaskV2: CurrentSerialData: 4D41494E535F4F46465F530D0A
+2025-06-18 15:26:44.948 INFO  ApplicationLauncher:111 - getExpectedLength():36
+2025-06-18 15:26:44.949 DEBUG ApplicationLauncher:152 - calibrationMenuTaskV2 Expected Data received:Length4:26:CurrentData:4D41494E535F4F46465F530D0A
+2025-06-18 15:26:44.949 DEBUG ApplicationLauncher:153 - calibrationMenuTaskV2 Expected Data received:Length4a:26:CurrentData:MAINS_OFF_S
+
+2025-06-18 15:26:44.949 DEBUG ApplicationLauncher:156 - calibrationMenuTaskV2 : lastPatternMatchingCount : 0
+2025-06-18 15:26:44.950 DEBUG ApplicationLauncher:162 - calibrationMenuTaskV2 : adding messageTimeStampList : currentTimeEpoch: 1750240604
+2025-06-18 15:26:44.950 DEBUG ApplicationLauncher:168 - calibrationMenuTaskV2 : patternMatchingCount : 1
+2025-06-18 15:26:44.950 DEBUG ApplicationLauncher:171 - calibrationMenuTaskV2 : patternMatchingCount matched
+2025-06-18 15:26:44.950 DEBUG ApplicationLauncher:173 - calibrationMenuTaskV2 : terminatorCount :1
+2025-06-18 15:26:44.950 DEBUG ApplicationLauncher:180 - calibrationMenuTaskV2 : terminatorCount matched
+2025-06-18 15:26:44.951 DEBUG ApplicationLauncher:1020 - setLDU_ReadSerialData: Entry
+2025-06-18 15:26:44.951 DEBUG ApplicationLauncher:185 - calibrationMenuTaskV2 Expected Data received:Length5:26:CurrentData:4D41494E535F4F46465F530D0A
+2025-06-18 15:26:44.951 DEBUG ApplicationLauncher:186 - calibrationMenuTaskV2 Expected Data received:Length5a:26:CurrentData:MAINS_OFF_S
+
+2025-06-18 15:26:44.951 INFO  ApplicationLauncher:194 - calibrationMenuTaskV2 : Timer Exit:
+2025-06-18 15:26:44.999 INFO  ApplicationLauncher:3814 - dutSendCmd: Expected recieved:4D41494E535F4F46465F530D0A : position id : 1
+2025-06-18 15:26:44.999 DEBUG ApplicationLauncher:6791 - StripLDU_SerialData :Entry
+2025-06-18 15:26:44.999 DEBUG ApplicationLauncher:542 - StripLength:  LengthTobeDeleted: 26
+2025-06-18 15:26:44.999 DEBUG ApplicationLauncher:6795 - StripLDU_SerialData : getSerialData :
+2025-06-18 15:26:44.999 INFO  ApplicationLauncher:3836 - dutSendCmd: timeOut Entry:  : position id : 1
+2025-06-18 15:26:44.999 INFO  ApplicationLauncher:3838 - dutSendCmd: timeOut countDown: 1 : position id : 1
+2025-06-18 15:26:45.999 INFO  ApplicationLauncher:3842 - dutSendCmd: timeOut Exit:  : position id : 1
+2025-06-18 15:26:45.999 DEBUG ApplicationLauncher:4014 - dutExecuteCommand: resultValue1:
+2025-06-18 15:26:45.999 DEBUG ApplicationLauncher:4027 - dutExecuteCommand: resultStatus2: P 
+2025-06-18 15:26:45.999 DEBUG ApplicationLauncher:4028 - dutExecuteCommand: resultValue2: Pass
+2025-06-18 15:26:53.994 INFO  ApplicationLauncher:2831 - btnVoltageMainsOnOnClick: Entry
+2025-06-18 15:26:54.045 INFO  ApplicationLauncher:3036 - MainsOnTask: Entry
+2025-06-18 15:26:54.045 INFO  ApplicationLauncher:4159 - MainsOnTask: Entry
+2025-06-18 15:26:54.052 INFO  ApplicationLauncher:4699 - dutCommandExecuteStart : ENTRY
+2025-06-18 15:26:54.052 DEBUG ApplicationLauncher:4001 - dutExecuteCommand: positionId:1
+2025-06-18 15:26:54.052 DEBUG ApplicationLauncher:3735 - dutSendCmd :Entry : positionId : 1
+2025-06-18 15:26:54.052 DEBUG ApplicationLauncher:90 - ClearSerialData :Entry
+2025-06-18 15:26:54.052 DEBUG ApplicationLauncher:3795 - dutSendCmd : absoluteCommandInAscii : MAINS_ON
+ : position id : 1
+2025-06-18 15:26:54.053 DEBUG ApplicationLauncher:3796 - dutSendCmd : expectedResponseInHex length: 20 : position id : 1
+2025-06-18 15:26:54.053 DEBUG ApplicationLauncher:6141 - calibrationSendCommand :Entry
+2025-06-18 15:26:54.053 DEBUG ApplicationLauncher:6143 - calibrationSendCommand : data: MAINS_ON
+
+2025-06-18 15:26:54.053 DEBUG ApplicationLauncher:3060 - WriteToSerialCommDUT1 :Data:MAINS_ON
+
+2025-06-18 15:26:54.253 DEBUG ApplicationLauncher:3853 - dutReadDataV2 :Entry  : position id : 1
+2025-06-18 15:26:54.253 DEBUG ApplicationLauncher:3862 - dutReadDataV2: setExpectedResult: Hex   :4D41494E535F4F4E5F53 : position id : 1
+2025-06-18 15:26:54.253 DEBUG ApplicationLauncher:3863 - dutReadDataV2: setExpectedResult: Ascii :MAINS_ON_S : position id : 1
+2025-06-18 15:26:54.253 DEBUG ApplicationLauncher:3864 - dutReadDataV2: setExpectedLength:34 : position id : 1
+2025-06-18 15:26:54.254 INFO  ApplicationLauncher:82 - setNumberOfReadingRequired: numberOfReadings: 1
+2025-06-18 15:26:54.254 INFO  ApplicationLauncher:66 - DUT SerialReponseTimerStart :DUT_Task Triggered:
+2025-06-18 15:26:54.455 INFO  ApplicationLauncher:109 - calibrationMenuTaskV2: CurrentSerialData: 4D41494E535F4F4E5F530D0A
+2025-06-18 15:26:54.455 INFO  ApplicationLauncher:111 - getExpectedLength():34
+2025-06-18 15:26:54.455 DEBUG ApplicationLauncher:152 - calibrationMenuTaskV2 Expected Data received:Length4:24:CurrentData:4D41494E535F4F4E5F530D0A
+2025-06-18 15:26:54.455 DEBUG ApplicationLauncher:153 - calibrationMenuTaskV2 Expected Data received:Length4a:24:CurrentData:MAINS_ON_S
+
+2025-06-18 15:26:54.455 DEBUG ApplicationLauncher:156 - calibrationMenuTaskV2 : lastPatternMatchingCount : 0
+2025-06-18 15:26:54.456 DEBUG ApplicationLauncher:162 - calibrationMenuTaskV2 : adding messageTimeStampList : currentTimeEpoch: 1750240614
+2025-06-18 15:26:54.456 DEBUG ApplicationLauncher:168 - calibrationMenuTaskV2 : patternMatchingCount : 1
+2025-06-18 15:26:54.456 DEBUG ApplicationLauncher:171 - calibrationMenuTaskV2 : patternMatchingCount matched
+2025-06-18 15:26:54.456 DEBUG ApplicationLauncher:173 - calibrationMenuTaskV2 : terminatorCount :1
+2025-06-18 15:26:54.456 DEBUG ApplicationLauncher:180 - calibrationMenuTaskV2 : terminatorCount matched
+2025-06-18 15:26:54.456 DEBUG ApplicationLauncher:1020 - setLDU_ReadSerialData: Entry
+2025-06-18 15:26:54.456 DEBUG ApplicationLauncher:185 - calibrationMenuTaskV2 Expected Data received:Length5:24:CurrentData:4D41494E535F4F4E5F530D0A
+2025-06-18 15:26:54.456 DEBUG ApplicationLauncher:186 - calibrationMenuTaskV2 Expected Data received:Length5a:24:CurrentData:MAINS_ON_S
+
+2025-06-18 15:26:54.457 INFO  ApplicationLauncher:194 - calibrationMenuTaskV2 : Timer Exit:
+2025-06-18 15:26:54.505 INFO  ApplicationLauncher:3814 - dutSendCmd: Expected recieved:4D41494E535F4F4E5F530D0A : position id : 1
+2025-06-18 15:26:54.505 DEBUG ApplicationLauncher:6791 - StripLDU_SerialData :Entry
+2025-06-18 15:26:54.505 DEBUG ApplicationLauncher:542 - StripLength:  LengthTobeDeleted: 24
+2025-06-18 15:26:54.505 DEBUG ApplicationLauncher:6795 - StripLDU_SerialData : getSerialData :
+2025-06-18 15:26:54.505 INFO  ApplicationLauncher:3836 - dutSendCmd: timeOut Entry:  : position id : 1
+2025-06-18 15:26:54.505 INFO  ApplicationLauncher:3838 - dutSendCmd: timeOut countDown: 1 : position id : 1
+2025-06-18 15:26:55.506 INFO  ApplicationLauncher:3842 - dutSendCmd: timeOut Exit:  : position id : 1
+2025-06-18 15:26:55.506 DEBUG ApplicationLauncher:4014 - dutExecuteCommand: resultValue1:
+2025-06-18 15:26:55.506 DEBUG ApplicationLauncher:4027 - dutExecuteCommand: resultStatus2: P 
+2025-06-18 15:26:55.506 DEBUG ApplicationLauncher:4028 - dutExecuteCommand: resultValue2: Pass
+2025-06-18 15:26:55.816 INFO  ApplicationLauncher:2615 - btnSetVoltageOnClick: Entry
+2025-06-18 15:26:55.881 INFO  ApplicationLauncher:4699 - dutCommandExecuteStart : ENTRY
+2025-06-18 15:26:55.881 DEBUG ApplicationLauncher:4001 - dutExecuteCommand: positionId:1
+2025-06-18 15:26:55.881 DEBUG ApplicationLauncher:3735 - dutSendCmd :Entry : positionId : 1
+2025-06-18 15:26:55.881 DEBUG ApplicationLauncher:90 - ClearSerialData :Entry
+2025-06-18 15:26:55.883 DEBUG ApplicationLauncher:3795 - dutSendCmd : absoluteCommandInAscii : SET_VOLTAGE,240
+ : position id : 1
+2025-06-18 15:26:55.883 DEBUG ApplicationLauncher:3796 - dutSendCmd : expectedResponseInHex length: 26 : position id : 1
+2025-06-18 15:26:55.883 DEBUG ApplicationLauncher:6141 - calibrationSendCommand :Entry
+2025-06-18 15:26:55.883 DEBUG ApplicationLauncher:6143 - calibrationSendCommand : data: SET_VOLTAGE,240
+
+2025-06-18 15:26:55.883 DEBUG ApplicationLauncher:3060 - WriteToSerialCommDUT1 :Data:SET_VOLTAGE,240
+
+2025-06-18 15:26:56.084 DEBUG ApplicationLauncher:3853 - dutReadDataV2 :Entry  : position id : 1
+2025-06-18 15:26:56.084 DEBUG ApplicationLauncher:3862 - dutReadDataV2: setExpectedResult: Hex   :5345545F564F4C544147455F53 : position id : 1
+2025-06-18 15:26:56.084 DEBUG ApplicationLauncher:3863 - dutReadDataV2: setExpectedResult: Ascii :SET_VOLTAGE_S : position id : 1
+2025-06-18 15:26:56.084 DEBUG ApplicationLauncher:3864 - dutReadDataV2: setExpectedLength:40 : position id : 1
+2025-06-18 15:26:56.085 INFO  ApplicationLauncher:82 - setNumberOfReadingRequired: numberOfReadings: 1
+2025-06-18 15:26:56.085 INFO  ApplicationLauncher:66 - DUT SerialReponseTimerStart :DUT_Task Triggered:
+2025-06-18 15:26:56.286 INFO  ApplicationLauncher:109 - calibrationMenuTaskV2: CurrentSerialData: 5345545F564F4C544147455F530D0A
+2025-06-18 15:26:56.286 INFO  ApplicationLauncher:111 - getExpectedLength():40
+2025-06-18 15:26:56.286 DEBUG ApplicationLauncher:152 - calibrationMenuTaskV2 Expected Data received:Length4:30:CurrentData:5345545F564F4C544147455F530D0A
+2025-06-18 15:26:56.286 DEBUG ApplicationLauncher:153 - calibrationMenuTaskV2 Expected Data received:Length4a:30:CurrentData:SET_VOLTAGE_S
+
+2025-06-18 15:26:56.286 DEBUG ApplicationLauncher:156 - calibrationMenuTaskV2 : lastPatternMatchingCount : 0
+2025-06-18 15:26:56.287 DEBUG ApplicationLauncher:162 - calibrationMenuTaskV2 : adding messageTimeStampList : currentTimeEpoch: 1750240616
+2025-06-18 15:26:56.287 DEBUG ApplicationLauncher:168 - calibrationMenuTaskV2 : patternMatchingCount : 1
+2025-06-18 15:26:56.287 DEBUG ApplicationLauncher:171 - calibrationMenuTaskV2 : patternMatchingCount matched
+2025-06-18 15:26:56.287 DEBUG ApplicationLauncher:173 - calibrationMenuTaskV2 : terminatorCount :1
+2025-06-18 15:26:56.288 DEBUG ApplicationLauncher:180 - calibrationMenuTaskV2 : terminatorCount matched
+2025-06-18 15:26:56.288 DEBUG ApplicationLauncher:1020 - setLDU_ReadSerialData: Entry
+2025-06-18 15:26:56.288 DEBUG ApplicationLauncher:185 - calibrationMenuTaskV2 Expected Data received:Length5:30:CurrentData:5345545F564F4C544147455F530D0A
+2025-06-18 15:26:56.288 DEBUG ApplicationLauncher:186 - calibrationMenuTaskV2 Expected Data received:Length5a:30:CurrentData:SET_VOLTAGE_S
+
+2025-06-18 15:26:56.288 INFO  ApplicationLauncher:194 - calibrationMenuTaskV2 : Timer Exit:
+2025-06-18 15:26:56.336 INFO  ApplicationLauncher:3814 - dutSendCmd: Expected recieved:5345545F564F4C544147455F530D0A : position id : 1
+2025-06-18 15:26:56.336 DEBUG ApplicationLauncher:6791 - StripLDU_SerialData :Entry
+2025-06-18 15:26:56.336 DEBUG ApplicationLauncher:542 - StripLength:  LengthTobeDeleted: 30
+2025-06-18 15:26:56.337 DEBUG ApplicationLauncher:6795 - StripLDU_SerialData : getSerialData :
+2025-06-18 15:26:56.337 INFO  ApplicationLauncher:3836 - dutSendCmd: timeOut Entry:  : position id : 1
+2025-06-18 15:26:56.337 INFO  ApplicationLauncher:3838 - dutSendCmd: timeOut countDown: 1 : position id : 1
+2025-06-18 15:26:57.337 INFO  ApplicationLauncher:3842 - dutSendCmd: timeOut Exit:  : position id : 1
+2025-06-18 15:26:57.337 DEBUG ApplicationLauncher:4014 - dutExecuteCommand: resultValue1:
+2025-06-18 15:26:57.337 DEBUG ApplicationLauncher:4027 - dutExecuteCommand: resultStatus2: P 
+2025-06-18 15:26:57.337 DEBUG ApplicationLauncher:4028 - dutExecuteCommand: resultValue2: Pass
+2025-06-18 15:27:52.373 INFO  ApplicationLauncher:2839 - btnVoltageMainsOffOnClick: Entry
+2025-06-18 15:27:52.428 INFO  ApplicationLauncher:4699 - dutCommandExecuteStart : ENTRY
+2025-06-18 15:27:52.428 DEBUG ApplicationLauncher:4001 - dutExecuteCommand: positionId:1
+2025-06-18 15:27:52.428 DEBUG ApplicationLauncher:3735 - dutSendCmd :Entry : positionId : 1
+2025-06-18 15:27:52.428 DEBUG ApplicationLauncher:90 - ClearSerialData :Entry
+2025-06-18 15:27:52.428 DEBUG ApplicationLauncher:3795 - dutSendCmd : absoluteCommandInAscii : MAINS_OFF
+ : position id : 1
+2025-06-18 15:27:52.428 DEBUG ApplicationLauncher:3796 - dutSendCmd : expectedResponseInHex length: 22 : position id : 1
+2025-06-18 15:27:52.428 DEBUG ApplicationLauncher:6141 - calibrationSendCommand :Entry
+2025-06-18 15:27:52.428 DEBUG ApplicationLauncher:6143 - calibrationSendCommand : data: MAINS_OFF
+
+2025-06-18 15:27:52.428 DEBUG ApplicationLauncher:3060 - WriteToSerialCommDUT1 :Data:MAINS_OFF
+
+2025-06-18 15:27:52.630 DEBUG ApplicationLauncher:3853 - dutReadDataV2 :Entry  : position id : 1
+2025-06-18 15:27:52.630 DEBUG ApplicationLauncher:3862 - dutReadDataV2: setExpectedResult: Hex   :4D41494E535F4F46465F53 : position id : 1
+2025-06-18 15:27:52.630 DEBUG ApplicationLauncher:3863 - dutReadDataV2: setExpectedResult: Ascii :MAINS_OFF_S : position id : 1
+2025-06-18 15:27:52.630 DEBUG ApplicationLauncher:3864 - dutReadDataV2: setExpectedLength:36 : position id : 1
+2025-06-18 15:27:52.630 INFO  ApplicationLauncher:82 - setNumberOfReadingRequired: numberOfReadings: 1
+2025-06-18 15:27:52.630 INFO  ApplicationLauncher:66 - DUT SerialReponseTimerStart :DUT_Task Triggered:
+2025-06-18 15:27:52.832 INFO  ApplicationLauncher:109 - calibrationMenuTaskV2: CurrentSerialData: 4D41494E535F4F46465F530D0A
+2025-06-18 15:27:52.832 INFO  ApplicationLauncher:111 - getExpectedLength():36
+2025-06-18 15:27:52.832 DEBUG ApplicationLauncher:152 - calibrationMenuTaskV2 Expected Data received:Length4:26:CurrentData:4D41494E535F4F46465F530D0A
+2025-06-18 15:27:52.832 DEBUG ApplicationLauncher:153 - calibrationMenuTaskV2 Expected Data received:Length4a:26:CurrentData:MAINS_OFF_S
+
+2025-06-18 15:27:52.832 DEBUG ApplicationLauncher:156 - calibrationMenuTaskV2 : lastPatternMatchingCount : 0
+2025-06-18 15:27:52.832 DEBUG ApplicationLauncher:162 - calibrationMenuTaskV2 : adding messageTimeStampList : currentTimeEpoch: 1750240672
+2025-06-18 15:27:52.832 DEBUG ApplicationLauncher:168 - calibrationMenuTaskV2 : patternMatchingCount : 1
+2025-06-18 15:27:52.832 DEBUG ApplicationLauncher:171 - calibrationMenuTaskV2 : patternMatchingCount matched
+2025-06-18 15:27:52.832 DEBUG ApplicationLauncher:173 - calibrationMenuTaskV2 : terminatorCount :1
+2025-06-18 15:27:52.832 DEBUG ApplicationLauncher:180 - calibrationMenuTaskV2 : terminatorCount matched
+2025-06-18 15:27:52.832 DEBUG ApplicationLauncher:1020 - setLDU_ReadSerialData: Entry
+2025-06-18 15:27:52.832 DEBUG ApplicationLauncher:185 - calibrationMenuTaskV2 Expected Data received:Length5:26:CurrentData:4D41494E535F4F46465F530D0A
+2025-06-18 15:27:52.832 DEBUG ApplicationLauncher:186 - calibrationMenuTaskV2 Expected Data received:Length5a:26:CurrentData:MAINS_OFF_S
+
+2025-06-18 15:27:52.832 INFO  ApplicationLauncher:194 - calibrationMenuTaskV2 : Timer Exit:
+2025-06-18 15:27:52.880 INFO  ApplicationLauncher:3814 - dutSendCmd: Expected recieved:4D41494E535F4F46465F530D0A : position id : 1
+2025-06-18 15:27:52.880 DEBUG ApplicationLauncher:6791 - StripLDU_SerialData :Entry
+2025-06-18 15:27:52.880 DEBUG ApplicationLauncher:542 - StripLength:  LengthTobeDeleted: 26
+2025-06-18 15:27:52.880 DEBUG ApplicationLauncher:6795 - StripLDU_SerialData : getSerialData :
+2025-06-18 15:27:52.880 INFO  ApplicationLauncher:3836 - dutSendCmd: timeOut Entry:  : position id : 1
+2025-06-18 15:27:52.880 INFO  ApplicationLauncher:3838 - dutSendCmd: timeOut countDown: 1 : position id : 1
+2025-06-18 15:27:53.880 INFO  ApplicationLauncher:3842 - dutSendCmd: timeOut Exit:  : position id : 1
+2025-06-18 15:27:53.880 DEBUG ApplicationLauncher:4014 - dutExecuteCommand: resultValue1:
+2025-06-18 15:27:53.880 DEBUG ApplicationLauncher:4027 - dutExecuteCommand: resultStatus2: P 
+2025-06-18 15:27:53.880 DEBUG ApplicationLauncher:4028 - dutExecuteCommand: resultValue2: Pass
+2025-06-18 15:27:58.947 INFO  ApplicationLauncher:2581 - btnDimmerForwardOnClick: Entry
+2025-06-18 15:27:59.013 INFO  ApplicationLauncher:4699 - dutCommandExecuteStart : ENTRY
+2025-06-18 15:27:59.013 DEBUG ApplicationLauncher:4001 - dutExecuteCommand: positionId:1
+2025-06-18 15:27:59.013 DEBUG ApplicationLauncher:3735 - dutSendCmd :Entry : positionId : 1
+2025-06-18 15:27:59.013 DEBUG ApplicationLauncher:90 - ClearSerialData :Entry
+2025-06-18 15:27:59.014 DEBUG ApplicationLauncher:3795 - dutSendCmd : absoluteCommandInAscii : ROTATE_FORWARD,100
+ : position id : 1
+2025-06-18 15:27:59.014 DEBUG ApplicationLauncher:3796 - dutSendCmd : expectedResponseInHex length: 32 : position id : 1
+2025-06-18 15:27:59.014 DEBUG ApplicationLauncher:6141 - calibrationSendCommand :Entry
+2025-06-18 15:27:59.014 DEBUG ApplicationLauncher:6143 - calibrationSendCommand : data: ROTATE_FORWARD,100
+
+2025-06-18 15:27:59.014 DEBUG ApplicationLauncher:3060 - WriteToSerialCommDUT1 :Data:ROTATE_FORWARD,100
+
+2025-06-18 15:27:59.216 DEBUG ApplicationLauncher:3853 - dutReadDataV2 :Entry  : position id : 1
+2025-06-18 15:27:59.217 DEBUG ApplicationLauncher:3862 - dutReadDataV2: setExpectedResult: Hex   :524F544154455F464F52574152445F53 : position id : 1
+2025-06-18 15:27:59.217 DEBUG ApplicationLauncher:3863 - dutReadDataV2: setExpectedResult: Ascii :ROTATE_FORWARD_S : position id : 1
+2025-06-18 15:27:59.217 DEBUG ApplicationLauncher:3864 - dutReadDataV2: setExpectedLength:46 : position id : 1
+2025-06-18 15:27:59.219 INFO  ApplicationLauncher:82 - setNumberOfReadingRequired: numberOfReadings: 1
+2025-06-18 15:27:59.219 INFO  ApplicationLauncher:66 - DUT SerialReponseTimerStart :DUT_Task Triggered:
+2025-06-18 15:27:59.420 INFO  ApplicationLauncher:109 - calibrationMenuTaskV2: CurrentSerialData: 524F544154455F464F52574152445F530D0A
+2025-06-18 15:27:59.420 INFO  ApplicationLauncher:111 - getExpectedLength():46
+2025-06-18 15:27:59.420 DEBUG ApplicationLauncher:152 - calibrationMenuTaskV2 Expected Data received:Length4:36:CurrentData:524F544154455F464F52574152445F530D0A
+2025-06-18 15:27:59.420 DEBUG ApplicationLauncher:153 - calibrationMenuTaskV2 Expected Data received:Length4a:36:CurrentData:ROTATE_FORWARD_S
+
+2025-06-18 15:27:59.420 DEBUG ApplicationLauncher:156 - calibrationMenuTaskV2 : lastPatternMatchingCount : 0
+2025-06-18 15:27:59.421 DEBUG ApplicationLauncher:162 - calibrationMenuTaskV2 : adding messageTimeStampList : currentTimeEpoch: 1750240679
+2025-06-18 15:27:59.421 DEBUG ApplicationLauncher:168 - calibrationMenuTaskV2 : patternMatchingCount : 1
+2025-06-18 15:27:59.421 DEBUG ApplicationLauncher:171 - calibrationMenuTaskV2 : patternMatchingCount matched
+2025-06-18 15:27:59.421 DEBUG ApplicationLauncher:173 - calibrationMenuTaskV2 : terminatorCount :1
+2025-06-18 15:27:59.422 DEBUG ApplicationLauncher:180 - calibrationMenuTaskV2 : terminatorCount matched
+2025-06-18 15:27:59.422 DEBUG ApplicationLauncher:1020 - setLDU_ReadSerialData: Entry
+2025-06-18 15:27:59.422 DEBUG ApplicationLauncher:185 - calibrationMenuTaskV2 Expected Data received:Length5:36:CurrentData:524F544154455F464F52574152445F530D0A
+2025-06-18 15:27:59.422 DEBUG ApplicationLauncher:186 - calibrationMenuTaskV2 Expected Data received:Length5a:36:CurrentData:ROTATE_FORWARD_S
+
+2025-06-18 15:27:59.422 INFO  ApplicationLauncher:194 - calibrationMenuTaskV2 : Timer Exit:
+2025-06-18 15:27:59.470 INFO  ApplicationLauncher:3814 - dutSendCmd: Expected recieved:524F544154455F464F52574152445F530D0A : position id : 1
+2025-06-18 15:27:59.470 DEBUG ApplicationLauncher:6791 - StripLDU_SerialData :Entry
+2025-06-18 15:27:59.470 DEBUG ApplicationLauncher:542 - StripLength:  LengthTobeDeleted: 36
+2025-06-18 15:27:59.470 DEBUG ApplicationLauncher:6795 - StripLDU_SerialData : getSerialData :
+2025-06-18 15:27:59.470 INFO  ApplicationLauncher:3836 - dutSendCmd: timeOut Entry:  : position id : 1
+2025-06-18 15:27:59.470 INFO  ApplicationLauncher:3838 - dutSendCmd: timeOut countDown: 1 : position id : 1
+2025-06-18 15:28:00.471 INFO  ApplicationLauncher:3842 - dutSendCmd: timeOut Exit:  : position id : 1
+2025-06-18 15:28:00.471 DEBUG ApplicationLauncher:4014 - dutExecuteCommand: resultValue1:
+2025-06-18 15:28:00.471 DEBUG ApplicationLauncher:4027 - dutExecuteCommand: resultStatus2: P 
+2025-06-18 15:28:00.471 DEBUG ApplicationLauncher:4028 - dutExecuteCommand: resultValue2: Pass
+2025-06-18 15:28:25.757 INFO  ApplicationLauncher:2831 - btnVoltageMainsOnOnClick: Entry
+2025-06-18 15:28:25.809 INFO  ApplicationLauncher:3036 - MainsOnTask: Entry
+2025-06-18 15:28:25.809 INFO  ApplicationLauncher:4159 - MainsOnTask: Entry
+2025-06-18 15:28:25.817 INFO  ApplicationLauncher:4699 - dutCommandExecuteStart : ENTRY
+2025-06-18 15:28:25.817 DEBUG ApplicationLauncher:4001 - dutExecuteCommand: positionId:1
+2025-06-18 15:28:25.817 DEBUG ApplicationLauncher:3735 - dutSendCmd :Entry : positionId : 1
+2025-06-18 15:28:25.817 DEBUG ApplicationLauncher:90 - ClearSerialData :Entry
+2025-06-18 15:28:25.818 DEBUG ApplicationLauncher:3795 - dutSendCmd : absoluteCommandInAscii : MAINS_ON
+ : position id : 1
+2025-06-18 15:28:25.818 DEBUG ApplicationLauncher:3796 - dutSendCmd : expectedResponseInHex length: 20 : position id : 1
+2025-06-18 15:28:25.818 DEBUG ApplicationLauncher:6141 - calibrationSendCommand :Entry
+2025-06-18 15:28:25.818 DEBUG ApplicationLauncher:6143 - calibrationSendCommand : data: MAINS_ON
+
+2025-06-18 15:28:25.818 DEBUG ApplicationLauncher:3060 - WriteToSerialCommDUT1 :Data:MAINS_ON
+
+2025-06-18 15:28:26.021 DEBUG ApplicationLauncher:3853 - dutReadDataV2 :Entry  : position id : 1
+2025-06-18 15:28:26.021 DEBUG ApplicationLauncher:3862 - dutReadDataV2: setExpectedResult: Hex   :4D41494E535F4F4E5F53 : position id : 1
+2025-06-18 15:28:26.021 DEBUG ApplicationLauncher:3863 - dutReadDataV2: setExpectedResult: Ascii :MAINS_ON_S : position id : 1
+2025-06-18 15:28:26.021 DEBUG ApplicationLauncher:3864 - dutReadDataV2: setExpectedLength:34 : position id : 1
+2025-06-18 15:28:26.022 INFO  ApplicationLauncher:82 - setNumberOfReadingRequired: numberOfReadings: 1
+2025-06-18 15:28:26.022 INFO  ApplicationLauncher:66 - DUT SerialReponseTimerStart :DUT_Task Triggered:
+2025-06-18 15:28:26.223 INFO  ApplicationLauncher:109 - calibrationMenuTaskV2: CurrentSerialData: 4D41494E535F4F4E5F530D0A
+2025-06-18 15:28:26.223 INFO  ApplicationLauncher:111 - getExpectedLength():34
+2025-06-18 15:28:26.223 DEBUG ApplicationLauncher:152 - calibrationMenuTaskV2 Expected Data received:Length4:24:CurrentData:4D41494E535F4F4E5F530D0A
+2025-06-18 15:28:26.223 DEBUG ApplicationLauncher:153 - calibrationMenuTaskV2 Expected Data received:Length4a:24:CurrentData:MAINS_ON_S
+
+2025-06-18 15:28:26.223 DEBUG ApplicationLauncher:156 - calibrationMenuTaskV2 : lastPatternMatchingCount : 0
+2025-06-18 15:28:26.224 DEBUG ApplicationLauncher:162 - calibrationMenuTaskV2 : adding messageTimeStampList : currentTimeEpoch: 1750240706
+2025-06-18 15:28:26.224 DEBUG ApplicationLauncher:168 - calibrationMenuTaskV2 : patternMatchingCount : 1
+2025-06-18 15:28:26.224 DEBUG ApplicationLauncher:171 - calibrationMenuTaskV2 : patternMatchingCount matched
+2025-06-18 15:28:26.224 DEBUG ApplicationLauncher:173 - calibrationMenuTaskV2 : terminatorCount :1
+2025-06-18 15:28:26.225 DEBUG ApplicationLauncher:180 - calibrationMenuTaskV2 : terminatorCount matched
+2025-06-18 15:28:26.225 DEBUG ApplicationLauncher:1020 - setLDU_ReadSerialData: Entry
+2025-06-18 15:28:26.225 DEBUG ApplicationLauncher:185 - calibrationMenuTaskV2 Expected Data received:Length5:24:CurrentData:4D41494E535F4F4E5F530D0A
+2025-06-18 15:28:26.225 DEBUG ApplicationLauncher:186 - calibrationMenuTaskV2 Expected Data received:Length5a:24:CurrentData:MAINS_ON_S
+
+2025-06-18 15:28:26.225 INFO  ApplicationLauncher:194 - calibrationMenuTaskV2 : Timer Exit:
+2025-06-18 15:28:26.273 INFO  ApplicationLauncher:3814 - dutSendCmd: Expected recieved:4D41494E535F4F4E5F530D0A : position id : 1
+2025-06-18 15:28:26.273 DEBUG ApplicationLauncher:6791 - StripLDU_SerialData :Entry
+2025-06-18 15:28:26.273 DEBUG ApplicationLauncher:542 - StripLength:  LengthTobeDeleted: 24
+2025-06-18 15:28:26.273 DEBUG ApplicationLauncher:6795 - StripLDU_SerialData : getSerialData :
+2025-06-18 15:28:26.273 INFO  ApplicationLauncher:3836 - dutSendCmd: timeOut Entry:  : position id : 1
+2025-06-18 15:28:26.273 INFO  ApplicationLauncher:3838 - dutSendCmd: timeOut countDown: 1 : position id : 1
+2025-06-18 15:28:27.274 INFO  ApplicationLauncher:3842 - dutSendCmd: timeOut Exit:  : position id : 1
+2025-06-18 15:28:27.274 DEBUG ApplicationLauncher:4014 - dutExecuteCommand: resultValue1:
+2025-06-18 15:28:27.274 DEBUG ApplicationLauncher:4027 - dutExecuteCommand: resultStatus2: P 
+2025-06-18 15:28:27.274 DEBUG ApplicationLauncher:4028 - dutExecuteCommand: resultValue2: Pass
+2025-06-18 15:28:28.813 INFO  ApplicationLauncher:2839 - btnVoltageMainsOffOnClick: Entry
+2025-06-18 15:28:28.873 INFO  ApplicationLauncher:4699 - dutCommandExecuteStart : ENTRY
+2025-06-18 15:28:28.873 DEBUG ApplicationLauncher:4001 - dutExecuteCommand: positionId:1
+2025-06-18 15:28:28.873 DEBUG ApplicationLauncher:3735 - dutSendCmd :Entry : positionId : 1
+2025-06-18 15:28:28.873 DEBUG ApplicationLauncher:90 - ClearSerialData :Entry
+2025-06-18 15:28:28.874 DEBUG ApplicationLauncher:3795 - dutSendCmd : absoluteCommandInAscii : MAINS_OFF
+ : position id : 1
+2025-06-18 15:28:28.874 DEBUG ApplicationLauncher:3796 - dutSendCmd : expectedResponseInHex length: 22 : position id : 1
+2025-06-18 15:28:28.874 DEBUG ApplicationLauncher:6141 - calibrationSendCommand :Entry
+2025-06-18 15:28:28.874 DEBUG ApplicationLauncher:6143 - calibrationSendCommand : data: MAINS_OFF
+
+2025-06-18 15:28:28.874 DEBUG ApplicationLauncher:3060 - WriteToSerialCommDUT1 :Data:MAINS_OFF
+
+2025-06-18 15:28:29.076 DEBUG ApplicationLauncher:3853 - dutReadDataV2 :Entry  : position id : 1
+2025-06-18 15:28:29.076 DEBUG ApplicationLauncher:3862 - dutReadDataV2: setExpectedResult: Hex   :4D41494E535F4F46465F53 : position id : 1
+2025-06-18 15:28:29.076 DEBUG ApplicationLauncher:3863 - dutReadDataV2: setExpectedResult: Ascii :MAINS_OFF_S : position id : 1
+2025-06-18 15:28:29.076 DEBUG ApplicationLauncher:3864 - dutReadDataV2: setExpectedLength:36 : position id : 1
+2025-06-18 15:28:29.077 INFO  ApplicationLauncher:82 - setNumberOfReadingRequired: numberOfReadings: 1
+2025-06-18 15:28:29.077 INFO  ApplicationLauncher:66 - DUT SerialReponseTimerStart :DUT_Task Triggered:
+2025-06-18 15:28:29.278 INFO  ApplicationLauncher:109 - calibrationMenuTaskV2: CurrentSerialData: 4D41494E535F4F46465F530D0A
+2025-06-18 15:28:29.278 INFO  ApplicationLauncher:111 - getExpectedLength():36
+2025-06-18 15:28:29.278 DEBUG ApplicationLauncher:152 - calibrationMenuTaskV2 Expected Data received:Length4:26:CurrentData:4D41494E535F4F46465F530D0A
+2025-06-18 15:28:29.278 DEBUG ApplicationLauncher:153 - calibrationMenuTaskV2 Expected Data received:Length4a:26:CurrentData:MAINS_OFF_S
+
+2025-06-18 15:28:29.278 DEBUG ApplicationLauncher:156 - calibrationMenuTaskV2 : lastPatternMatchingCount : 0
+2025-06-18 15:28:29.279 DEBUG ApplicationLauncher:162 - calibrationMenuTaskV2 : adding messageTimeStampList : currentTimeEpoch: 1750240709
+2025-06-18 15:28:29.280 DEBUG ApplicationLauncher:168 - calibrationMenuTaskV2 : patternMatchingCount : 1
+2025-06-18 15:28:29.280 DEBUG ApplicationLauncher:171 - calibrationMenuTaskV2 : patternMatchingCount matched
+2025-06-18 15:28:29.280 DEBUG ApplicationLauncher:173 - calibrationMenuTaskV2 : terminatorCount :1
+2025-06-18 15:28:29.280 DEBUG ApplicationLauncher:180 - calibrationMenuTaskV2 : terminatorCount matched
+2025-06-18 15:28:29.281 DEBUG ApplicationLauncher:1020 - setLDU_ReadSerialData: Entry
+2025-06-18 15:28:29.281 DEBUG ApplicationLauncher:185 - calibrationMenuTaskV2 Expected Data received:Length5:26:CurrentData:4D41494E535F4F46465F530D0A
+2025-06-18 15:28:29.281 DEBUG ApplicationLauncher:186 - calibrationMenuTaskV2 Expected Data received:Length5a:26:CurrentData:MAINS_OFF_S
+
+2025-06-18 15:28:29.281 INFO  ApplicationLauncher:194 - calibrationMenuTaskV2 : Timer Exit:
+2025-06-18 15:28:29.328 INFO  ApplicationLauncher:3814 - dutSendCmd: Expected recieved:4D41494E535F4F46465F530D0A : position id : 1
+2025-06-18 15:28:29.328 DEBUG ApplicationLauncher:6791 - StripLDU_SerialData :Entry
+2025-06-18 15:28:29.328 DEBUG ApplicationLauncher:542 - StripLength:  LengthTobeDeleted: 26
+2025-06-18 15:28:29.328 DEBUG ApplicationLauncher:6795 - StripLDU_SerialData : getSerialData :
+2025-06-18 15:28:29.329 INFO  ApplicationLauncher:3836 - dutSendCmd: timeOut Entry:  : position id : 1
+2025-06-18 15:28:29.329 INFO  ApplicationLauncher:3838 - dutSendCmd: timeOut countDown: 1 : position id : 1
+2025-06-18 15:28:30.329 INFO  ApplicationLauncher:3842 - dutSendCmd: timeOut Exit:  : position id : 1
+2025-06-18 15:28:30.329 DEBUG ApplicationLauncher:4014 - dutExecuteCommand: resultValue1:
+2025-06-18 15:28:30.329 DEBUG ApplicationLauncher:4027 - dutExecuteCommand: resultStatus2: P 
+2025-06-18 15:28:30.330 DEBUG ApplicationLauncher:4028 - dutExecuteCommand: resultValue2: Pass
+2025-06-18 15:28:48.985 INFO  ApplicationLauncher:2831 - btnVoltageMainsOnOnClick: Entry
+2025-06-18 15:28:49.036 INFO  ApplicationLauncher:3036 - MainsOnTask: Entry
+2025-06-18 15:28:49.036 INFO  ApplicationLauncher:4159 - MainsOnTask: Entry
+2025-06-18 15:28:49.044 INFO  ApplicationLauncher:4699 - dutCommandExecuteStart : ENTRY
+2025-06-18 15:28:49.044 DEBUG ApplicationLauncher:4001 - dutExecuteCommand: positionId:1
+2025-06-18 15:28:49.044 DEBUG ApplicationLauncher:3735 - dutSendCmd :Entry : positionId : 1
+2025-06-18 15:28:49.044 DEBUG ApplicationLauncher:90 - ClearSerialData :Entry
+2025-06-18 15:28:49.045 DEBUG ApplicationLauncher:3795 - dutSendCmd : absoluteCommandInAscii : MAINS_ON
+ : position id : 1
+2025-06-18 15:28:49.045 DEBUG ApplicationLauncher:3796 - dutSendCmd : expectedResponseInHex length: 20 : position id : 1
+2025-06-18 15:28:49.045 DEBUG ApplicationLauncher:6141 - calibrationSendCommand :Entry
+2025-06-18 15:28:49.045 DEBUG ApplicationLauncher:6143 - calibrationSendCommand : data: MAINS_ON
+
+2025-06-18 15:28:49.045 DEBUG ApplicationLauncher:3060 - WriteToSerialCommDUT1 :Data:MAINS_ON
+
+2025-06-18 15:28:49.245 DEBUG ApplicationLauncher:3853 - dutReadDataV2 :Entry  : position id : 1
+2025-06-18 15:28:49.245 DEBUG ApplicationLauncher:3862 - dutReadDataV2: setExpectedResult: Hex   :4D41494E535F4F4E5F53 : position id : 1
+2025-06-18 15:28:49.246 DEBUG ApplicationLauncher:3863 - dutReadDataV2: setExpectedResult: Ascii :MAINS_ON_S : position id : 1
+2025-06-18 15:28:49.246 DEBUG ApplicationLauncher:3864 - dutReadDataV2: setExpectedLength:34 : position id : 1
+2025-06-18 15:28:49.247 INFO  ApplicationLauncher:82 - setNumberOfReadingRequired: numberOfReadings: 1
+2025-06-18 15:28:49.247 INFO  ApplicationLauncher:66 - DUT SerialReponseTimerStart :DUT_Task Triggered:
+2025-06-18 15:28:49.448 INFO  ApplicationLauncher:109 - calibrationMenuTaskV2: CurrentSerialData: 4D41494E535F4F4E5F530D0A
+2025-06-18 15:28:49.448 INFO  ApplicationLauncher:111 - getExpectedLength():34
+2025-06-18 15:28:49.448 DEBUG ApplicationLauncher:152 - calibrationMenuTaskV2 Expected Data received:Length4:24:CurrentData:4D41494E535F4F4E5F530D0A
+2025-06-18 15:28:49.448 DEBUG ApplicationLauncher:153 - calibrationMenuTaskV2 Expected Data received:Length4a:24:CurrentData:MAINS_ON_S
+
+2025-06-18 15:28:49.449 DEBUG ApplicationLauncher:156 - calibrationMenuTaskV2 : lastPatternMatchingCount : 0
+2025-06-18 15:28:49.449 DEBUG ApplicationLauncher:162 - calibrationMenuTaskV2 : adding messageTimeStampList : currentTimeEpoch: 1750240729
+2025-06-18 15:28:49.449 DEBUG ApplicationLauncher:168 - calibrationMenuTaskV2 : patternMatchingCount : 1
+2025-06-18 15:28:49.449 DEBUG ApplicationLauncher:171 - calibrationMenuTaskV2 : patternMatchingCount matched
+2025-06-18 15:28:49.449 DEBUG ApplicationLauncher:173 - calibrationMenuTaskV2 : terminatorCount :1
+2025-06-18 15:28:49.450 DEBUG ApplicationLauncher:180 - calibrationMenuTaskV2 : terminatorCount matched
+2025-06-18 15:28:49.450 DEBUG ApplicationLauncher:1020 - setLDU_ReadSerialData: Entry
+2025-06-18 15:28:49.450 DEBUG ApplicationLauncher:185 - calibrationMenuTaskV2 Expected Data received:Length5:24:CurrentData:4D41494E535F4F4E5F530D0A
+2025-06-18 15:28:49.450 DEBUG ApplicationLauncher:186 - calibrationMenuTaskV2 Expected Data received:Length5a:24:CurrentData:MAINS_ON_S
+
+2025-06-18 15:28:49.450 INFO  ApplicationLauncher:194 - calibrationMenuTaskV2 : Timer Exit:
+2025-06-18 15:28:49.497 INFO  ApplicationLauncher:3814 - dutSendCmd: Expected recieved:4D41494E535F4F4E5F530D0A : position id : 1
+2025-06-18 15:28:49.497 DEBUG ApplicationLauncher:6791 - StripLDU_SerialData :Entry
+2025-06-18 15:28:49.497 DEBUG ApplicationLauncher:542 - StripLength:  LengthTobeDeleted: 24
+2025-06-18 15:28:49.497 DEBUG ApplicationLauncher:6795 - StripLDU_SerialData : getSerialData :
+2025-06-18 15:28:49.497 INFO  ApplicationLauncher:3836 - dutSendCmd: timeOut Entry:  : position id : 1
+2025-06-18 15:28:49.497 INFO  ApplicationLauncher:3838 - dutSendCmd: timeOut countDown: 1 : position id : 1
+2025-06-18 15:28:50.497 INFO  ApplicationLauncher:3842 - dutSendCmd: timeOut Exit:  : position id : 1
+2025-06-18 15:28:50.497 DEBUG ApplicationLauncher:4014 - dutExecuteCommand: resultValue1:
+2025-06-18 15:28:50.497 DEBUG ApplicationLauncher:4027 - dutExecuteCommand: resultStatus2: P 
+2025-06-18 15:28:50.497 DEBUG ApplicationLauncher:4028 - dutExecuteCommand: resultValue2: Pass
+2025-06-18 15:29:03.282 INFO  ApplicationLauncher:2839 - btnVoltageMainsOffOnClick: Entry
+2025-06-18 15:29:03.344 INFO  ApplicationLauncher:4699 - dutCommandExecuteStart : ENTRY
+2025-06-18 15:29:03.344 DEBUG ApplicationLauncher:4001 - dutExecuteCommand: positionId:1
+2025-06-18 15:29:03.344 DEBUG ApplicationLauncher:3735 - dutSendCmd :Entry : positionId : 1
+2025-06-18 15:29:03.345 DEBUG ApplicationLauncher:90 - ClearSerialData :Entry
+2025-06-18 15:29:03.345 DEBUG ApplicationLauncher:3795 - dutSendCmd : absoluteCommandInAscii : MAINS_OFF
+ : position id : 1
+2025-06-18 15:29:03.346 DEBUG ApplicationLauncher:3796 - dutSendCmd : expectedResponseInHex length: 22 : position id : 1
+2025-06-18 15:29:03.346 DEBUG ApplicationLauncher:6141 - calibrationSendCommand :Entry
+2025-06-18 15:29:03.346 DEBUG ApplicationLauncher:6143 - calibrationSendCommand : data: MAINS_OFF
+
+2025-06-18 15:29:03.346 DEBUG ApplicationLauncher:3060 - WriteToSerialCommDUT1 :Data:MAINS_OFF
+
+2025-06-18 15:29:03.547 DEBUG ApplicationLauncher:3853 - dutReadDataV2 :Entry  : position id : 1
+2025-06-18 15:29:03.547 DEBUG ApplicationLauncher:3862 - dutReadDataV2: setExpectedResult: Hex   :4D41494E535F4F46465F53 : position id : 1
+2025-06-18 15:29:03.547 DEBUG ApplicationLauncher:3863 - dutReadDataV2: setExpectedResult: Ascii :MAINS_OFF_S : position id : 1
+2025-06-18 15:29:03.547 DEBUG ApplicationLauncher:3864 - dutReadDataV2: setExpectedLength:36 : position id : 1
+2025-06-18 15:29:03.548 INFO  ApplicationLauncher:82 - setNumberOfReadingRequired: numberOfReadings: 1
+2025-06-18 15:29:03.548 INFO  ApplicationLauncher:66 - DUT SerialReponseTimerStart :DUT_Task Triggered:
+2025-06-18 15:29:03.749 INFO  ApplicationLauncher:109 - calibrationMenuTaskV2: CurrentSerialData: 4D41494E535F4F46465F530D0A
+2025-06-18 15:29:03.749 INFO  ApplicationLauncher:111 - getExpectedLength():36
+2025-06-18 15:29:03.749 DEBUG ApplicationLauncher:152 - calibrationMenuTaskV2 Expected Data received:Length4:26:CurrentData:4D41494E535F4F46465F530D0A
+2025-06-18 15:29:03.749 DEBUG ApplicationLauncher:153 - calibrationMenuTaskV2 Expected Data received:Length4a:26:CurrentData:MAINS_OFF_S
+
+2025-06-18 15:29:03.750 DEBUG ApplicationLauncher:156 - calibrationMenuTaskV2 : lastPatternMatchingCount : 0
+2025-06-18 15:29:03.750 DEBUG ApplicationLauncher:162 - calibrationMenuTaskV2 : adding messageTimeStampList : currentTimeEpoch: 1750240743
+2025-06-18 15:29:03.751 DEBUG ApplicationLauncher:168 - calibrationMenuTaskV2 : patternMatchingCount : 1
+2025-06-18 15:29:03.751 DEBUG ApplicationLauncher:171 - calibrationMenuTaskV2 : patternMatchingCount matched
+2025-06-18 15:29:03.751 DEBUG ApplicationLauncher:173 - calibrationMenuTaskV2 : terminatorCount :1
+2025-06-18 15:29:03.751 DEBUG ApplicationLauncher:180 - calibrationMenuTaskV2 : terminatorCount matched
+2025-06-18 15:29:03.751 DEBUG ApplicationLauncher:1020 - setLDU_ReadSerialData: Entry
+2025-06-18 15:29:03.751 DEBUG ApplicationLauncher:185 - calibrationMenuTaskV2 Expected Data received:Length5:26:CurrentData:4D41494E535F4F46465F530D0A
+2025-06-18 15:29:03.751 DEBUG ApplicationLauncher:186 - calibrationMenuTaskV2 Expected Data received:Length5a:26:CurrentData:MAINS_OFF_S
+
+2025-06-18 15:29:03.752 INFO  ApplicationLauncher:194 - calibrationMenuTaskV2 : Timer Exit:
+2025-06-18 15:29:03.799 INFO  ApplicationLauncher:3814 - dutSendCmd: Expected recieved:4D41494E535F4F46465F530D0A : position id : 1
+2025-06-18 15:29:03.799 DEBUG ApplicationLauncher:6791 - StripLDU_SerialData :Entry
+2025-06-18 15:29:03.799 DEBUG ApplicationLauncher:542 - StripLength:  LengthTobeDeleted: 26
+2025-06-18 15:29:03.799 DEBUG ApplicationLauncher:6795 - StripLDU_SerialData : getSerialData :
+2025-06-18 15:29:03.799 INFO  ApplicationLauncher:3836 - dutSendCmd: timeOut Entry:  : position id : 1
+2025-06-18 15:29:03.799 INFO  ApplicationLauncher:3838 - dutSendCmd: timeOut countDown: 1 : position id : 1
+2025-06-18 15:29:04.800 INFO  ApplicationLauncher:3842 - dutSendCmd: timeOut Exit:  : position id : 1
+2025-06-18 15:29:04.800 DEBUG ApplicationLauncher:4014 - dutExecuteCommand: resultValue1:
+2025-06-18 15:29:04.800 DEBUG ApplicationLauncher:4027 - dutExecuteCommand: resultStatus2: P 
+2025-06-18 15:29:04.800 DEBUG ApplicationLauncher:4028 - dutExecuteCommand: resultValue2: Pass
+2025-06-18 15:29:19.974 INFO  ApplicationLauncher:2605 - btnDimmerSetMinOnClick: Entry
+2025-06-18 15:29:20.052 INFO  ApplicationLauncher:4699 - dutCommandExecuteStart : ENTRY
+2025-06-18 15:29:20.052 DEBUG ApplicationLauncher:4001 - dutExecuteCommand: positionId:1
+2025-06-18 15:29:20.052 DEBUG ApplicationLauncher:3735 - dutSendCmd :Entry : positionId : 1
+2025-06-18 15:29:20.052 DEBUG ApplicationLauncher:90 - ClearSerialData :Entry
+2025-06-18 15:29:20.052 DEBUG ApplicationLauncher:3795 - dutSendCmd : absoluteCommandInAscii : DIMMER_MIN
+ : position id : 1
+2025-06-18 15:29:20.052 DEBUG ApplicationLauncher:3796 - dutSendCmd : expectedResponseInHex length: 24 : position id : 1
+2025-06-18 15:29:20.052 DEBUG ApplicationLauncher:6141 - calibrationSendCommand :Entry
+2025-06-18 15:29:20.052 DEBUG ApplicationLauncher:6143 - calibrationSendCommand : data: DIMMER_MIN
+
+2025-06-18 15:29:20.052 DEBUG ApplicationLauncher:3060 - WriteToSerialCommDUT1 :Data:DIMMER_MIN
+
+2025-06-18 15:29:20.253 DEBUG ApplicationLauncher:3853 - dutReadDataV2 :Entry  : position id : 1
+2025-06-18 15:29:20.253 DEBUG ApplicationLauncher:3862 - dutReadDataV2: setExpectedResult: Hex   :44494D4D45525F4D494E5F53 : position id : 1
+2025-06-18 15:29:20.253 DEBUG ApplicationLauncher:3863 - dutReadDataV2: setExpectedResult: Ascii :DIMMER_MIN_S : position id : 1
+2025-06-18 15:29:20.253 DEBUG ApplicationLauncher:3864 - dutReadDataV2: setExpectedLength:38 : position id : 1
+2025-06-18 15:29:20.254 INFO  ApplicationLauncher:82 - setNumberOfReadingRequired: numberOfReadings: 1
+2025-06-18 15:29:20.254 INFO  ApplicationLauncher:66 - DUT SerialReponseTimerStart :DUT_Task Triggered:
+2025-06-18 15:29:20.454 INFO  ApplicationLauncher:109 - calibrationMenuTaskV2: CurrentSerialData: 44494D4D45525F4D494E5F530D0A
+2025-06-18 15:29:20.454 INFO  ApplicationLauncher:111 - getExpectedLength():38
+2025-06-18 15:29:20.454 DEBUG ApplicationLauncher:152 - calibrationMenuTaskV2 Expected Data received:Length4:28:CurrentData:44494D4D45525F4D494E5F530D0A
+2025-06-18 15:29:20.454 DEBUG ApplicationLauncher:153 - calibrationMenuTaskV2 Expected Data received:Length4a:28:CurrentData:DIMMER_MIN_S
+
+2025-06-18 15:29:20.454 DEBUG ApplicationLauncher:156 - calibrationMenuTaskV2 : lastPatternMatchingCount : 0
+2025-06-18 15:29:20.455 DEBUG ApplicationLauncher:162 - calibrationMenuTaskV2 : adding messageTimeStampList : currentTimeEpoch: 1750240760
+2025-06-18 15:29:20.456 DEBUG ApplicationLauncher:168 - calibrationMenuTaskV2 : patternMatchingCount : 1
+2025-06-18 15:29:20.456 DEBUG ApplicationLauncher:171 - calibrationMenuTaskV2 : patternMatchingCount matched
+2025-06-18 15:29:20.456 DEBUG ApplicationLauncher:173 - calibrationMenuTaskV2 : terminatorCount :1
+2025-06-18 15:29:20.456 DEBUG ApplicationLauncher:180 - calibrationMenuTaskV2 : terminatorCount matched
+2025-06-18 15:29:20.456 DEBUG ApplicationLauncher:1020 - setLDU_ReadSerialData: Entry
+2025-06-18 15:29:20.456 DEBUG ApplicationLauncher:185 - calibrationMenuTaskV2 Expected Data received:Length5:28:CurrentData:44494D4D45525F4D494E5F530D0A
+2025-06-18 15:29:20.456 DEBUG ApplicationLauncher:186 - calibrationMenuTaskV2 Expected Data received:Length5a:28:CurrentData:DIMMER_MIN_S
+
+2025-06-18 15:29:20.457 INFO  ApplicationLauncher:194 - calibrationMenuTaskV2 : Timer Exit:
+2025-06-18 15:29:20.504 INFO  ApplicationLauncher:3814 - dutSendCmd: Expected recieved:44494D4D45525F4D494E5F530D0A : position id : 1
+2025-06-18 15:29:20.504 DEBUG ApplicationLauncher:6791 - StripLDU_SerialData :Entry
+2025-06-18 15:29:20.504 DEBUG ApplicationLauncher:542 - StripLength:  LengthTobeDeleted: 28
+2025-06-18 15:29:20.504 DEBUG ApplicationLauncher:6795 - StripLDU_SerialData : getSerialData :
+2025-06-18 15:29:20.504 INFO  ApplicationLauncher:3836 - dutSendCmd: timeOut Entry:  : position id : 1
+2025-06-18 15:29:20.504 INFO  ApplicationLauncher:3838 - dutSendCmd: timeOut countDown: 1 : position id : 1
+2025-06-18 15:29:21.505 INFO  ApplicationLauncher:3842 - dutSendCmd: timeOut Exit:  : position id : 1
+2025-06-18 15:29:21.505 DEBUG ApplicationLauncher:4014 - dutExecuteCommand: resultValue1:
+2025-06-18 15:29:21.505 DEBUG ApplicationLauncher:4027 - dutExecuteCommand: resultStatus2: P 
+2025-06-18 15:29:21.505 DEBUG ApplicationLauncher:4028 - dutExecuteCommand: resultValue2: Pass
+2025-06-18 15:29:54.934 INFO  ApplicationLauncher:2597 - btnDimmerIsMinOnClick: Entry
+2025-06-18 15:29:55.002 INFO  ApplicationLauncher:4699 - dutCommandExecuteStart : ENTRY
+2025-06-18 15:29:55.002 DEBUG ApplicationLauncher:4001 - dutExecuteCommand: positionId:1
+2025-06-18 15:29:55.002 DEBUG ApplicationLauncher:3735 - dutSendCmd :Entry : positionId : 1
+2025-06-18 15:29:55.002 DEBUG ApplicationLauncher:90 - ClearSerialData :Entry
+2025-06-18 15:29:55.003 DEBUG ApplicationLauncher:3795 - dutSendCmd : absoluteCommandInAscii : CHECK_DIMMER_MIN
+ : position id : 1
+2025-06-18 15:29:55.003 DEBUG ApplicationLauncher:3796 - dutSendCmd : expectedResponseInHex length: 30 : position id : 1
+2025-06-18 15:29:55.003 DEBUG ApplicationLauncher:6141 - calibrationSendCommand :Entry
+2025-06-18 15:29:55.003 DEBUG ApplicationLauncher:6143 - calibrationSendCommand : data: CHECK_DIMMER_MIN
+
+2025-06-18 15:29:55.003 DEBUG ApplicationLauncher:3060 - WriteToSerialCommDUT1 :Data:CHECK_DIMMER_MIN
+
+2025-06-18 15:29:55.205 DEBUG ApplicationLauncher:3853 - dutReadDataV2 :Entry  : position id : 1
+2025-06-18 15:29:55.205 DEBUG ApplicationLauncher:3862 - dutReadDataV2: setExpectedResult: Hex   :44494D4D45525F41545F4D494E5F53 : position id : 1
+2025-06-18 15:29:55.205 DEBUG ApplicationLauncher:3863 - dutReadDataV2: setExpectedResult: Ascii :DIMMER_AT_MIN_S : position id : 1
+2025-06-18 15:29:55.205 DEBUG ApplicationLauncher:3864 - dutReadDataV2: setExpectedLength:44 : position id : 1
+2025-06-18 15:29:55.206 INFO  ApplicationLauncher:82 - setNumberOfReadingRequired: numberOfReadings: 1
+2025-06-18 15:29:55.206 INFO  ApplicationLauncher:66 - DUT SerialReponseTimerStart :DUT_Task Triggered:
+2025-06-18 15:29:55.406 INFO  ApplicationLauncher:109 - calibrationMenuTaskV2: CurrentSerialData: 44494D4D45525F41545F4D494E5F530D0A
+2025-06-18 15:29:55.406 INFO  ApplicationLauncher:111 - getExpectedLength():44
+2025-06-18 15:29:55.406 DEBUG ApplicationLauncher:152 - calibrationMenuTaskV2 Expected Data received:Length4:34:CurrentData:44494D4D45525F41545F4D494E5F530D0A
+2025-06-18 15:29:55.406 DEBUG ApplicationLauncher:153 - calibrationMenuTaskV2 Expected Data received:Length4a:34:CurrentData:DIMMER_AT_MIN_S
+
+2025-06-18 15:29:55.406 DEBUG ApplicationLauncher:156 - calibrationMenuTaskV2 : lastPatternMatchingCount : 0
+2025-06-18 15:29:55.406 DEBUG ApplicationLauncher:162 - calibrationMenuTaskV2 : adding messageTimeStampList : currentTimeEpoch: 1750240795
+2025-06-18 15:29:55.406 DEBUG ApplicationLauncher:168 - calibrationMenuTaskV2 : patternMatchingCount : 1
+2025-06-18 15:29:55.406 DEBUG ApplicationLauncher:171 - calibrationMenuTaskV2 : patternMatchingCount matched
+2025-06-18 15:29:55.406 DEBUG ApplicationLauncher:173 - calibrationMenuTaskV2 : terminatorCount :1
+2025-06-18 15:29:55.408 DEBUG ApplicationLauncher:180 - calibrationMenuTaskV2 : terminatorCount matched
+2025-06-18 15:29:55.408 DEBUG ApplicationLauncher:1020 - setLDU_ReadSerialData: Entry
+2025-06-18 15:29:55.408 DEBUG ApplicationLauncher:185 - calibrationMenuTaskV2 Expected Data received:Length5:34:CurrentData:44494D4D45525F41545F4D494E5F530D0A
+2025-06-18 15:29:55.408 DEBUG ApplicationLauncher:186 - calibrationMenuTaskV2 Expected Data received:Length5a:34:CurrentData:DIMMER_AT_MIN_S
+
+2025-06-18 15:29:55.408 INFO  ApplicationLauncher:194 - calibrationMenuTaskV2 : Timer Exit:
+2025-06-18 15:29:55.457 INFO  ApplicationLauncher:3814 - dutSendCmd: Expected recieved:44494D4D45525F41545F4D494E5F530D0A : position id : 1
+2025-06-18 15:29:55.457 DEBUG ApplicationLauncher:6791 - StripLDU_SerialData :Entry
+2025-06-18 15:29:55.457 DEBUG ApplicationLauncher:542 - StripLength:  LengthTobeDeleted: 34
+2025-06-18 15:29:55.457 DEBUG ApplicationLauncher:6795 - StripLDU_SerialData : getSerialData :
+2025-06-18 15:29:55.457 INFO  ApplicationLauncher:3836 - dutSendCmd: timeOut Entry:  : position id : 1
+2025-06-18 15:29:55.457 INFO  ApplicationLauncher:3838 - dutSendCmd: timeOut countDown: 1 : position id : 1
+2025-06-18 15:29:56.458 INFO  ApplicationLauncher:3842 - dutSendCmd: timeOut Exit:  : position id : 1
+2025-06-18 15:29:56.458 DEBUG ApplicationLauncher:4014 - dutExecuteCommand: resultValue1:
+2025-06-18 15:29:56.458 DEBUG ApplicationLauncher:4027 - dutExecuteCommand: resultStatus2: P 
+2025-06-18 15:29:56.458 DEBUG ApplicationLauncher:4028 - dutExecuteCommand: resultValue2: Pass
+2025-06-18 15:30:03.458 INFO  ApplicationLauncher:1479 - <------------ Spring App Context closing... ---------->
+
+2025-06-18 15:30:03.665 INFO  Http11NioProtocol:173 - Pausing ProtocolHandler ["http-nio-8085"]
+2025-06-18 15:30:03.666 INFO  StandardService:173 - Stopping service [Tomcat]
+2025-06-18 15:30:03.673 INFO  Http11NioProtocol:173 - Stopping ProtocolHandler ["http-nio-8085"]
+2025-06-18 15:30:03.679 INFO  Http11NioProtocol:173 - Destroying ProtocolHandler ["http-nio-8085"]
+2025-06-18 15:30:03.684 INFO  LocalContainerEntityManagerFactoryBean:651 - Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-06-18 15:30:03.686 INFO  HikariDataSource:350 - HikariPool-1 - Shutdown initiated...
+2025-06-18 15:30:03.699 INFO  HikariDataSource:352 - HikariPool-1 - Shutdown completed.
+2025-06-18 15:30:03.699 INFO  ApplicationLauncher:1484 - <------------ Spring App Context closed ---------->
+
+2025-06-18 15:30:03.699 INFO  ApplicationLauncher:1486 - <------------Exiting ProFAN application---------->
+

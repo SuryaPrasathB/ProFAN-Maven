@@ -355,3 +355,7 @@
 2025-06-18 11:29:59.203 WARN  javafx:61 - Loading FXML document with JavaFX API of version 23.0.1 by JavaFX runtime of version 8.0.161
 2025-06-18 11:30:01.227 INFO  ApplicationLauncher:330 - You clicked Report Icon!
 2025-06-18 11:30:01.229 WARN  javafx:61 - Loading FXML document with JavaFX API of version 23.0.1 by JavaFX runtime of version 8.0.161
+2025-06-18 11:32:00.300 INFO  ApplicationLauncher:330 - You clicked Report Icon!
+2025-06-18 11:32:00.303 WARN  javafx:61 - Loading FXML document with JavaFX API of version 23.0.1 by JavaFX runtime of version 8.0.161
+2025-06-18 12:10:55.213 INFO  ApplicationLauncher:330 - You clicked Report Icon!
+2025-06-18 12:10:55.241 WARN  javafx:61 - Loading FXML document with JavaFX API of version 23.0.1 by JavaFX runtime of version 8.0.161
