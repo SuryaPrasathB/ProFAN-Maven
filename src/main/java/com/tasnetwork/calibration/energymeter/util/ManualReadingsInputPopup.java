@@ -37,8 +37,8 @@ public class ManualReadingsInputPopup {
 
         VBox root = new VBox(10);
         root.setPadding(new Insets(15)); // Set padding for the root VBox
-        root.setPrefWidth(400);
-        root.setPrefHeight(400);
+        root.setPrefWidth(250);
+        root.setPrefHeight(300);
         // Set the background of the root VBox to black
         //root.setBackground(new Background(new BackgroundFill(Color.BLACK, CornerRadii.EMPTY, Insets.EMPTY))); // <<<--- ADDED/MODIFIED LINE
 
@@ -57,7 +57,7 @@ public class ManualReadingsInputPopup {
             warningLabel.setTextFill(Color.RED);
             warningLabel.setVisible(false); // Initially hidden
             warningLabels.put(tf, warningLabel); // Store the warning label
-
+            
             Label readingLabel = new Label("Reading " + i + ":");
             readingLabel.setTextFill(Color.BLACK); // <<<--- ADDED/MODIFIED LINE: Set label text color to white for contrast
             HBox inputRow = new HBox(5, readingLabel, tf);

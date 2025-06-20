@@ -1,10 +1,6 @@
 package com.tasnetwork.spring.orm.service;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime; // Import LocalDateTime
 import java.util.List;
-import java.util.ArrayList; // Import ArrayList
-import java.util.stream.Collectors; // Import Collectors
 
 import javax.transaction.Transactional;
 
@@ -52,45 +48,23 @@ public class ResultService {
 	public List<Result> findall() {
 		return resultRepo.findAll();
 	}
-
+	
 	/**
-	 * Finds Results based on a list of serial number search queries and a date range.
-	 * This method translates the SearchQuery objects into concrete serial numbers
-	 * and converts LocalDate to LocalDateTime for database filtering.
-	 *
-	 * @param serialSearchQueries A list of SearchQuery objects representing exact serial numbers or ranges.
-	 * If this list is empty, no serial number filtering is applied.
-	 * @param fromDate            The start date for filtering (inclusive). Can be null.
-	 * @param toDate              The end date for filtering (inclusive). Can be null.
-	 * @return A list of Results matching the combined criteria.
-	 */
-	public List<Result> findBySerialAndDateRange(List<SearchQuery> serialSearchQueries, LocalDate fromDate,
-			LocalDate toDate) {
-		
-		// 1. Prepare serial numbers for the repository query
-		List<String> exactSerialNumbersForDbQuery = new ArrayList<>();
-        if (serialSearchQueries != null && !serialSearchQueries.isEmpty()) {
-            for (SearchQuery query : serialSearchQueries) {
-                if (query.isRange()) {
-                    int paddingLength = query.getNumericPartLengthForRange();
-                    for (int i = query.getStartNumeric(); i <= query.getEndNumeric(); i++) {
-                        exactSerialNumbersForDbQuery.add(String.format("%s%0" + paddingLength + "d", query.getPrefix(), i));
-                    }
-                } else {
-                    exactSerialNumbersForDbQuery.add(query.getExactSerialNumber());
-                }
-            }
-        }
+     * Finds Results by a given epoch time range (inclusive) and test status.
+     * This method directly calls the corresponding repository method.
+     *
+     * @param fromEpochTime 	The start epoch time (inclusive, in milliseconds).
+     * @param toEpochTime   	The end epoch time (inclusive, in milliseconds).
+     * @param fanSerialNumber   The fan serial number     
+     * @return A list of Results matching the criteria.
+     */
+    public List<Result> findByEpochTimeBetweenAndFanSerialNumber(Long fromEpochTime, Long toEpochTime, String fanSerialNumber) {
+        return resultRepo.findByEpochTimeBetweenAndFanSerialNumber(fromEpochTime, toEpochTime, fanSerialNumber);
+    }
+    
+    public List<Result> findByEpochTimeBetween(Long fromEpochTime, Long toEpochTime) {
+    	return resultRepo.findByEpochTimeBetween(fromEpochTime, toEpochTime);
+    }
 
-        // If no serial numbers are specified (list is empty), pass null or empty list to the repository
-        // The @Query annotation in ResultRepo handles `null` or `EMPTY` list for serialNumbers.
-        
-        // 2. Convert LocalDate to LocalDateTime for database comparison
-        LocalDateTime fromDateTime = (fromDate != null) ? fromDate.atStartOfDay() : null;
-        // To include the entire 'toDate', set it to the very end of that day.
-        LocalDateTime toDateTime = (toDate != null) ? toDate.atTime(23, 59, 59, 999999999) : null;
-        
-        // 3. Call the new repository method
-		return resultRepo.findBySerialNumbersAndDateTimeRange(exactSerialNumbersForDbQuery, fromDateTime, toDateTime);
-	}
+
 }

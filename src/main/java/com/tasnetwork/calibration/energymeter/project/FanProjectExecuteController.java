@@ -4,7 +4,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
@@ -144,7 +147,7 @@ public class FanProjectExecuteController implements Initializable {
 	static private Button ref_btnDimmerIsMinExecute;
 
 	@FXML private Button btnDimmerSetMinExecute;
-	
+
 	@FXML private Button btnDimmerForwardExecute;
 	static private Button ref_btnDimmerForwardExecute;
 
@@ -499,7 +502,7 @@ public class FanProjectExecuteController implements Initializable {
 	@FXML private TableColumn<FanTestSetup, String> colTestSetupRpmActual;
 
 	@FXML private TableColumn<FanTestSetup, String> colTestSetupWindSpeedActual;
-	
+
 	@FXML private TableColumn<FanTestSetup, String> colTestSetupVibActual;
 
 	@FXML private TableColumn<FanTestSetup, String> colTestSetupCurrentActual;
@@ -613,24 +616,27 @@ public class FanProjectExecuteController implements Initializable {
 		});
 
 		// Add global key event filter to the scene for the simulation mode shortcut
-        Platform.runLater(() -> {
-            if (tvTestSetup.getScene() != null) {
-                tvTestSetup.getScene().addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-                    // Detect CTRL + SHIFT + ` (back_quote)
-                    if (isSimulationShortcutEnabled && event.isAltDown() && event.isShiftDown() && event.getCode() == KeyCode.BACK_QUOTE) {
-                        openSimulationConfigurationDialog();
-                        event.consume(); // Consume the event so it doesn't propagate
-                    }
-                    if (isSimulationShortcutEnabled && event.isControlDown() && event.isShiftDown() && event.getCode() == KeyCode.BACK_QUOTE) {
-                    	ReportGeneratorController reportGeneratorController = new ReportGeneratorController();
-                    	reportGeneratorController.openPathConfigurationDialog();
-                        event.consume(); // Consume the event so it doesn't propagate
-                    }
-                });
-            } else {
-                System.err.println("Warning: Scene not available during initialize, cannot set global key listener for simulation config.");
-            }
-        });
+		Platform.runLater(() -> {
+			if (tvTestSetup.getScene() != null) {
+				tvTestSetup.getScene().addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+					// Detect CTRL + SHIFT + ` (back_quote)
+					if (isSimulationShortcutEnabled && event.isAltDown() && event.isShiftDown() && event.getCode() == KeyCode.BACK_QUOTE) {
+						openSimulationConfigurationDialog();
+						event.consume(); // Consume the event so it doesn't propagate
+					}
+					/*
+					 * if (isSimulationShortcutEnabled && event.isControlDown() &&
+					 * event.isShiftDown() && event.getCode() == KeyCode.BACK_QUOTE) {
+					 * ReportGeneratorController reportGeneratorController = new
+					 * ReportGeneratorController();
+					 * reportGeneratorController.openPathConfigurationDialog(); event.consume(); //
+					 * Consume the event so it doesn't propagate }
+					 */
+				});
+			} else {
+				System.err.println("Warning: Scene not available during initialize, cannot set global key listener for simulation config.");
+			}
+		});
 
 
 		// TEXT BOX VALIDATION ===============================================================================
@@ -825,7 +831,7 @@ public class FanProjectExecuteController implements Initializable {
 				}
 			}
 		});
-		
+
 		colTestSetupVibActual.setCellValueFactory(cellData -> cellData.getValue().vibrationActualProperty());
 		colTestSetupVibActual.setCellFactory(col -> new TableCell<FanTestSetup, String>() {
 			@Override
@@ -1857,20 +1863,27 @@ public class FanProjectExecuteController implements Initializable {
 		FanTestSetup testPoint = testPoints.get(currentIndex);
 		// Update results to DB
 		updateResultMeasurements(
-				//currentProjectRun, 
-				fanSerialNumber, 
-				LocalDateTime.now(),
-				testPoint.getTestPointName(),
-				currentResult.getVoltage(),
-				currentResult.getRpm(), 
-				currentResult.getWindSpeed(), 
-				currentResult.getVibration(),
-				currentResult.getWatts(), 
-				currentResult.getVa(), 
-				currentResult.getCurrent(), 
-				currentResult.getPowerFactor(), 
-				currentResult.getTestStatus()
-				);
+			    fanSerialNumber,
+			    LocalDateTime.now(),
+			    testPoint.getTestPointName(),
+			    currentResult.getVoltage(),
+			    currentResult.getRpm(),
+			    currentResult.isRpmValid(),
+			    currentResult.getWindSpeed(),
+			    currentResult.isWindSpeedValid(),
+			    currentResult.getVibration(),
+			    currentResult.isVibrationValid(),
+			    currentResult.getWatts(),
+			    currentResult.isWattsValid(),
+			    currentResult.getVa(),
+			    currentResult.getCurrent(),
+			    currentResult.isCurrentValid(),
+			    currentResult.getPowerFactor(),
+			    currentResult.isPowerFactorValid(),
+			    currentResult.getTestStatus(),
+			    currentResult.isActivePowerValid()
+			);
+
 
 		ApplicationLauncher.logger.debug("Test Point Name : " + testPoint.getTestPointName());
 		appendLog("Result Updated : Test point : TestName1 ", LogLevel.INFO);
@@ -1957,41 +1970,86 @@ public class FanProjectExecuteController implements Initializable {
 	 * @param powerFactor     Measured power factor.
 	 * @param status          Final test status ("Completed", "Failed", etc.).
 	 */
-	public void updateResultMeasurements(String fanSerialNumber,LocalDateTime dateTime, String testPointName, String voltage,
-			String rpm, String windspeed, String vibration, String watts, String va, String current,
-			String powerFactor, String status) {
-
-
-		/*Result test1 = displayDataObj.getResultService()
-	            .findByProjectRunAndTestPointName(projectRun,testPointName);
-
-		if (test1 != null) {
-			ApplicationLauncher.logger.debug("Test 1 Found : By Project Run and Test Point Name") ;
-		}*/
+	public void updateResultMeasurements(
+	        String fanSerialNumber,
+	        LocalDateTime dateTime,
+	        String testPointName,
+	        String voltage,
+	        String rpm,
+	        boolean rpmValid,
+	        String windspeed,
+	        boolean windSpeedValid,
+	        String vibration,
+	        boolean vibrationValid,
+	        String watts,
+	        boolean wattsValid,
+	        String va,
+	        String current,
+	        boolean currentValid,
+	        String powerFactor,
+	        boolean powerFactorValid,
+	        String status,
+	        boolean activePowerValid
+	)
+	{
 
 		Result result = DeviceDataManagerController.getResultService()
 				.findByFanSerialNumberAndTestPointName(fanSerialNumber, testPointName);
 
 		if (result != null) {
-			result.setDateTime(dateTime);
-			result.setVoltage(voltage);
-			result.setRpm(rpm);
-			result.setWindSpeed(windspeed);
-			result.setWatts(watts);
-			result.setVibration(vibration);
-			result.setVa(va);
-			result.setCurrent(current);
-			result.setPowerFactor(powerFactor);
-			result.setTestStatus(status);
+		    result.setDateTime(dateTime);
+		    result.setEpochTime(convertToEpoch(dateTime));
 
-			DeviceDataManagerController.getResultService().saveToDb(result);
-		} else {
+		    //result.setTestPointName(testPointName); // Optional, in case you need to update it
+		    //result.setFanSerialNumber(fanSerialNumber); // Optional
+
+		    result.setVoltage(voltage);
+		    result.setRpm(rpm);
+		    result.setRpmValid(rpmValid);
+
+		    result.setWindSpeed(windspeed);
+		    result.setWindSpeedValid(windSpeedValid);
+
+		    result.setVibration(vibration);
+		    result.setVibrationValid(vibrationValid);
+
+		    result.setCurrent(current);
+		    result.setCurrentValid(currentValid);
+
+		    result.setWatts(watts);
+		    result.setWattsValid(wattsValid);
+
+		    result.setVa(va);
+
+		    result.setPowerFactor(powerFactor);
+		    result.setPowerFactorValid(powerFactorValid);
+
+		    result.setTestStatus(status);
+		    result.setActivePowerValid(activePowerValid);
+
+		    DeviceDataManagerController.getResultService().saveToDb(result);
+		}
+ else {
 			ApplicationLauncher.logger.debug("Fan Serial Number : " + fanSerialNumber);
 			ApplicationLauncher.logger.debug("Test Point Name : " + testPointName);
 			appendLog("Result not found for test point: " + testPointName, LogLevel.INFO);
 			ApplicationLauncher.logger.debug("Result not found for test point: " + testPointName);
 		}
 	}
+	
+	/**
+	 * Converts a LocalDateTime to epoch milliseconds in UTC.
+	 * Returns null if input is null.
+	 */
+	private Long convertToEpoch(LocalDateTime dateTime) {
+	    if (dateTime == null) {
+	        return null;
+	    }
+	    return dateTime.atZone(ZoneOffset.UTC)
+	                   .toInstant()
+	                   .toEpochMilli();
+	}
+
 
 	// Call this method to disable or enable test control buttons
 	private void setControlsDisabled(boolean disabled) {
@@ -2023,7 +2081,7 @@ public class FanProjectExecuteController implements Initializable {
 					testPoint.setPowerFactorActual("");
 					testPoint.setWindSpeedActual("");
 					testPoint.setVibrationActual("");
-					
+
 				});
 				appendLog("Running : Testpoint : " + (currentIndex + 1), LogLevel.INFO);
 				runSingleTestPoint(testPoint);
@@ -2213,7 +2271,7 @@ public class FanProjectExecuteController implements Initializable {
 			Platform.runLater(() -> testPoint.setProgress(progress));
 		}
 
-		// Step 5+: Loop measurement update until stop
+		// Step 5: Loop measurement update until stop
 		currentResult = new Result();
 		currentResult.setFanSerialNumber(ref_txtNewFanSerialNo.getText());
 		currentResult.setVoltage(targetVoltage);
@@ -2229,24 +2287,30 @@ public class FanProjectExecuteController implements Initializable {
 
 		// Update results to DB
 		updateResultMeasurements(
-				//currentProjectRun, 
-				fanSerialNumber,
-				LocalDateTime.now(),
-				testPoint.getTestPointName(), 
-				currentResult.getVoltage(),
-				currentResult.getRpm(), 
-				currentResult.getWindSpeed(), 
-				currentResult.getVibration(),
-				currentResult.getWatts(), 
-				currentResult.getVa(), 
-				currentResult.getCurrent(), 
-				currentResult.getPowerFactor(), 
-				currentResult.getTestStatus()
-				);
+			    fanSerialNumber,
+			    LocalDateTime.now(),
+			    testPoint.getTestPointName(),
+			    currentResult.getVoltage(),
+			    currentResult.getRpm(),
+			    currentResult.isRpmValid(),
+			    currentResult.getWindSpeed(),
+			    currentResult.isWindSpeedValid(),
+			    currentResult.getVibration(),
+			    currentResult.isVibrationValid(),
+			    currentResult.getWatts(),
+			    currentResult.isWattsValid(),
+			    currentResult.getVa(),
+			    currentResult.getCurrent(),
+			    currentResult.isCurrentValid(),
+			    currentResult.getPowerFactor(),
+			    currentResult.isPowerFactorValid(),
+			    currentResult.getTestStatus(),
+			    currentResult.isActivePowerValid()
+			);
 
 		appendLog("Result Updated : Test point : " + testPoint.getTestPointName(), LogLevel.INFO);
 
-		// Final clean-up
+		// Step 6: Clean-up
 		Platform.runLater(() -> {
 			testPoint.setIsRunning(false);
 			if (!isStopped) testPoint.setStatus(ConstantStatus.COMPLETED);
@@ -2262,11 +2326,20 @@ public class FanProjectExecuteController implements Initializable {
 	        setControlsDisabled(false);
 	    } */	        
 
-		if (!isStepRun && currentIndex >= testPoints.size() - 1) {
-			TestPointUtils.mainsOff();
-			appendLog("All test points completed. Voltage set to 0. Without setting dimmer to min.", LogLevel.INFO);
-			setControlsDisabled(false);
+		// Step 7 : All test points completed — Mains OFF
+		appendLog("All test points completed. Turning Mains OFF...", LogLevel.INFO);
+		Platform.runLater(() -> testPoint.setProgress(1.0)); // Optional visual update
+
+		if (!SIMULATION_MODE) {
+		    TestPointUtils.mainsOff();
+		    appendLog("Mains OFF executed (hardware). Voltage set to 0. Dimmer not set to min.", LogLevel.INFO);
+		} else {
+		    appendLog("SIMULATION: Mains OFF (no actual hardware call). Voltage set to 0. Dimmer not set to min.", LogLevel.INFO);
 		}
+
+		// Re-enable UI controls
+		setControlsDisabled(false);
+
 	}
 
 	/**
@@ -2320,25 +2393,25 @@ public class FanProjectExecuteController implements Initializable {
 	 * @return the average of the entered vibration values
 	 */
 	private double promptForVibrationReadings(int count) {
-	    final FutureTask<Double> task = new FutureTask<>(() -> {
-	        // Reusing WindSpeedPopup for simplicity. Ideally, you might create a dedicated
-	        // 'VibrationPopup' class in 'com.tasnetwork.calibration.energymeter.util;'
-	        // if you need different UI or validation logic for vibration.
-	        ManualReadingsInputPopup popup = new ManualReadingsInputPopup(count, "Vibration Readings");
-	        return popup.showAndWaitAndReturnAverage(); // Should be blocking on FX thread
-	    });
+		final FutureTask<Double> task = new FutureTask<>(() -> {
+			// Reusing WindSpeedPopup for simplicity. Ideally, you might create a dedicated
+			// 'VibrationPopup' class in 'com.tasnetwork.calibration.energymeter.util;'
+			// if you need different UI or validation logic for vibration.
+			ManualReadingsInputPopup popup = new ManualReadingsInputPopup(count, "Vibration Readings");
+			return popup.showAndWaitAndReturnAverage(); // Should be blocking on FX thread
+		});
 
-	    Platform.runLater(task); // Run UI interaction on FX thread
+		Platform.runLater(task); // Run UI interaction on FX thread
 
-	    try {
-	        return task.get(); // Wait for result from FX thread
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        ApplicationLauncher.logger.error("Failed to get vibration readings from popup.", e);
-	        return 0.0; // Or some other fallback/default
-	    }
+		try {
+			return task.get(); // Wait for result from FX thread
+		} catch (Exception e) {
+			e.printStackTrace();
+			ApplicationLauncher.logger.error("Failed to get vibration readings from popup.", e);
+			return 0.0; // Or some other fallback/default
+		}
 	}
-	
+
 	/**
 	 * Executes a single test point by performing measurements such as RPM, Current, Watts,
 	 * Active Power, Power Factor, and Wind Speed. The execution path is controlled by the
@@ -2381,7 +2454,7 @@ public class FanProjectExecuteController implements Initializable {
 				int windSpeedCount = fetchWindSpeedConfigForCurrentModel();
 				double avgWindSpeed;
 				if (SIMULATION_MODE) {
-					promptForWindSpeedReadings(windSpeedCount); // Simulating pop up
+					//promptForWindSpeedReadings(windSpeedCount); // Simulating pop up
 					avgWindSpeed = Double.parseDouble(generateRandomWindSpeed());
 					appendLog("SIMULATION: Windspeed: " + String.format("%.1f", avgWindSpeed), LogLevel.INFO);
 				} else {
@@ -2399,29 +2472,29 @@ public class FanProjectExecuteController implements Initializable {
 						1.0,
 						"WindSpeed"
 						);
-				
+
 				// Vibration Parameter Logic similar to Wind speed
 				int vibrationCount = fetchWindSpeedConfigForCurrentModel();
-	            double avgVibration;
-	            if (SIMULATION_MODE) {
-	                promptForVibrationReadings(vibrationCount); // Simulating pop up for vibration
-	                avgVibration = Double.parseDouble(generateRandomVibration());
-	                appendLog("SIMULATION: Vibration: " + String.format("%.1f", avgVibration), LogLevel.INFO);
-	            } else {
-	                avgVibration = promptForVibrationReadings(vibrationCount);
-	            }
-	            Supplier<String> vibrationSupplier = () -> String.valueOf(avgVibration);
+				double avgVibration;
+				if (SIMULATION_MODE) {
+					//promptForVibrationReadings(vibrationCount); // Simulating pop up for vibration
+					avgVibration = Double.parseDouble(generateRandomVibration());
+					appendLog("SIMULATION: Vibration: " + String.format("%.1f", avgVibration), LogLevel.INFO);
+				} else {
+					avgVibration = promptForVibrationReadings(vibrationCount);
+				}
+				Supplier<String> vibrationSupplier = () -> String.valueOf(avgVibration);
 
-	            readValidateAndUpdate(
-	                    vibrationSupplier,
-	                    FanTestSetup::getVibrationLowerLimit, // Assumes this method exists
-	                    FanTestSetup::getVibrationUpperLimit, // Assumes this method exists
-	                    FanTestSetup::setVibrationActual,     // Assumes this method exists
-	                    FanTestSetup::getVibrationValid,      // Assumes this method exists
-	                    testPoint,
-	                    1.0, // Adjust progress if other steps follow
-	                    "Vibration"
-	            );
+				readValidateAndUpdate(
+						vibrationSupplier,
+						FanTestSetup::getVibrationLowerLimit, // Assumes this method exists
+						FanTestSetup::getVibrationUpperLimit, // Assumes this method exists
+						FanTestSetup::setVibrationActual,     // Assumes this method exists
+						FanTestSetup::getVibrationValid,      // Assumes this method exists
+						testPoint,
+						1.0, // Adjust progress if other steps follow
+						"Vibration"
+						);
 
 			} catch (InterruptedException e) {
 				appendLog("Measurement loop interrupted.", LogLevel.INFO);
@@ -2615,7 +2688,7 @@ public class FanProjectExecuteController implements Initializable {
 		ApplicationLauncher.logger.info("btnStopOnClick: Entry");
 
 		isFirstTestPointInSequence = true;
-		
+
 		stopTimer = new Timer();
 		stopTimer.schedule(new stopOnTaskClick(), 50);
 	}
@@ -4474,68 +4547,78 @@ public class FanProjectExecuteController implements Initializable {
 	 * @throws InterruptedException if the thread is interrupted during sleep
 	 */
 	private void readValidateAndUpdate(
-			Supplier<String> readFunc,
-			Function<FanTestSetup, String> lowerLimitGetter,
-			Function<FanTestSetup, String> upperLimitGetter,
-			BiConsumer<FanTestSetup, String> actualSetter,
-			Function<FanTestSetup, BooleanProperty> validPropertyGetter,
-			FanTestSetup testPoint,
-			double progress,
-			String label
-			) throws InterruptedException {
-		// Step 1: Read the parameter value
-		String value = readFunc.get();
-		String finalValue = value;
-		appendLog("Read and Update : " + label + " : " + finalValue, LogLevel.INFO);
-		ApplicationLauncher.logger.debug("runSingleTestPoint : Read and Update : " + label + " : " + finalValue);
+	        Supplier<String> readFunc,
+	        Function<FanTestSetup, String> lowerLimitGetter,
+	        Function<FanTestSetup, String> upperLimitGetter,
+	        BiConsumer<FanTestSetup, String> actualSetter,
+	        Function<FanTestSetup, BooleanProperty> validPropertyGetter,
+	        FanTestSetup testPoint,
+	        double progress,
+	        String label
+	) throws InterruptedException {
+	    // Step 1: Read the parameter value
+	    String value = readFunc.get();
+	    String finalValue = value;
+	    appendLog("Read and Update : " + label + " : " + finalValue, LogLevel.INFO);
+	    ApplicationLauncher.logger.debug("runSingleTestPoint : Read and Update : " + label + " : " + finalValue);
 
-		// Step 2: Fetch limit values for validation
-		String lowerLimit = lowerLimitGetter.apply(testPoint);
-		String upperLimit = upperLimitGetter.apply(testPoint);
-		boolean isValid = false;
+	    // Step 2: Fetch limit values for validation
+	    String lowerLimit = lowerLimitGetter.apply(testPoint);
+	    String upperLimit = upperLimitGetter.apply(testPoint);
+	    boolean isValid = false;
 
-		// Step 3: Validate the value within lower and upper bounds
-		try {
-			if (finalValue != null && !finalValue.trim().isEmpty() &&
-					lowerLimit != null && !lowerLimit.trim().isEmpty() &&
-					upperLimit != null && !upperLimit.trim().isEmpty()) {
+	    // Step 3: Validate the value within lower and upper bounds
+	    try {
+	        if (finalValue != null && !finalValue.trim().isEmpty() &&
+	            lowerLimit != null && !lowerLimit.trim().isEmpty() &&
+	            upperLimit != null && !upperLimit.trim().isEmpty()) {
 
-				double val = Double.parseDouble(finalValue.trim());
-				double lower = Double.parseDouble(lowerLimit.trim());
-				double upper = Double.parseDouble(upperLimit.trim());
+	            double val = Double.parseDouble(finalValue.trim());
+	            double lower = Double.parseDouble(lowerLimit.trim());
+	            double upper = Double.parseDouble(upperLimit.trim());
 
-				isValid = val >= lower && val <= upper;
-			}
-		} catch (NumberFormatException e) {
-			isValid = true; // fallback if parsing fails
-		}
+	            isValid = val >= lower && val <= upper;
+	        }
+	    } catch (NumberFormatException e) {
+	        isValid = true; // fallback if parsing fails
+	    }
 
-		// Step 4: Update validity status
-		validPropertyGetter.apply(testPoint).set(isValid);
-		if (!isValid) {
-			allValid = false; // Mark test point result as failed if any parameter is invalid
-		}
+	    // Step 4: Update validity status in UI and result
+	    validPropertyGetter.apply(testPoint).set(isValid);
+	    if (!isValid) {
+	        allValid = false; // Mark test point result as failed if any parameter is invalid
+	    }
 
+	    // Set the validity flag in currentResult
+	    switch (label) {
+	        case "RPM"          : currentResult.setRpmValid(isValid); break;
+	        case "WindSpeed"    : currentResult.setWindSpeedValid(isValid); break;
+	        case "Current"      : currentResult.setCurrentValid(isValid); break;
+	        case "Watts"        : currentResult.setWattsValid(isValid); break;
+	        case "Vibration"    : currentResult.setVibrationValid(isValid); break;
+	        case "ActivePower"  : currentResult.setActivePowerValid(isValid); break;
+	        case "PowerFactor"  : currentResult.setPowerFactorValid(isValid); break;
+	    }
 
+	    // Step 5: Update the actual value and progress in the UI
+	    Platform.runLater(() -> actualSetter.accept(testPoint, finalValue));
+	    Platform.runLater(() -> testPoint.setProgress(progress));
 
-		// Step 5: Update the actual value and progress in the UI
-		Platform.runLater(() -> actualSetter.accept(testPoint, finalValue));
-		Platform.runLater(() -> testPoint.setProgress(progress));
+	    // Step 6: Update actual measurement in currentResult
+	    switch (label) {
+	        case "RPM"          : currentResult.setRpm(finalValue); break;
+	        case "WindSpeed"    : currentResult.setWindSpeed(finalValue); break;
+	        case "Current"      : currentResult.setCurrent(finalValue); break;
+	        case "Watts"        : currentResult.setWatts(finalValue); break;
+	        case "Vibration"    : currentResult.setVibration(finalValue); break;
+	        case "ActivePower"  : currentResult.setVa(finalValue); break;
+	        case "PowerFactor"  : currentResult.setPowerFactor(finalValue); break;
+	    }
 
-		// Step 6: Update result object based on label
-		switch (label) {
-		case "RPM" 			: currentResult.setRpm(finalValue); break;
-		case "WindSpeed" 	: currentResult.setWindSpeed(finalValue); break;
-		case "Current" 		: currentResult.setCurrent(finalValue); break;
-		case "Watts" 		: currentResult.setWatts(finalValue); break;
-		case "Vibration"	: currentResult.setVibration(finalValue); break;
-		case "ActivePower"  : currentResult.setVa(finalValue); break;
-		case "PowerFactor"  : currentResult.setPowerFactor(finalValue); break;
-		}
-
-		// Step 7: Small delay between updates
-		Thread.sleep(500);
+	    // Step 7: Small delay between updates
+	    Thread.sleep(500);
 	}
+
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -4790,11 +4873,11 @@ public class FanProjectExecuteController implements Initializable {
 		double windSpeed = 1 + (random.nextDouble() * 19); // Random value between 1 and 20
 		return String.format("%.1f", windSpeed);  // Format to one decimal place
 	}
-	
+
 	// Method to generate random Vibration value (e.g., in the range of 0.1 to 5.0 g)
 	public static String generateRandomVibration() {
-	    double vibration = 0.1 + (random.nextDouble() * 4.9); // Random value between 0.1 and 5.0
-	    return String.format("%.1f", vibration);  // Format to one decimal place
+		double vibration = 0.1 + (random.nextDouble() * 4.9); // Random value between 0.1 and 5.0
+		return String.format("%.1f", vibration);  // Format to one decimal place
 	}
 
 	// Method to generate random voltage value (e.g., in the range of 0 to 415)
@@ -4869,73 +4952,73 @@ public class FanProjectExecuteController implements Initializable {
 	public void setFirstTestPointInSequence(boolean isFirstTestPointInSequence) {
 		this.isFirstTestPointInSequence = isFirstTestPointInSequence;
 	}
-	
+
 	private void openSimulationConfigurationDialog() {
-	    ApplicationLauncher.logger.info("Opening Simulation Configuration Dialog.");
-	    
-	    Stage dialogStage = new Stage();
-	    dialogStage.setTitle("Simulation Configuration");
+		ApplicationLauncher.logger.info("Opening Simulation Configuration Dialog.");
 
-	    try {
-	        Window owner = btnSettings != null && btnSettings.getScene() != null
-	                       ? btnSettings.getScene().getWindow()
-	                       : null;
-	        if (owner != null) {
-	            dialogStage.initOwner(owner);
-	        } else {
-	            ApplicationLauncher.logger.warn("btnSettings or its scene is null. Opening dialog without owner.");
-	        }
-	    } catch (Exception e) {
-	        ApplicationLauncher.logger.warn("Failed to set dialog owner: " + e.getMessage());
-	    }
+		Stage dialogStage = new Stage();
+		dialogStage.setTitle("Simulation Configuration");
 
-	    dialogStage.initModality(Modality.APPLICATION_MODAL);
+		try {
+			Window owner = btnSettings != null && btnSettings.getScene() != null
+					? btnSettings.getScene().getWindow()
+							: null;
+			if (owner != null) {
+				dialogStage.initOwner(owner);
+			} else {
+				ApplicationLauncher.logger.warn("btnSettings or its scene is null. Opening dialog without owner.");
+			}
+		} catch (Exception e) {
+			ApplicationLauncher.logger.warn("Failed to set dialog owner: " + e.getMessage());
+		}
 
-	    GridPane grid = new GridPane();
-	    grid.setPadding(new Insets(10));
-	    grid.setHgap(10);
-	    grid.setVgap(10);
+		dialogStage.initModality(Modality.APPLICATION_MODAL);
 
-	    Label label = new Label("Enable Simulation Mode:");
-	    CheckBox simulationCheckBox = new CheckBox();
-	    simulationCheckBox.setSelected(SIMULATION_MODE);
+		GridPane grid = new GridPane();
+		grid.setPadding(new Insets(10));
+		grid.setHgap(10);
+		grid.setVgap(10);
 
-	    Button saveButton = new Button("Save");
-	    Button cancelButton = new Button("Cancel");
-	    Label statusLabel = new Label();
-	    statusLabel.setWrapText(true);
+		Label label = new Label("Enable Simulation Mode:");
+		CheckBox simulationCheckBox = new CheckBox();
+		simulationCheckBox.setSelected(SIMULATION_MODE);
 
-	    grid.add(label, 0, 0);
-	    grid.add(simulationCheckBox, 1, 0);
-	    grid.add(saveButton, 0, 1);
-	    grid.add(cancelButton, 1, 1);
-	    GridPane.setColumnSpan(statusLabel, 2);
-	    grid.add(statusLabel, 0, 2);
+		Button saveButton = new Button("Save");
+		Button cancelButton = new Button("Cancel");
+		Label statusLabel = new Label();
+		statusLabel.setWrapText(true);
 
-	    saveButton.setOnAction(event -> {
-	        boolean newMode = simulationCheckBox.isSelected();
-	        if (SIMULATION_MODE != newMode) {
-	            SIMULATION_MODE = newMode;
-	            appendLog("Simulation Mode set to: " + SIMULATION_MODE, LogLevel.INFO);
-	            statusLabel.setText("Simulation mode updated successfully.");
-	            statusLabel.setTextFill(Color.GREEN);
-	            ApplicationLauncher.logger.info("Simulation mode updated: " + SIMULATION_MODE);
-	        } else {
-	            statusLabel.setText("No change detected.");
-	            statusLabel.setTextFill(Color.GRAY);
-	            ApplicationLauncher.logger.info("Simulation mode unchanged.");
-	        }
-	        dialogStage.close();
-	    });
+		grid.add(label, 0, 0);
+		grid.add(simulationCheckBox, 1, 0);
+		grid.add(saveButton, 0, 1);
+		grid.add(cancelButton, 1, 1);
+		GridPane.setColumnSpan(statusLabel, 2);
+		grid.add(statusLabel, 0, 2);
 
-	    cancelButton.setOnAction(event -> {
-	        ApplicationLauncher.logger.info("Simulation Configuration Dialog cancelled.");
-	        dialogStage.close();
-	    });
+		saveButton.setOnAction(event -> {
+			boolean newMode = simulationCheckBox.isSelected();
+			if (SIMULATION_MODE != newMode) {
+				SIMULATION_MODE = newMode;
+				appendLog("Simulation Mode set to: " + SIMULATION_MODE, LogLevel.INFO);
+				statusLabel.setText("Simulation mode updated successfully.");
+				statusLabel.setTextFill(Color.GREEN);
+				ApplicationLauncher.logger.info("Simulation mode updated: " + SIMULATION_MODE);
+			} else {
+				statusLabel.setText("No change detected.");
+				statusLabel.setTextFill(Color.GRAY);
+				ApplicationLauncher.logger.info("Simulation mode unchanged.");
+			}
+			dialogStage.close();
+		});
 
-	    dialogStage.setScene(new Scene(grid));
-	    dialogStage.setResizable(false);
-	    dialogStage.showAndWait();
+		cancelButton.setOnAction(event -> {
+			ApplicationLauncher.logger.info("Simulation Configuration Dialog cancelled.");
+			dialogStage.close();
+		});
+
+		dialogStage.setScene(new Scene(grid));
+		dialogStage.setResizable(false);
+		dialogStage.showAndWait();
 	}
 
 }

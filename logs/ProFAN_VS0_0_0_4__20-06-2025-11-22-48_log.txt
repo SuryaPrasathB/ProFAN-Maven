@@ -1,0 +1,24 @@
+2025-06-20 11:22:49.228 INFO  Version:21 - HV000001: Hibernate Validator 6.2.5.Final
+2025-06-20 11:22:49.336 INFO  SpringApplication:55 - Starting application using Java 1.8.0_161 on DESKTOP-BRVMCFO with PID 2040 (started by hp in D:\tasworkspace\ProFAN\ProFAN-Maven-s0.0.0.7)
+2025-06-20 11:22:49.453 INFO  SpringApplication:631 - No active profile set, falling back to 1 default profile: "default"
+2025-06-20 11:22:50.777 INFO  RepositoryConfigurationDelegate:262 - Multiple Spring Data modules found, entering strict repository configuration mode
+2025-06-20 11:22:50.778 INFO  RepositoryConfigurationDelegate:132 - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-06-20 11:22:51.144 INFO  RepositoryConfigurationDelegate:201 - Finished Spring Data repository scanning in 338 ms. Found 13 JPA repository interfaces.
+2025-06-20 11:22:51.633 INFO  RepositoryConfigurationDelegate:262 - Multiple Spring Data modules found, entering strict repository configuration mode
+2025-06-20 11:22:51.633 INFO  RepositoryConfigurationDelegate:132 - Bootstrapping Spring Data JDBC repositories in DEFAULT mode.
+2025-06-20 11:22:52.547 INFO  RepositoryConfigurationDelegate:201 - Finished Spring Data repository scanning in 912 ms. Found 0 JDBC repository interfaces.
+2025-06-20 11:22:54.443 INFO  TomcatWebServer:108 - Tomcat initialized with port(s): 8085 (http)
+2025-06-20 11:22:54.475 INFO  Http11NioProtocol:173 - Initializing ProtocolHandler ["http-nio-8085"]
+2025-06-20 11:22:54.476 INFO  StandardService:173 - Starting service [Tomcat]
+2025-06-20 11:22:54.476 INFO  StandardEngine:173 - Starting Servlet engine: [Apache Tomcat/9.0.75]
+2025-06-20 11:22:54.713 INFO  [/]:173 - Initializing Spring embedded WebApplicationContext
+2025-06-20 11:22:54.713 INFO  ServletWebServerApplicationContext:292 - Root WebApplicationContext: initialization completed in 5149 ms
+2025-06-20 11:22:54.965 INFO  LogHelper:31 - HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-06-20 11:22:55.091 INFO  Version:44 - HHH000412: Hibernate ORM core version 5.6.15.Final
+2025-06-20 11:22:55.597 INFO  Version:56 - HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
+2025-06-20 11:22:55.878 INFO  HikariDataSource:110 - HikariPool-1 - Starting...
+2025-06-20 11:22:56.276 INFO  HikariDataSource:123 - HikariPool-1 - Start completed.
+2025-06-20 11:22:56.321 INFO  Dialect:175 - HHH000400: Using dialect: org.hibernate.dialect.MySQL5Dialect
+2025-06-20 11:22:59.345 INFO  JtaPlatformInitiator:52 - HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2025-06-20 11:22:59.358 INFO  LocalContainerEntityManagerFactoryBean:437 - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-06-20 11:22:59.363 INFO  AutowiredAnnotationBeanPostProcessor:477 - Autowired annotation is not supported on static fields: private static com.tasnetwork.spring.config.ConfigLoader com.tasnetwork.calibration.energymeter.ApplicationLauncher.configLoader
