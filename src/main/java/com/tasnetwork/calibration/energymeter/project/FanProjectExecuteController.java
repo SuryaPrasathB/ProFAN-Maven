@@ -483,17 +483,13 @@ public class FanProjectExecuteController implements Initializable {
 	private ComboBox<String> cmbBxModelName;
 	static private ComboBox<String> ref_cmbBxModelName;
 
-	@FXML
-	private TableColumn<FanTestSetup, String> colTestSetupStatus;
+	@FXML private TableColumn<FanTestSetup, String> colTestSetupStatus;
 
-	@FXML
-	private TableColumn<FanTestSetup, Double> colTestSetupProgress;
+	@FXML private TableColumn<FanTestSetup, Double> colTestSetupProgress;
 
-	@FXML
-	private TableColumn<FanTestSetup, String> colTestSetupTestPointName;
+	@FXML private TableColumn<FanTestSetup, String> colTestSetupTestPointName;
 
-	@FXML
-	private TableColumn<FanTestSetup, Integer> colTestSetupSerialNo;
+	@FXML private TableColumn<FanTestSetup, Integer> colTestSetupSerialNo;
 
 	@FXML private TableColumn<FanTestSetup, String> colTestSetupTargetVoltage;
 
@@ -512,6 +508,9 @@ public class FanProjectExecuteController implements Initializable {
 	@FXML private TableColumn<FanTestSetup, String> colTestSetupActivePowerActual;
 
 	@FXML private TableColumn<FanTestSetup, String> colTestSetupPfActual;
+
+	// List to control column visibility
+	private List<String> fieldsToShow = new ArrayList<>();
 
 
 	// TEST EXECUTION ===================================================================================
@@ -983,11 +982,15 @@ public class FanProjectExecuteController implements Initializable {
 					setText(status);
 					if (ConstantStatus.COMPLETED.equalsIgnoreCase(status)) {
 						setTextFill(Color.GREEN);
+					} else if (ConstantStatus.PASSED.equalsIgnoreCase(status)) {
+						setTextFill(Color.GREEN);
+					} else if (ConstantStatus.FAILED.equalsIgnoreCase(status)) {
+						setTextFill(Color.RED);
 					} else if (ConstantStatus.IN_PROG.equalsIgnoreCase(status)) {
 						setTextFill(Color.ORANGE);
 					} else if (ConstantStatus.FAILED.equalsIgnoreCase(status)) {
 						setTextFill(Color.RED);
-					}else {
+					} else {
 						setTextFill(Color.BLACK);
 					}
 				}
@@ -1011,6 +1014,10 @@ public class FanProjectExecuteController implements Initializable {
 					FanTestSetup testPoint = getTableView().getItems().get(getIndex());
 					if (ConstantStatus.COMPLETED.equalsIgnoreCase(testPoint.getStatus())) {
 						progressBar.setStyle(ConstantCSS.FX_ACCENT + ConstantCSS.COLOR_GREEN_SEMI_COLON);
+					} else if (ConstantStatus.PASSED.equalsIgnoreCase(testPoint.getStatus())) {
+						progressBar.setStyle(ConstantCSS.FX_ACCENT + ConstantCSS.COLOR_GREEN_SEMI_COLON);
+					} else if (ConstantStatus.FAILED.equalsIgnoreCase(testPoint.getStatus())) {
+						progressBar.setStyle(ConstantCSS.FX_ACCENT + ConstantCSS.COLOR_RED_SEMI_COLON);
 					} else if ("Failed".equalsIgnoreCase(testPoint.getStatus())) {
 						progressBar.setStyle(ConstantCSS.FX_ACCENT + ConstantCSS.COLOR_RED_SEMI_COLON);
 					} else {
@@ -1254,6 +1261,44 @@ public class FanProjectExecuteController implements Initializable {
 			}
 		});*/
 
+		// Initialize the fieldsToShow list with some default columns
+		// You can customize this list to control which columns are initially visible
+		fieldsToShow.add("S.No");
+		fieldsToShow.add("Status");
+		fieldsToShow.add("Progress");
+		fieldsToShow.add("Test Name");
+		fieldsToShow.add("Target Voltage");
+		fieldsToShow.add("Setup Time in Sec");
+		fieldsToShow.add("Actual RPM");
+		fieldsToShow.add("Actual Wind Speed");
+		fieldsToShow.add("Actual Vibration");
+		fieldsToShow.add("Actual Current");
+		fieldsToShow.add("Actual Watts");
+		fieldsToShow.add("Actual VA");
+		fieldsToShow.add("Actual PF");
+		
+
+		// Update column visibility after setting up all column factories
+		updateTableColumnVisibility(fieldsToShow);
+	}
+
+	/**
+	 * Updates the visibility of columns in the tvTestSetup TableView
+	 * based on the provided list of field names.
+	 *
+	 * @param fieldsToShow A list of column header texts (strings) that should be visible.
+	 * All other columns will be hidden.
+	 */
+	private void updateTableColumnVisibility(List<String> fieldsToShow) {
+	    // Iterate through all columns and set their visibility
+	    for (TableColumn<FanTestSetup, ?> column : tvTestSetup.getColumns()) {
+	        String columnText = column.getText();
+	        if (fieldsToShow.contains(columnText)) {
+	            column.setVisible(true);
+	        } else {
+	            column.setVisible(false);
+	        }
+	    }
 	}
 
 	/**
@@ -1302,7 +1347,14 @@ public class FanProjectExecuteController implements Initializable {
 	private void loadDataFromDb() {
 		List<DutMasterData> dutMasterDataList = DeviceDataManagerController.getDutMasterDataService().findAll();
 		List<String> modelList = new ArrayList<String>();
-		modelList = dutMasterDataList.stream().map(e->e.getModelName()).collect(Collectors.toList());
+		
+		String selectedPhase = "1"; // or 3, set based on your config/UI
+
+		modelList = dutMasterDataList.stream()
+		    .filter(e -> e.getPhase().equals(selectedPhase))
+		    .map(e -> e.getModelName())
+		    .collect(Collectors.toList());
+
 		if (!modelList.isEmpty()) {
 			ref_cmbBxModelName.getItems().clear();
 			ref_cmbBxModelName.getItems().addAll(modelList);
@@ -1778,6 +1830,8 @@ public class FanProjectExecuteController implements Initializable {
 
 		isRunning = false;
 		isStopped = true;
+		
+		isFirstTestPointInSequence = true;
 
 		// Reset voltage to 0 only if not in simulation mode
 		if (!SIMULATION_MODE) {
@@ -2257,7 +2311,9 @@ public class FanProjectExecuteController implements Initializable {
 		}
 
 		if (!voltageVerified || isStopped) {
-			handleExecutionFailure(testPoint, "Failed to verify voltage after " + MAX_ATTEMPTS + " attempts.");
+			if (!isStopped) {
+				handleExecutionFailure(testPoint, "Failed to verify voltage after " + MAX_ATTEMPTS + " attempts.");
+			}
 			return;
 		}
 
@@ -2313,8 +2369,23 @@ public class FanProjectExecuteController implements Initializable {
 		// Step 6: Clean-up
 		Platform.runLater(() -> {
 			testPoint.setIsRunning(false);
-			if (!isStopped) testPoint.setStatus(ConstantStatus.COMPLETED);
-			else testPoint.setStatus(ConstantStatus.STOPPED);
+			if (!isStopped) {
+			    boolean allValid = currentResult.isRpmValid()
+			                    && currentResult.isWindSpeedValid()
+			                    && currentResult.isVibrationValid()
+			                    && currentResult.isWattsValid()
+			                    && currentResult.isCurrentValid()
+			                    && currentResult.isPowerFactorValid()
+			                    && currentResult.isActivePowerValid();
+
+			    if (allValid) {
+			        testPoint.setStatus(ConstantStatus.PASSED);
+			    } else {
+			        testPoint.setStatus(ConstantStatus.FAILED);
+			    }
+			} else {
+			    testPoint.setStatus(ConstantStatus.STOPPED);
+			}
 			tvTestSetup.refresh();
 		});
 
@@ -2451,51 +2522,71 @@ public class FanProjectExecuteController implements Initializable {
 						FanTestSetup::setPowerFactorActual, FanTestSetup::getPowerFactorValid, testPoint, 0.90, "PowerFactor");
 
 				// Wind speed logic
-				int windSpeedCount = fetchWindSpeedConfigForCurrentModel();
-				double avgWindSpeed;
-				if (SIMULATION_MODE) {
-					//promptForWindSpeedReadings(windSpeedCount); // Simulating pop up
-					avgWindSpeed = Double.parseDouble(generateRandomWindSpeed());
-					appendLog("SIMULATION: Windspeed: " + String.format("%.1f", avgWindSpeed), LogLevel.INFO);
-				} else {
-					avgWindSpeed = promptForWindSpeedReadings(windSpeedCount);
-				}
-				Supplier<String> windSpeedSupplier = () -> String.valueOf(avgWindSpeed);
+				if (fieldsToShow.contains("Actual Wind Speed")) {
+					int windSpeedCount = fetchWindSpeedConfigForCurrentModel();
+					double avgWindSpeed;
+					if (SIMULATION_MODE) {
+						//promptForWindSpeedReadings(windSpeedCount); // Simulating pop up
+						avgWindSpeed = Double.parseDouble(generateRandomWindSpeed());
+						appendLog("SIMULATION: Windspeed: " + String.format("%.1f", avgWindSpeed), LogLevel.INFO);
+					} else {
+						avgWindSpeed = promptForWindSpeedReadings(windSpeedCount);
+					}
+					
+					Supplier<String> windSpeedSupplier;
+					
+					if (avgWindSpeed == 0) {
+						windSpeedSupplier = () -> "N/A";
+					} {
+						windSpeedSupplier = () -> String.valueOf(avgWindSpeed);
+					}
 
-				readValidateAndUpdate(
-						windSpeedSupplier,
-						FanTestSetup::getWindSpeedLowerLimit,
-						FanTestSetup::getWindSpeedUpperLimit,
-						FanTestSetup::setWindSpeedActual,
-						FanTestSetup::getWindSpeedValid,
-						testPoint,
-						1.0,
-						"WindSpeed"
-						);
+					readValidateAndUpdate(
+							windSpeedSupplier,
+							FanTestSetup::getWindSpeedLowerLimit,
+							FanTestSetup::getWindSpeedUpperLimit,
+							FanTestSetup::setWindSpeedActual,
+							FanTestSetup::getWindSpeedValid,
+							testPoint,
+							1.0,
+							"WindSpeed"
+							);
+				}  else {
+					// If Wind Speed column is not shown, set its validity to true and actual to N/A or empty
+					currentResult.setWindSpeedValid(true);
+					Platform.runLater(() -> testPoint.setWindSpeedActual("N/A"));
+					appendLog("Skipping Wind Speed measurement (column not visible).", LogLevel.INFO);
+				}
 
 				// Vibration Parameter Logic similar to Wind speed
-				int vibrationCount = fetchWindSpeedConfigForCurrentModel();
-				double avgVibration;
-				if (SIMULATION_MODE) {
-					//promptForVibrationReadings(vibrationCount); // Simulating pop up for vibration
-					avgVibration = Double.parseDouble(generateRandomVibration());
-					appendLog("SIMULATION: Vibration: " + String.format("%.1f", avgVibration), LogLevel.INFO);
+				if (fieldsToShow.contains("Actual Vibration")) {
+					int vibrationCount = fetchWindSpeedConfigForCurrentModel();
+					double avgVibration;
+					if (SIMULATION_MODE) {
+						//promptForVibrationReadings(vibrationCount); // Simulating pop up for vibration
+						avgVibration = Double.parseDouble(generateRandomVibration());
+						appendLog("SIMULATION: Vibration: " + String.format("%.1f", avgVibration), LogLevel.INFO);
+					} else {
+						avgVibration = promptForVibrationReadings(vibrationCount);
+					}
+					Supplier<String> vibrationSupplier = () -> String.valueOf(avgVibration);
+
+					readValidateAndUpdate(
+							vibrationSupplier,
+							FanTestSetup::getVibrationLowerLimit, // Assumes this method exists
+							FanTestSetup::getVibrationUpperLimit, // Assumes this method exists
+							FanTestSetup::setVibrationActual,     // Assumes this method exists
+							FanTestSetup::getVibrationValid,      // Assumes this method exists
+							testPoint,
+							1.0, // Adjust progress if other steps follow
+							"Vibration"
+							);
 				} else {
-					avgVibration = promptForVibrationReadings(vibrationCount);
+					// If Vibration column is not shown, set its validity to true and actual to N/A or empty
+					currentResult.setVibrationValid(true);
+					Platform.runLater(() -> testPoint.setVibrationActual("N/A"));
+					appendLog("Skipping Vibration measurement (column not visible).", LogLevel.INFO);
 				}
-				Supplier<String> vibrationSupplier = () -> String.valueOf(avgVibration);
-
-				readValidateAndUpdate(
-						vibrationSupplier,
-						FanTestSetup::getVibrationLowerLimit, // Assumes this method exists
-						FanTestSetup::getVibrationUpperLimit, // Assumes this method exists
-						FanTestSetup::setVibrationActual,     // Assumes this method exists
-						FanTestSetup::getVibrationValid,      // Assumes this method exists
-						testPoint,
-						1.0, // Adjust progress if other steps follow
-						"Vibration"
-						);
-
 			} catch (InterruptedException e) {
 				appendLog("Measurement loop interrupted.", LogLevel.INFO);
 				Thread.currentThread().interrupt();
@@ -2579,36 +2670,77 @@ public class FanProjectExecuteController implements Initializable {
 	 * Assumes serial numbers are in the format "SN" followed by a number (e.g., "SN100").
 	 */
 	private void updateNextSerialNumber() {
-		String currentSerialNumber = ref_txtNewFanSerialNo.getText();
-		if (currentSerialNumber != null && currentSerialNumber.startsWith("SN") && currentSerialNumber.length() > 2) {
-			try {
-				// Extract the numeric part of the serial number
-				String numericPartStr = currentSerialNumber.substring(2);
-				int numericPart = Integer.parseInt(numericPartStr);
+	    String currentSerialNumber = ref_txtNewFanSerialNo.getText();
 
-				// Increment the numeric part
-				int nextNumericPart = numericPart + 1;
+	    if (currentSerialNumber != null && !currentSerialNumber.isEmpty()) {
+	        try {
+	            int lastDigitIndex = -1;
+	            for (int i = currentSerialNumber.length() - 1; i >= 0; i--) {
+	                if (Character.isDigit(currentSerialNumber.charAt(i))) {
+	                    lastDigitIndex = i;
+	                    break;
+	                }
+	            }
 
-				// Format the new serial number back to "SN" + incremented number (with leading zeros if necessary)
-				// This assumes a fixed width for the numeric part, or you can adjust formatting as needed.
-				// For example, if "SN100" becomes "SN101", "SN001" becomes "SN002"
-				String formatString = "SN%0" + numericPartStr.length() + "d";
-				String newSerialNumber = String.format(formatString, nextNumericPart);
+	            if (lastDigitIndex != -1) {
+	                // Find the start of the numeric part
+	                int firstDigitOfNumericPart = -1;
+	                for (int i = lastDigitIndex; i >= 0; i--) {
+	                    if (Character.isDigit(currentSerialNumber.charAt(i))) {
+	                        firstDigitOfNumericPart = i;
+	                    } else {
+	                        break;
+	                    }
+	                }
 
-				// Set the new serial number to the text field on the JavaFX Application Thread
-				Platform.runLater(() -> {
-					ref_txtNewFanSerialNo.setText(newSerialNumber);
-					appendLog("Fan serial number updated to: " + newSerialNumber, LogLevel.INFO);
-				});
+	                String prefix = "";
+	                String numericPartStr = "";
 
-			} catch (NumberFormatException e) {
-				appendLog("Failed to parse serial number for increment: " + currentSerialNumber + ". Error: " + e.getMessage(), LogLevel.ERROR);
-			} catch (Exception e) {
-				appendLog("An unexpected error occurred while updating serial number: " + e.getMessage(), LogLevel.ERROR);
-			}
-		} else {
-			appendLog("Current serial number format is not 'SNXXX' or is empty. Cannot automatically increment: " + currentSerialNumber, LogLevel.DEBUG);
-		}
+	                if (firstDigitOfNumericPart != -1) {
+	                    prefix = currentSerialNumber.substring(0, firstDigitOfNumericPart);
+	                    numericPartStr = currentSerialNumber.substring(firstDigitOfNumericPart, lastDigitIndex + 1);
+	                } else {
+	                    // This case should ideally not be hit if lastDigitIndex is not -1, but for safety
+	                    // If the whole string is numeric, prefix is empty
+	                    numericPartStr = currentSerialNumber;
+	                }
+
+	                int numericPart = Integer.parseInt(numericPartStr);
+	                int nextNumericPart = numericPart + 1;
+
+	                // Determine the original length of the numeric part
+	                int originalNumericLength = numericPartStr.length();
+	                String newNumericPartStr;
+
+	                // If the incremented number is shorter than the original numeric part's length,
+	                // we need to pad with leading zeros.
+	                if (String.valueOf(nextNumericPart).length() < originalNumericLength) {
+	                    String formatString = "%0" + originalNumericLength + "d";
+	                    newNumericPartStr = String.format(formatString, nextNumericPart);
+	                } else {
+	                    // If the incremented number is the same length or longer,
+	                    // just format it without explicit padding, which will handle cases like 99 -> 100
+	                    newNumericPartStr = String.valueOf(nextNumericPart);
+	                }
+	                
+	                String newSerialNumber = prefix + newNumericPartStr;
+
+	                Platform.runLater(() -> {
+	                    ref_txtNewFanSerialNo.setText(newSerialNumber);
+	                    appendLog("Fan serial number updated to: " + newSerialNumber, LogLevel.INFO);
+	                });
+
+	            } else {
+	                appendLog("Current serial number '" + currentSerialNumber + "' does not end with a number. Cannot automatically increment.", LogLevel.DEBUG);
+	            }
+	        } catch (NumberFormatException e) {
+	            appendLog("Failed to parse the numeric part of serial number '" + currentSerialNumber + "' for increment. Error: " + e.getMessage(), LogLevel.ERROR);
+	        } catch (Exception e) {
+	            appendLog("An unexpected error occurred while updating serial number: " + e.getMessage(), LogLevel.ERROR);
+	        }
+	    } else {
+	        appendLog("Current serial number is empty or null. Cannot automatically increment.", LogLevel.DEBUG);
+	    }
 	}
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -3204,12 +3336,15 @@ public class FanProjectExecuteController implements Initializable {
 
 		if (dutCommandDataOpt.isPresent()) {
 			DutCommand dutCommand = dutCommandDataOpt.get();
-			DeviceDataManagerController.setDutCommandData(dutCommand);
+			DeviceDataManagerController.setDutCommandData(dutCommand);	
 
 			boolean isDataAppend = false;
 			// Only call hardware command if not in simulation mode
 			if (!SIMULATION_MODE) {
 				dutCommandExecuteStart("", isDataAppend);
+				
+				TestPointUtils.mainsOff();
+				appendLog("Mains Off", LogLevel.INFO);
 			} else {
 				appendLog("SIMULATION: Stop command skipped.", LogLevel.INFO);
 			}
@@ -3346,7 +3481,7 @@ public class FanProjectExecuteController implements Initializable {
 				result = dutCommandExecuteStart("", isDataAppend);
 			}
 
-			Platform.runLater(() -> {
+			/*.runLater(() -> {
 				if (clickedButtonRef == ref_btnDimmerIsMin) { // Note: this might be a copy-paste error, should be SetMin related buttons
 					ref_btnDimmerIsMin.setStyle(result 
 							? ConstantCSS.FX_BACKGROUND_COLOR + ConstantCSS.COLOR_GREEN_SEMI_COLON
@@ -3357,7 +3492,7 @@ public class FanProjectExecuteController implements Initializable {
 									: ConstantCSS.FX_BACKGROUND_COLOR + ConstantCSS.COLOR_RED_SEMI_COLON);
 				}
 				// Potentially, add specific styles for btnDimmerSetMin and btnDimmerSetMinExecute if they exist
-			});
+			});*/
 		}
 
 		Platform.runLater(() -> clickedButtonRef.setDisable(false));
@@ -4573,11 +4708,17 @@ public class FanProjectExecuteController implements Initializable {
 	            lowerLimit != null && !lowerLimit.trim().isEmpty() &&
 	            upperLimit != null && !upperLimit.trim().isEmpty()) {
 
-	            double val = Double.parseDouble(finalValue.trim());
-	            double lower = Double.parseDouble(lowerLimit.trim());
-	            double upper = Double.parseDouble(upperLimit.trim());
+	            String trimmedValue = finalValue.trim();
 
-	            isValid = val >= lower && val <= upper;
+	            if (trimmedValue.equalsIgnoreCase("N/A")) {
+	                isValid = true; // Skip validation
+	            } else {
+	                double val = Double.parseDouble(trimmedValue);
+	                double lower = Double.parseDouble(lowerLimit.trim());
+	                double upper = Double.parseDouble(upperLimit.trim());
+
+	                isValid = val >= lower && val <= upper;
+	            }
 	        }
 	    } catch (NumberFormatException e) {
 	        isValid = true; // fallback if parsing fails
@@ -4864,8 +5005,10 @@ public class FanProjectExecuteController implements Initializable {
 	private static final Random random = new Random();
 	// Method to generate random RPM value (e.g., in the range of 0 to 1150)
 	public static String generateRandomRpm() {
-		int rpm = random.nextInt(1151); // Random number between 0 and 1150
-		return String.valueOf(rpm);
+//		int rpm = random.nextInt(1151); // Random number between 0 and 1150
+//		return String.valueOf(rpm);
+		
+		return "N/A";
 	}
 
 	// Method to generate random wind speed value (e.g., in the range of 0 to 20)
