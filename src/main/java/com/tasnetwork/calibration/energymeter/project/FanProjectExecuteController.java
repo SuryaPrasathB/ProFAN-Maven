@@ -1275,7 +1275,7 @@ public class FanProjectExecuteController implements Initializable {
 		fieldsToShow.add("Actual Current");
 		fieldsToShow.add("Actual Watts");
 		fieldsToShow.add("Actual VA");
-		fieldsToShow.add("Actual PF");
+		fieldsToShow.add("Actual Pf");
 		
 
 		// Update column visibility after setting up all column factories

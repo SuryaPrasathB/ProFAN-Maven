@@ -10,4 +10,6 @@ import com.tasnetwork.spring.orm.model.FanTestSetup;
 @Repository
 public interface FanTestSetupRepo  extends JpaRepository<FanTestSetup, Long>{
 
+	FanTestSetup findByDutMasterData(DutMasterData dutMasterData);
+
 }

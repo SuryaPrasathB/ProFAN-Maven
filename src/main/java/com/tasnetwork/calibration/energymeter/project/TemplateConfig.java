@@ -13,6 +13,8 @@ import java.util.regex.Pattern;
 public class TemplateConfig {
     // Number of records to be written into the Excel template. This determines the range size.
     private int numRecords;
+    
+    private Map<String, String> nominalFieldToCell;
 
     // Map where key = Result property name (camelCase), value = Excel STARTING cell string (e.g., "A2", "B5")
     private Map<String, String> propertyToCellRange;
@@ -96,4 +98,13 @@ public class TemplateConfig {
         }
         return startRowIndex + numRecords - 1;
     }
+    
+    public Map<String, String> getNominalFieldToCell() {
+        return nominalFieldToCell;
+    }
+
+    public void setNominalFieldToCell(Map<String, String> nominalFieldToCell) {
+        this.nominalFieldToCell = nominalFieldToCell;
+    }
+
 }

@@ -1,0 +1,22 @@
+{
+  "numRecords": 13,
+  "propertyToCellRange": {
+    "current": "E16",
+    "watts": "F16",
+    "va": "J16",
+    "fanSerialNumber": "C16",
+    "windSpeed": "H16",
+    "vibration": "I16",
+    "rpm": "G16",
+    "voltage": "D16",
+    "powerFactor": "K16"
+  },
+  "nominalFieldToCell": {
+    "currentCell": "E13",
+    "speedCell": "G13",
+    "modelCell": "B13",
+    "phaseCell": "D13",
+    "powerCell": "F13",
+    "airVolumeCell": "H13"
+  }
+}

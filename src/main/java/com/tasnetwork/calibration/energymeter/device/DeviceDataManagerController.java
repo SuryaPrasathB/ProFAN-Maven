@@ -91,6 +91,7 @@ import com.tasnetwork.spring.orm.repository.FanTestSetupRepo;
 import com.tasnetwork.spring.orm.service.ConveyorDutSerialNoService;
 import com.tasnetwork.spring.orm.service.DutCommandService;
 import com.tasnetwork.spring.orm.service.DutMasterDataService;
+import com.tasnetwork.spring.orm.service.FanTestSetupService;
 import com.tasnetwork.spring.orm.service.OperationParamService;
 import com.tasnetwork.spring.orm.service.OperationProcessService;
 import com.tasnetwork.spring.orm.service.ProjectRunService;
@@ -183,7 +184,7 @@ public class DeviceDataManagerController {
 	public static ProjectRunService projectRunService = null ;
 	public static ResultService resultService = null;
 	public static DutMasterDataService dutMasterDataService = null ;
-	public static FanTestSetupRepo fanTestSetupRepo = null ;
+	public static FanTestSetupService fanTestSetupService = null ;
 	public static DutCommandService dutCommandService = null ;
 	
 	private static volatile boolean powerSrcReadData = false;
@@ -500,7 +501,7 @@ public class DeviceDataManagerController {
 		resultService = ApplicationLauncher.springContext.getBean(ResultService.class);
 		conveyorDutSerialNoService = ApplicationLauncher.springContext.getBean(ConveyorDutSerialNoService.class);
 		dutMasterDataService = ApplicationLauncher.springContext.getBean(DutMasterDataService.class);
-		fanTestSetupRepo = ApplicationLauncher.springContext.getBean(FanTestSetupRepo.class);
+		fanTestSetupService = ApplicationLauncher.springContext.getBean(FanTestSetupService.class);
 		dutCommandService = ApplicationLauncher.springContext.getBean(DutCommandService.class);
 		
 		
@@ -9524,12 +9525,12 @@ public class DeviceDataManagerController {
 		DeviceDataManagerController.conveyorDutSerialNoService = conveyorDutSerialNoService;
 	}
 	
-	public static FanTestSetupRepo getFanTestSetupRepo() {
-		return fanTestSetupRepo;
+	public static FanTestSetupService getFanTestSetupService() {
+		return fanTestSetupService;
 	}
 
-	public static void setFanTestSetupRepo(FanTestSetupRepo fanTestSetupRepo) {
-		DeviceDataManagerController.fanTestSetupRepo = fanTestSetupRepo;
+	public static void setFanTestSetupRepo(FanTestSetupService fanTestSetupService) {
+		DeviceDataManagerController.fanTestSetupService = fanTestSetupService;
 	}
 	
 	public static DutMasterDataService getDutMasterDataService() {

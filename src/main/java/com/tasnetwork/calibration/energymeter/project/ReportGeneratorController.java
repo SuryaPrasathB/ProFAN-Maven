@@ -1,4 +1,5 @@
 package com.tasnetwork.calibration.energymeter.project;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -14,6 +15,7 @@ import java.time.LocalTime; // Required for converting LocalDate to epoch
 import java.time.ZoneOffset; // Required for converting LocalDate to epoch
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -30,6 +32,7 @@ import java.util.stream.Collectors;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.CellStyle; // Import CellStyle
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 // Gson imports for JSON serialization/deserialization
@@ -39,6 +42,11 @@ import com.google.gson.JsonSyntaxException;
 import com.tasnetwork.calibration.energymeter.ApplicationLauncher;
 import com.tasnetwork.calibration.energymeter.device.DeviceDataManagerController;
 import com.tasnetwork.spring.orm.model.Result;
+// Assuming these imports are available for FanTestSetup and DutMasterData
+import com.tasnetwork.spring.orm.model.FanTestSetup;
+import com.tasnetwork.spring.orm.service.FanTestSetupService; // Assuming this service exists
+import com.tasnetwork.spring.orm.model.DutMasterData; // Assuming this class exists
+
 
 import javafx.application.Platform; // For Platform.runLater
 import javafx.beans.property.ReadOnlyStringWrapper;
@@ -51,6 +59,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets; // For dialog layout padding
 import javafx.geometry.Pos; // For centering cells
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -63,12 +72,14 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
+import javafx.scene.control.TitledPane;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode; // For key event handling
 import javafx.scene.input.KeyEvent; // For key event handling
 import javafx.scene.layout.GridPane; // For the config dialog layout
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality; // For dialog window
@@ -114,7 +125,9 @@ public class ReportGeneratorController implements Initializable {
     // Default template directory path (used if no config file or invalid config)
     private static String TEMPLATES_DIR_PATH = "D:\\tasworkspace\\ProFAN\\ProFAN-Maven-s0.0.0.7\\src\\main\\resources\\reportTemplates";
     // Configuration file for storing the template directory path
-    private static final String TEMPLATES_CONFIG_FILE_NAME = "D:\\tasworkspace\\ProFAN\\ProFAN-Maven-s0.0.0.7\\src\\main\\resources\\config\\templates\\templates_config.json";
+    private static final String TEMPLATES_CONFIG_FILE_NAME = "C:\\Users\\Surya\\git\\ProFAN-Maven\\src\\main\\resources\\config\\templates\\templates_config.json";
+    // Key for storing the last saved report path in the config file
+    private static final String LAST_REPORT_PATH_CONFIG_KEY = "lastReportPath";
 
     private ObservableList<Template> availableTemplates = FXCollections.observableArrayList();
     private Template selectedTemplate = null;
@@ -134,6 +147,7 @@ public class ReportGeneratorController implements Initializable {
     );
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create(); // Gson for JSON operations
+    private String lastSavedReportPath; // Instance variable to store the last saved path
 
     /**
      * Initializes the controller after its root element has been completely processed.
@@ -639,34 +653,53 @@ public class ReportGeneratorController implements Initializable {
         if (configFile.exists()) {
             try (FileReader reader = new FileReader(configFile)) {
                 Properties configProps = GSON.fromJson(reader, Properties.class);
-                if (configProps != null && configProps.containsKey("templatesDirPath")) {
-                    TEMPLATES_DIR_PATH = configProps.getProperty("templatesDirPath");
-                    ApplicationLauncher.logger.info("ReportGeneratorController: loadConfiguredTemplatesDirPath: Loaded TEMPLATES_DIR_PATH from config: " + TEMPLATES_DIR_PATH);
+                if (configProps != null) {
+                    if (configProps.containsKey("templatesDirPath")) {
+                        TEMPLATES_DIR_PATH = configProps.getProperty("templatesDirPath");
+                        ApplicationLauncher.logger.info("ReportGeneratorController: loadConfiguredTemplatesDirPath: Loaded TEMPLATES_DIR_PATH from config: " + TEMPLATES_DIR_PATH);
+                    } else {
+                        ApplicationLauncher.logger.warn("ReportGeneratorController: loadConfiguredTemplatesDirPath: Config file exists but missing 'templatesDirPath'. Using default path.");
+                    }
+                    if (configProps.containsKey(LAST_REPORT_PATH_CONFIG_KEY)) {
+                        lastSavedReportPath = configProps.getProperty(LAST_REPORT_PATH_CONFIG_KEY);
+                        ApplicationLauncher.logger.info("ReportGeneratorController: loadConfiguredTemplatesDirPath: Loaded lastSavedReportPath from config: " + lastSavedReportPath);
+                    } else {
+                        ApplicationLauncher.logger.info("ReportGeneratorController: loadConfiguredTemplatesDirPath: Config file exists but missing 'lastReportPath'. Initializing to null.");
+                        lastSavedReportPath = null; // Initialize if not found
+                    }
                 } else {
-                    ApplicationLauncher.logger.error("ReportGeneratorController: loadConfiguredTemplatesDirPath: Config file exists but is empty or missing 'templatesDirPath'. Using default path.");
+                    ApplicationLauncher.logger.error("ReportGeneratorController: loadConfiguredTemplatesDirPath: Config file exists but is empty. Using default paths.");
                 }
             } catch (IOException | JsonSyntaxException e) {
                 ApplicationLauncher.logger.error("ReportGeneratorController: loadConfiguredTemplatesDirPath: Error reading templates config file: " + e.getMessage());
-                // Fallback to default path
+                // Fallback to default path and null lastSavedReportPath
+                lastSavedReportPath = null;
             }
         } else {
             ApplicationLauncher.logger.info("ReportGeneratorController: loadConfiguredTemplatesDirPath: Templates config file not found. Using default path: " + TEMPLATES_DIR_PATH);
+            lastSavedReportPath = null; // No config file, no last saved path
         }
         
     }
 
     /**
-     * Saves the provided template directory path to a JSON file.
-     * @param newPath The new path to save.
+     * Saves the provided template directory path and last saved report path to a JSON file.
+     * @param newTemplatesPath The new path for templates to save.
+     * @param newLastReportPath The new path for the last saved report to save.
      */
-    private void saveConfiguredTemplatesDirPath(String newPath) {
+    private void saveConfiguredTemplatesDirPath(String newTemplatesPath, String newLastReportPath) {
         File configFile = new File(TEMPLATES_CONFIG_FILE_NAME);
         try (FileWriter writer = new FileWriter(configFile)) {
             Properties configProps = new Properties();
-            configProps.setProperty("templatesDirPath", newPath);
+            configProps.setProperty("templatesDirPath", newTemplatesPath);
+            if (newLastReportPath != null) {
+                configProps.setProperty(LAST_REPORT_PATH_CONFIG_KEY, newLastReportPath);
+            }
             GSON.toJson(configProps, writer);
-            TEMPLATES_DIR_PATH = newPath; // Update the static variable
-            ApplicationLauncher.logger.info("ReportGeneratorController: saveConfiguredTemplatesDirPath: TEMPLATES_DIR_PATH saved to config: " + newPath);
+            TEMPLATES_DIR_PATH = newTemplatesPath; // Update the static variable
+            lastSavedReportPath = newLastReportPath; // Update the instance variable
+            ApplicationLauncher.logger.info("ReportGeneratorController: saveConfiguredTemplatesDirPath: TEMPLATES_DIR_PATH saved to config: " + newTemplatesPath);
+            ApplicationLauncher.logger.info("ReportGeneratorController: saveConfiguredTemplatesDirPath: LAST_REPORT_PATH_CONFIG_KEY saved to config: " + newLastReportPath);
         } catch (IOException e) {
             ApplicationLauncher.logger.error("ReportGeneratorController: saveConfiguredTemplatesDirPath: Error saving templates config file: " + e.getMessage());
             showAlert(Alert.AlertType.ERROR, "Save Error", "Failed to save template path: " + e.getMessage());
@@ -751,7 +784,8 @@ public class ReportGeneratorController implements Initializable {
                 statusLabel.setTextFill(Color.RED);
                 ApplicationLauncher.logger.info("ReportGeneratorController: openPathConfigurationDialog: Invalid path entered in config dialog: " + newPath);
             } else {
-                saveConfiguredTemplatesDirPath(newPath);
+                // When saving the template path, don't change the last saved report path
+                saveConfiguredTemplatesDirPath(newPath, lastSavedReportPath); 
                 reloadTemplates();
                 statusLabel.setText("Path saved and templates reloaded successfully.");
                 statusLabel.setTextFill(Color.GREEN);
@@ -1085,59 +1119,54 @@ public class ReportGeneratorController implements Initializable {
         if (!serialInput.isEmpty()) {
             serialSearchQueries = parseSerialQueries(serialInput);
             if (serialSearchQueries.isEmpty() && !errorMessageLabel.getText().isEmpty()) {
-                 ApplicationLauncher.logger.info("ReportGeneratorController: handleSearchFans: Search query parsing failed. Clearing table.");
-                 fanTableView.setItems(FXCollections.emptyObservableList());
-                 updateTableViewVisibility();
-                 updateSelectAllCheckboxState();
-                 updateGenerateReportButtonState();
-                 return;
+                ApplicationLauncher.logger.info("ReportGeneratorController: handleSearchFans: Search query parsing failed. Clearing table.");
+                fanTableView.setItems(FXCollections.emptyObservableList());
+                updateTableViewVisibility();
+                updateSelectAllCheckboxState();
+                updateGenerateReportButtonState();
+                return;
             }
         }
-        
+
         // Convert LocalDate to epoch milliseconds
         Long fromEpochTime = null;
         if (fromDate != null) {
             fromEpochTime = fromDate.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
             ApplicationLauncher.logger.info("ReportGeneratorController: handleSearchFans: From Date: " + fromDate + " -> From Epoch: " + fromEpochTime);
         }
-        
+
         Long toEpochTime = null;
         if (toDate != null) {
-            // End of day for toDate, inclusive
+            // Fix: Assign the long value to toEpochTime, not toDate (which is LocalDate)
             toEpochTime = toDate.atTime(LocalTime.MAX).atZone(ZoneOffset.UTC).toInstant().toEpochMilli();
             ApplicationLauncher.logger.info("ReportGeneratorController: handleSearchFans: To Date: " + toDate + " -> To Epoch: " + toEpochTime);
         }
 
-        // Determine if any serial or date filters are active based on user input
         boolean isSerialInputProvided = !serialInput.isEmpty();
         boolean isDateFilterActive = (fromEpochTime != null || toEpochTime != null);
 
         List<Result> preliminaryFilteredData = new ArrayList<>();
 
         if (isSerialInputProvided && isDateFilterActive) {
-            // Both serial and date filters are active
             if (serialSearchQueries.size() == 1 && !serialSearchQueries.get(0).isRange()) {
-                // Single exact serial number and date range
                 String singleSerialNumber = serialSearchQueries.get(0).getExactSerialNumber();
                 preliminaryFilteredData = DeviceDataManagerController.getResultService()
-                                            .findByEpochTimeBetweenAndFanSerialNumber(fromEpochTime, toEpochTime, singleSerialNumber);
+                    .findByEpochTimeBetweenAndFanSerialNumber(fromEpochTime, toEpochTime, singleSerialNumber);
                 ApplicationLauncher.logger.info("ReportGeneratorController: handleSearchFans: Single serial ('" + singleSerialNumber + "') and date range filter applied. Found " + preliminaryFilteredData.size() + " fans.");
             } else {
-                // Multiple serial numbers or a range AND date range
                 Set<Result> uniqueResults = new HashSet<>();
                 for (SearchQuery query : serialSearchQueries) {
-                    // Expand range queries into individual serial numbers
                     if (query.isRange()) {
                         int paddingLength = query.getNumericPartLengthForRange();
                         for (int i = query.getStartNumeric(); i <= query.getEndNumeric(); i++) {
                             String formattedSerial = String.format("%s%0" + paddingLength + "d", query.getPrefix(), i);
                             List<Result> found = DeviceDataManagerController.getResultService()
-                                                    .findByEpochTimeBetweenAndFanSerialNumber(fromEpochTime, toEpochTime, formattedSerial);
+                                .findByEpochTimeBetweenAndFanSerialNumber(fromEpochTime, toEpochTime, formattedSerial);
                             uniqueResults.addAll(found);
                         }
                     } else {
                         List<Result> found = DeviceDataManagerController.getResultService()
-                                                .findByEpochTimeBetweenAndFanSerialNumber(fromEpochTime, toEpochTime, query.getExactSerialNumber());
+                            .findByEpochTimeBetweenAndFanSerialNumber(fromEpochTime, toEpochTime, query.getExactSerialNumber());
                         uniqueResults.addAll(found);
                     }
                 }
@@ -1145,7 +1174,6 @@ public class ReportGeneratorController implements Initializable {
                 ApplicationLauncher.logger.info("ReportGeneratorController: handleSearchFans: Multiple serials/range and date range filter applied. Found " + preliminaryFilteredData.size() + " fans.");
             }
         } else if (isSerialInputProvided) {
-            // Only serial filter is active (no date range)
             Set<Result> uniqueResults = new HashSet<>();
             for (SearchQuery query : serialSearchQueries) {
                 if (query.isRange()) {
@@ -1163,17 +1191,32 @@ public class ReportGeneratorController implements Initializable {
             preliminaryFilteredData.addAll(uniqueResults);
             ApplicationLauncher.logger.info("ReportGeneratorController: handleSearchFans: Only serial filter applied. Found " + preliminaryFilteredData.size() + " fans.");
         } else if (isDateFilterActive) {
-            // Only date filter is active (no serial input)
             preliminaryFilteredData = DeviceDataManagerController.getResultService()
-                                        .findByEpochTimeBetween(fromEpochTime, toEpochTime);
+                .findByEpochTimeBetween(fromEpochTime, toEpochTime);
             ApplicationLauncher.logger.info("ReportGeneratorController: handleSearchFans: Only date filter applied. Found " + preliminaryFilteredData.size() + " fans.");
         } else {
-            // No filters active, no results shown as per current logic
             ApplicationLauncher.logger.info("ReportGeneratorController: handleSearchFans: No filters active. No results shown.");
         }
 
-        // Apply the status filter on the results (already filtered by serial and date/epoch time if applicable)
+        // 🔽 Sort by numeric suffix of the fan serial number
+        preliminaryFilteredData.sort(Comparator.comparingInt(r -> extractNumericSuffix(r.getFanSerialNumber())));
+
+        // ✅ Final filter and display
         applyStatusFilter(filterComboBox.getSelectionModel().getSelectedItem(), preliminaryFilteredData);
+    }
+    
+    private int extractNumericSuffix(String serial) {
+        if (serial == null || serial.isEmpty()) return Integer.MAX_VALUE;
+
+        Matcher matcher = Pattern.compile("(\\d+)$").matcher(serial);
+        if (matcher.find()) {
+            try {
+                return Integer.parseInt(matcher.group(1));
+            } catch (NumberFormatException e) {
+                // Parsing failed; place at the end
+            }
+        }
+        return Integer.MAX_VALUE;
     }
 
     /**
@@ -1241,12 +1284,12 @@ public class ReportGeneratorController implements Initializable {
         }
 
         try {
-            ApplicationLauncher.logger.info("ReportGeneratorController: handleGenerateReport: Initiating Excel report generation for " + fansToReport.size() + " fans.");
-            generateExcelReport(selectedTemplate, fansToReport);
-            ApplicationLauncher.logger.info("ReportGeneratorController: handleGenerateReport: Report generation complete.");
-            showAlert(Alert.AlertType.INFORMATION, "Report Generation Complete",
-                    "Report successfully generated and saved to your chosen location.");
-        }
+    ApplicationLauncher.logger.info("ReportGeneratorController: handleGenerateReport: Initiating Excel report generation for " + fansToReport.size() + " fans.");
+    generateExcelReport(selectedTemplate, fansToReport);
+    ApplicationLauncher.logger.info("ReportGeneratorController: handleGenerateReport: Report generation complete.");
+    showAlert(Alert.AlertType.INFORMATION, "Report Generation Complete",
+            "Report successfully generated and saved to your chosen location.");
+}
         catch (IOException e) {
             ApplicationLauncher.logger.error("ReportGeneratorController: handleGenerateReport: Report generation failed due to I/O error: " + e.getMessage());
             showAlert(Alert.AlertType.ERROR, "Report Generation Failed",
@@ -1262,7 +1305,7 @@ public class ReportGeneratorController implements Initializable {
     }
 
     /**
-     * Opens a dialog for the user to configure the Excel mapping for the selected template.
+     * Opens a dialog for the user to configure the Excel mapping for the selected template	.
      * @param template The template to configure.
      */
     private void openTemplateConfigurationDialog(Template template) {
@@ -1272,158 +1315,180 @@ public class ReportGeneratorController implements Initializable {
         dialogStage.initModality(Modality.APPLICATION_MODAL);
         dialogStage.initOwner(templateListView.getScene().getWindow());
 
-        GridPane grid = new GridPane();
-        grid.setPadding(new Insets(10));
-        grid.setHgap(10);
-        grid.setVgap(5);
+        // === Layout containers ===
+        HBox root = new HBox(20);
+        root.setPadding(new Insets(10));
+        root.setAlignment(Pos.TOP_LEFT);
 
-        Map<String, TextField> propertyTextFields = new LinkedHashMap<>(); // To maintain order and access fields
+        // === Nominal Data TitledPane ===
+        GridPane nominalGrid = new GridPane();
+        nominalGrid.setHgap(10);
+        nominalGrid.setVgap(5);
+        nominalGrid.setPadding(new Insets(10));
 
-        // New field for Number of Records
+        TitledPane nominalPane = new TitledPane("Nominal Data", nominalGrid);
+        nominalPane.setCollapsible(false);
+
+        Map<String, TextField> nominalTextFields = new LinkedHashMap<>();
+        // Added more nominal fields for configuration
+        String[] nominalFields = {
+            "modelCell", "phaseCell", "currentCell", "powerCell", "speedCell", "airVolumeCell",
+            "vibrationUpperLimitCell", "activePowerUpperLimitCell", "powerFactorUpperLimitCell"
+        };
+        int nRow = 0;
+        for (String field : nominalFields) {
+            Label label = new Label(toTitleCase(field.replace("Cell", "")) + " Cell:");
+            TextField textField = new TextField();
+            textField.setPromptText("e.g., A1");
+            nominalTextFields.put(field, textField);
+            nominalGrid.addRow(nRow++, label, textField);
+        }
+
+        // === Test Data TitledPane (previously Mapping Grid) ===
+        GridPane mappingGrid = new GridPane();
+        mappingGrid.setHgap(10);
+        mappingGrid.setVgap(5);
+        mappingGrid.setPadding(new Insets(10));
+
+        TitledPane testDataPane = new TitledPane("Test Data", mappingGrid);
+        testDataPane.setCollapsible(false);
+
         TextField recordsTextField = new TextField();
         recordsTextField.setPromptText("e.g., 10");
-        recordsTextField.setTextFormatter(new TextFormatter<>(change -> { // Allow only numeric input
-            if (change.getControlNewText().matches("\\d*")) {
-                return change;
-            }
-            return null;
+        recordsTextField.setTextFormatter(new TextFormatter<>(change -> {
+            return change.getControlNewText().matches("\\d*") ? change : null;
         }));
-        grid.addRow(0, new Label("Number of Records:"), recordsTextField);
+        mappingGrid.addRow(0, new Label("Number of Records:"), recordsTextField);
 
-        int rowIdx = 1; // Start from second row for other properties
-        // Dynamically create input fields for each mappable Result property
+        int mRow = 1;
+        Map<String, TextField> propertyTextFields = new LinkedHashMap<>();
         for (String propertyName : RESULT_PROPERTIES_TO_MAP) {
-            Label label = new Label(camelCaseToTitleCase(propertyName) + " Start Cell:"); // Changed prompt
+            Label label = new Label(camelCaseToTitleCase(propertyName) + " Start Cell:");
             TextField textField = new TextField();
-            textField.setPromptText("e.g., A2"); // Changed prompt
+            textField.setPromptText("e.g., B2");
             propertyTextFields.put(propertyName, textField);
-            grid.addRow(rowIdx++, label, textField);
+            mappingGrid.addRow(mRow++, label, textField);
         }
 
         Button loadButton = new Button("Load Configuration");
         Button saveButton = new Button("Save Configuration");
         Label statusLabel = new Label();
-        statusLabel.setWrapText(true); // Allow text to wrap
+        statusLabel.setWrapText(true);
 
-        grid.addRow(rowIdx++, loadButton, saveButton);
-        GridPane.setColumnSpan(statusLabel, 2); // Span across two columns
-        grid.addRow(rowIdx++, statusLabel);
+        mappingGrid.addRow(mRow++, loadButton, saveButton);
+        GridPane.setColumnSpan(statusLabel, 2);
+        mappingGrid.addRow(mRow, statusLabel);
 
-        // --- Load Configuration Logic ---
-        File configFile = getConfigFile(template); // This will now point to reportTemplates/json
+        // Combine and set scene
+        root.getChildren().addAll(nominalPane, testDataPane); // Add both TitledPanes
+        dialogStage.setScene(new Scene(root));
+        dialogStage.show();
+
+        // === Config file location ===
+        File configFile = getConfigFile(template);
+
+        // === Load button logic ===
         loadButton.setOnAction(event -> {
-            ApplicationLauncher.logger.info("ReportGeneratorController: openTemplateConfigurationDialog: Loading template config for: " + template.getName());
+            ApplicationLauncher.logger.info("Loading config for template: " + template.getName());
             if (configFile.exists()) {
                 try (FileReader reader = new FileReader(configFile)) {
                     TemplateConfig config = GSON.fromJson(reader, TemplateConfig.class);
                     if (config != null) {
-                        recordsTextField.setText(String.valueOf(config.getNumRecords())); // Set numRecords
+                        recordsTextField.setText(String.valueOf(config.getNumRecords()));
                         if (config.getPropertyToCellRange() != null) {
                             for (Map.Entry<String, String> entry : config.getPropertyToCellRange().entrySet()) {
                                 TextField tf = propertyTextFields.get(entry.getKey());
-                                if (tf != null) {
-                                    tf.setText(entry.getValue());
-                                }
+                                if (tf != null) tf.setText(entry.getValue());
+                            }
+                        }
+                        if (config.getNominalFieldToCell() != null) {
+                            for (Map.Entry<String, String> entry : config.getNominalFieldToCell().entrySet()) {
+                                TextField tf = nominalTextFields.get(entry.getKey());
+                                if (tf != null) tf.setText(entry.getValue());
                             }
                         }
                         statusLabel.setText("Configuration loaded successfully from " + configFile.getName());
                         statusLabel.setTextFill(Color.GREEN);
-                        ApplicationLauncher.logger.info("ReportGeneratorController: openTemplateConfigurationDialog: Config loaded. Num records: " + config.getNumRecords());
                     } else {
                         statusLabel.setText("Configuration file empty or invalid.");
                         statusLabel.setTextFill(Color.ORANGE);
-                        ApplicationLauncher.logger.warn("ReportGeneratorController: openTemplateConfigurationDialog: Config file empty or invalid for " + template.getName() + ".");
                     }
                 } catch (IOException | JsonSyntaxException e) {
                     statusLabel.setText("Error loading configuration: " + e.getMessage());
                     statusLabel.setTextFill(Color.RED);
-                    ApplicationLauncher.logger.error("ReportGeneratorController: openTemplateConfigurationDialog: Error loading config for " + template.getName() + ": " + e.getMessage());
                     e.printStackTrace();
                 }
             } else {
-                statusLabel.setText("No existing configuration found for this template.");
+                statusLabel.setText("No configuration file found.");
                 statusLabel.setTextFill(Color.BLUE);
-                ApplicationLauncher.logger.info("ReportGeneratorController: openTemplateConfigurationDialog: No config file found for " + template.getName() + ".");
             }
         });
-        // Automatically load on dialog open if config exists
-        loadButton.fire(); // Simulate a click to load on opening
 
-        // --- Save Configuration Logic ---
+        loadButton.fire(); // Auto-load config on open
+
+        // === Save button logic ===
         saveButton.setOnAction(event -> {
-            ApplicationLauncher.logger.info("ReportGeneratorController: openTemplateConfigurationDialog: Saving template config for: " + template.getName());
             TemplateConfig config = new TemplateConfig();
             Map<String, String> newMapping = new HashMap<>();
+            Map<String, String> nominalMapping = new HashMap<>();
             boolean hasInvalidInput = false;
 
-            // Validate and set numRecords
+            // Validate number of records
             try {
-                int numRec = Integer.parseInt(recordsTextField.getText().trim());
-                if (numRec <= 0) {
-                    statusLabel.setText("Number of records must be a positive integer.");
-                    statusLabel.setTextFill(Color.RED);
-                    hasInvalidInput = true;
-                    ApplicationLauncher.logger.warn("ReportGeneratorController: openTemplateConfigurationDialog: Invalid num records (non-positive): " + numRec);
-                } else {
-                    config.setNumRecords(numRec);
-                    ApplicationLauncher.logger.info("ReportGeneratorController: openTemplateConfigurationDialog: Num records set to: " + numRec);
-                }
+                int numRecords = Integer.parseInt(recordsTextField.getText().trim());
+                if (numRecords <= 0) throw new NumberFormatException("Non-positive");
+                config.setNumRecords(numRecords);
             } catch (NumberFormatException e) {
-                statusLabel.setText("Invalid number of records. Please enter a valid integer.");
+                statusLabel.setText("Invalid number of records. Must be a positive integer.");
                 statusLabel.setTextFill(Color.RED);
-                hasInvalidInput = true;
-                ApplicationLauncher.logger.warn("ReportGeneratorController: openTemplateConfigurationDialog: Invalid num records (not an integer): '" + recordsTextField.getText() + "'.");
+                return;
             }
 
-            if (hasInvalidInput) {
-                return; // Stop saving if number of records is invalid
-            }
-
-
+            // Validate result property mappings
             for (Map.Entry<String, TextField> entry : propertyTextFields.entrySet()) {
-                String propertyName = entry.getKey();
-                String cellReference = entry.getValue().getText().trim();
-                if (!cellReference.isEmpty()) {
-                    // Validation for single cell reference (e.g., A1, B10, not A1:B2)
-                    if (!Pattern.matches("^[A-Z]+[0-9]+$", cellReference.toUpperCase())) {
-                        statusLabel.setText("Invalid cell format for " + camelCaseToTitleCase(propertyName) + ": " + cellReference + ". Expected single cell (e.g., A2).");
+                String prop = entry.getKey();
+                String cell = entry.getValue().getText().trim().toUpperCase();
+                if (!cell.isEmpty()) {
+                    if (!cell.matches("^[A-Z]+[0-9]+$")) {
+                        statusLabel.setText("Invalid cell format for " + prop + ": " + cell);
                         statusLabel.setTextFill(Color.RED);
                         hasInvalidInput = true;
-                        ApplicationLauncher.logger.warn("ReportGeneratorController: openTemplateConfigurationDialog: Invalid cell format for " + propertyName + ": '" + cellReference + "'.");
                         break;
                     }
-                    newMapping.put(propertyName, cellReference);
+                    newMapping.put(prop, cell);
                 }
             }
 
-            if (hasInvalidInput) {
-                return; // Stop saving if any cell input is invalid
+            // Validate nominal field mappings
+            for (Map.Entry<String, TextField> entry : nominalTextFields.entrySet()) {
+                String prop = entry.getKey();
+                String cell = entry.getValue().getText().trim().toUpperCase();
+                if (!cell.isEmpty()) {
+                    if (!cell.matches("^[A-Z]+[0-9]+$")) {
+                        statusLabel.setText("Invalid cell format for " + prop + ": " + cell);
+                        statusLabel.setTextFill(Color.RED);
+                        hasInvalidInput = true;
+                        break;
+                    }
+                    nominalMapping.put(prop, cell);
+                }
             }
 
-            if (newMapping.isEmpty() && config.getNumRecords() == 0) { // Consider it empty if no records and no mappings
-                statusLabel.setText("No mappings or records entered. Configuration will be empty.");
-                statusLabel.setTextFill(Color.ORANGE);
-                ApplicationLauncher.logger.info("ReportGeneratorController: openTemplateConfigurationDialog: No mappings or records entered. Config will be empty.");
-            }
+            if (hasInvalidInput) return;
 
-            config.setPropertyToCellRange(newMapping); // Update the config with valid mappings
+            config.setPropertyToCellRange(newMapping);
+            config.setNominalFieldToCell(nominalMapping);
 
             try (FileWriter writer = new FileWriter(configFile)) {
                 GSON.toJson(config, writer);
-                statusLabel.setText("Configuration saved successfully to " + configFile.getName());
+                statusLabel.setText("Configuration saved successfully.");
                 statusLabel.setTextFill(Color.GREEN);
-                ApplicationLauncher.logger.info("ReportGeneratorController: openTemplateConfigurationDialog: Config saved successfully.");
             } catch (IOException e) {
                 statusLabel.setText("Error saving configuration: " + e.getMessage());
                 statusLabel.setTextFill(Color.RED);
-                ApplicationLauncher.logger.error("ReportGeneratorController: openTemplateConfigurationDialog: Error saving configuration: " + e.getMessage());
                 e.printStackTrace();
             }
         });
-
-        // Set the scene and show the dialog
-        dialogStage.setScene(new javafx.scene.Scene(grid));
-        dialogStage.showAndWait();
     }
 
     /**
@@ -1541,6 +1606,18 @@ public class ReportGeneratorController implements Initializable {
                 Result fan = fansToReport.get(i);
                 ApplicationLauncher.logger.info("ReportGeneratorController: generateExcelReport: Populating data for fan: " + fan.getFanSerialNumber() + " (Record " + (i + 1) + "/" + fansToReport.size() + ")");
 
+                // Fetch FanTestSetup for nominal data
+                FanTestSetup setup = null;
+                if (fan.getDutMasterData() != null) {
+                    setup = DeviceDataManagerController.getFanTestSetupService().findByDutMasterData(fan.getDutMasterData());
+                    if (setup == null) {
+                        ApplicationLauncher.logger.warn("ReportGeneratorController: generateExcelReport: No FanTestSetup found for DutMasterData of fan: " + fan.getFanSerialNumber() + ". Nominal data might be missing.");
+                    }
+                } else {
+                    ApplicationLauncher.logger.warn("ReportGeneratorController: generateExcelReport: DutMasterData is null for fan: " + fan.getFanSerialNumber() + ". Cannot fetch FanTestSetup for nominal data.");
+                }
+
+
                 for (Map.Entry<String, String> mapping : config.getPropertyToCellRange().entrySet()) {
                     String resultPropertyName = mapping.getKey(); 
                     String cellRefStr = mapping.getValue(); // This is the starting cell like "A2"
@@ -1555,7 +1632,7 @@ public class ReportGeneratorController implements Initializable {
 
                     // Get the current row index for this specific column
                     int currentRowForThisColumn = currentRowIndexForColumn.getOrDefault(targetColIdx, startRowIdx);
-                    int maxEndRowForThisColumn = endRowIndexForColumn.getOrDefault(targetColIdx, startRowIdx); // Max row for this column
+                    int maxEndRowForThisColumn = endRowIndexForColumn.getOrDefault(targetColIdx, startRowIdx + numRecordsToProcess - 1); // Corrected calculation for maxEndRowForThisColumn
 
                     // Only write if there's space left in the configured range for this column
                     if (currentRowForThisColumn <= maxEndRowForThisColumn) {
@@ -1577,6 +1654,22 @@ public class ReportGeneratorController implements Initializable {
                             dataRow = sheet.createRow(currentRowForThisColumn);
                         }
                         Cell dataCell = dataRow.createCell(targetColIdx);
+
+                        // Preserve cell style from the template's starting cell
+                        Row templateStartRow = sheet.getRow(startRowIdx);
+                        if (templateStartRow != null) {
+                            Cell templateCell = templateStartRow.getCell(targetColIdx);
+                            if (templateCell != null && templateCell.getCellStyle() != null) {
+                                dataCell.setCellStyle(templateCell.getCellStyle());
+                                ApplicationLauncher.logger.debug("ReportGeneratorController: generateExcelReport: Applied style from template cell " + cellRefStr + " to data cell R" + (currentRowForThisColumn + 1) + "C" + (targetColIdx + 1));
+                            } else {
+                                ApplicationLauncher.logger.debug("ReportGeneratorController: generateExcelReport: No style found in template cell " + cellRefStr + " for property " + resultPropertyName);
+                            }
+                        } else {
+                            ApplicationLauncher.logger.debug("ReportGeneratorController: generateExcelReport: Template start row " + startRowIdx + " is null for property " + resultPropertyName);
+                        }
+
+
                         if (value != null) {
                             if (value instanceof String) {
                                 dataCell.setCellValue((String) value);
@@ -1600,6 +1693,99 @@ public class ReportGeneratorController implements Initializable {
                     	
                     }
                 }
+            
+                // Populate Nominal Data (Model Name, Phase, Upper Limits)
+                if (config.getNominalFieldToCell() != null && setup != null) {
+                    ApplicationLauncher.logger.info("ReportGeneratorController: generateExcelReport: Populating nominal data for fan: " + fan.getFanSerialNumber());
+                    for (Map.Entry<String, String> nominal : config.getNominalFieldToCell().entrySet()) {
+                        String nominalKey = nominal.getKey();
+                        String cellRefStr = nominal.getValue();
+                        int col = TemplateConfig.getColumnIndexFromCellReference(cellRefStr);
+                        int row = TemplateConfig.getRowIndexFromCellReference(cellRefStr);
+
+                        if (col == -1 || row == -1) {
+                            ApplicationLauncher.logger.warn("ReportGeneratorController: generateExcelReport: Invalid cell reference '" + cellRefStr + "' for nominal field '" + nominalKey + "'. Skipping.");
+                            continue;
+                        }
+
+                        Object value = null;
+                        DutMasterData dutMasterData = setup.getDutMasterData();
+
+                        if (dutMasterData == null) {
+                            ApplicationLauncher.logger.warn("ReportGeneratorController: generateExcelReport: DutMasterData is null for FanTestSetup of fan: " + fan.getFanSerialNumber() + ". Cannot populate nominal data for " + nominalKey + ".");
+                            continue;
+                        }
+
+                        switch (nominalKey) {
+                            case "modelCell":
+                                value = dutMasterData.getModelName();
+                                break;
+                            case "phaseCell":
+                                value = dutMasterData.getPhase();
+                                break;
+                            case "currentCell":
+                                value = setup.getCurrentUpperLimit();
+                                break;
+                            case "powerCell":
+                                value = setup.getWattsUpperLimit(); // Assuming 'powerCell' maps to Watts upper limit
+                                break;
+                            case "speedCell":
+                                value = setup.getRpmUpperLimit();
+                                break;
+                            case "airVolumeCell":
+                                value = setup.getWindSpeedUpperLimit();
+                                break;
+                            // Add cases for other nominal limits (e.g., vibration, active power, power factor)
+                            case "vibrationUpperLimitCell": // Example for a new nominal field
+                                value = setup.getVibrationUpperLimit();
+                                break;
+                            case "activePowerUpperLimitCell": // Example for a new nominal field
+                                value = setup.getActivePowerUpperLimit();
+                                break;
+                            case "powerFactorUpperLimitCell": // Example for a new nominal field
+                                value = setup.getPowerFactorUpperLimit();
+                                break;
+                            default:
+                                ApplicationLauncher.logger.warn("ReportGeneratorController: generateExcelReport: Unrecognized nominal field key: " + nominalKey);
+                                break;
+                        }
+
+                        Row rowObj = sheet.getRow(row);
+                        if (rowObj == null) {
+                            rowObj = sheet.createRow(row);
+                        }
+                        Cell cell = rowObj.createCell(col);
+
+                        // Preserve cell style from the template's nominal cell
+                        Row templateNominalRow = sheet.getRow(row);
+                        if (templateNominalRow != null) {
+                            Cell templateNominalCell = templateNominalRow.getCell(col);
+                            if (templateNominalCell != null && templateNominalCell.getCellStyle() != null) {
+                                cell.setCellStyle(templateNominalCell.getCellStyle());
+                                ApplicationLauncher.logger.debug("ReportGeneratorController: generateExcelReport: Applied style from template nominal cell " + cellRefStr + " to nominal data cell R" + (row + 1) + "C" + (col + 1));
+                            } else {
+                                ApplicationLauncher.logger.debug("ReportGeneratorController: generateExcelReport: No style found in template nominal cell " + cellRefStr + " for nominal field " + nominalKey);
+                            }
+                        } else {
+                            ApplicationLauncher.logger.debug("ReportGeneratorController: generateExcelReport: Template nominal row " + row + " is null for nominal field " + nominalKey);
+                        }
+
+
+                        if (value != null) {
+                            if (value instanceof Number) {
+                                cell.setCellValue(((Number) value).doubleValue());
+                            } else {
+                                cell.setCellValue(value.toString());
+                            }
+                        } else {
+                            cell.setCellValue("");
+                            ApplicationLauncher.logger.debug("ReportGeneratorController: generateExcelReport: Nominal value for " + nominalKey + " was null for fan: " + fan.getFanSerialNumber());
+                        }
+                        ApplicationLauncher.logger.debug("ReportGeneratorController: generateExcelReport: Populated nominal field '" + nominalKey + "' with value '" + value + "' at cell " + cellRefStr);
+                    }
+                } else if (config.getNominalFieldToCell() != null && setup == null) {
+                    ApplicationLauncher.logger.warn("ReportGeneratorController: generateExcelReport: Nominal fields configured, but FanTestSetup is null for fan: " + fan.getFanSerialNumber() + ". Skipping nominal data population for this fan.");
+                }
             }
 
             // 3. Prompt user to save the new file
@@ -1607,6 +1793,14 @@ public class ReportGeneratorController implements Initializable {
             fileChooser.setTitle("Save Report As");
             fileChooser.setInitialFileName("Report_" + template.getName().replace(".xlsx", "") + "_" + System.currentTimeMillis() + ".xlsx");
             fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel Workbook", "*.xlsx"));
+
+            // Set initial directory to the last saved path if available and valid
+            if (lastSavedReportPath != null && new File(lastSavedReportPath).isDirectory()) {
+                fileChooser.setInitialDirectory(new File(lastSavedReportPath));
+                ApplicationLauncher.logger.info("ReportGeneratorController: generateExcelReport: Setting initial directory to last saved path: " + lastSavedReportPath);
+            } else {
+                ApplicationLauncher.logger.info("ReportGeneratorController: generateExcelReport: Last saved path not available or invalid. Using default initial directory.");
+            }
 
             Window stage = generateReportButton.getScene().getWindow();
             File outputFile = fileChooser.showSaveDialog(stage);
@@ -1616,6 +1810,8 @@ public class ReportGeneratorController implements Initializable {
                 try (FileOutputStream fos = new FileOutputStream(outputFile)) {
                     workbook.write(fos);
                 }
+                // Update and save the last saved report path
+                saveConfiguredTemplatesDirPath(TEMPLATES_DIR_PATH, outputFile.getParent());
             } else {
                 ApplicationLauncher.logger.info("ReportGeneratorController: generateExcelReport: Report save cancelled by user.");
                 throw new IOException("Report save cancelled by user.");
@@ -1760,5 +1956,16 @@ public class ReportGeneratorController implements Initializable {
             return imageFile;
         }
     }
+    
+    /**
+     * Converts camelCase or any string into a title-cased string with spaces.
+     * Example: "modelCell" → "Model", "airVolumeCell" → "Air Volume"
+     */
+    private String toTitleCase(String input) {
+        if (input == null || input.isEmpty()) return input;
 
+        return Arrays.stream(input.replace("Cell", "").split("(?=[A-Z])"))
+                .map(word -> word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase())
+                .collect(Collectors.joining(" "));
+    }
 }

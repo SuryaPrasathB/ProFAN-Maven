@@ -10,6 +10,8 @@ import javafx.beans.property.SimpleBooleanProperty;
 @Entity
 @Table(name = "Result")
 public class Result {
+	
+	
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,6 +27,10 @@ public class Result {
 
 	@Column(name = "epoch_time", columnDefinition = "BIGINT")
 	private Long epochTime;
+	
+	@ManyToOne
+	@JoinColumn(name = "dut_master_data_id")
+	private DutMasterData dutMasterData;
 
 	@Column(columnDefinition = "VARCHAR(45)")
 	private String testPointName;
@@ -291,6 +297,14 @@ public class Result {
 
 	public void setPowerFactorValid(boolean powerFactorValid) {
 		this.powerFactorValid = powerFactorValid;
+	}
+
+	public DutMasterData getDutMasterData() {
+		return dutMasterData;
+	}
+
+	public void setDutMasterData(DutMasterData dutMasterData) {
+		this.dutMasterData = dutMasterData;
 	}
 
 	@Override

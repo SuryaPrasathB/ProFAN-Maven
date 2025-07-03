@@ -33,4 +33,9 @@ public class FanTestSetupService {
 		return fanTestSetupList;
 	}
 
+
+	public FanTestSetup findByDutMasterData(DutMasterData dutMasterData) {
+		return fanTestSetupRepo.findByDutMasterData(dutMasterData);
+	}
+
 }
